@@ -31,6 +31,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+SITE_ID = 1
+
 
 # Application definition
 
@@ -43,6 +45,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'blog.apps.BlogConfig',
     'taggit',
+    'django.contrib.sites',
+    'django.contrib.sitemaps',
 ]
 
 MIDDLEWARE = [
@@ -81,8 +85,12 @@ WSGI_APPLICATION = 'wielandtech.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'wieland2_blog',  # Remote database name
+        'USER': 'wieland2_blog_admin',  # Remote database username
+        'PASSWORD': os.getenv("DATABASE_PASSWORD"),  # Remote database password
+        'HOST': 'wielandtech.com',  # Remote database IP or domain
+        'PORT': '5432',  # Default PostgreSQL port
     }
 }
 
