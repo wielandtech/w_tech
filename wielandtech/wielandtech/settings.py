@@ -89,7 +89,7 @@ DATABASES = {
         'NAME': 'wieland2_blog',  # Remote database name
         'USER': 'wieland2_blog_admin',  # Remote database username
         'PASSWORD': os.getenv("DATABASE_PASSWORD"),  # Remote database password
-        'HOST': 'wielandtech.com',  # Remote database IP or domain
+        'HOST': 'localhost',  # Remote database IP or domain
         'PORT': '5432',  # Default PostgreSQL port
     }
 }
