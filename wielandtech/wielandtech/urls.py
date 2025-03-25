@@ -21,8 +21,6 @@ from django.urls import include, path
 
 from blog.sitemaps import PostSitemap
 
-from wielandtech.wielandtech import settings
-
 sitemaps = {
  'posts': PostSitemap,
 }
