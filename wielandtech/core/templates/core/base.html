@@ -14,12 +14,10 @@
     <meta name="theme-color" content="#fafafa">
 </head>
 <body>
-    {% include 'core/header.html' %}
-
     <div class="wrapper">
+        {% include 'core/header.html' %}
         {% block content %}{% endblock %}
+        {% include 'core/footer.html' %}
     </div>
-
-    {% include 'core/footer.html' %}
 </body>
 </html>
