@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Welcome to WielandTech{% endblock %}
+
+{% block content %}
+    <div class="splash parallax">
+        <div class="header">WIELANDTECH</div>
+    </div>
+
+    <div id="about_anchor">
+        {% include 'about.html' %}
+    </div>
+
+    <div class="parallax transition1"></div>
+
+    <div id="resume_anchor">
+        {% include 'resume.html' %}
+    </div>
+
+    <div class="parallax transition2"></div>
+
+    <div id="education_anchor">
+        {% include 'education.html' %}
+    </div>
+
+    <div class="parallax transition3"></div>
+
+    <div id="projects_anchor">
+        {% include 'projects.html' %}
+    </div>
+{% endblock %}

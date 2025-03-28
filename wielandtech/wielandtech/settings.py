@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'taggit',
     'django.contrib.sites',
     'django.contrib.sitemaps',
+    'core.apps.CoreConfig',
 ]
 
 MIDDLEWARE = [
@@ -130,6 +131,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    BASE_DIR / 'core/static',
+]
 STATIC_ROOT = os.path.join('/home/wieland2/public_html', 'static')
 
 # Default primary key field type
