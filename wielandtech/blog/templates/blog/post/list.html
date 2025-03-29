@@ -8,7 +8,7 @@
     <h2>Posts tagged with "{{ tag.name }}"</h2>
     {% endif %}
     {% for post in posts %}
-    <h2>
+    <h2 class="secondary">
         <a href="{{ post.get_absolute_url }}">
             {{ post.title }}
         </a>
