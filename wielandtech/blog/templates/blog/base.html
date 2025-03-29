@@ -1,16 +1,12 @@
-{% extends 'core/base.html' %}
+{% extends "core/base.html" %}
 {% load blog_tags %}
 {% load static %}
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{% block title %}{% endblock %}</title>
-    <link href="{% static "css/blog.css" %}" rel="stylesheet">
-</head>
-<body>
+{% block title %}WielandTech Blog{% endblock %}
+
+{% block content %}
 <div class="content blog">
-    {% block content %}
+    {% block blog_content %}
     {% endblock %}
 </div>
 <div id="sidebar">
@@ -32,5 +28,4 @@
         {% endfor %}
     </ul>
 </div>
-</body>
-</html>
+{% endblock %}
