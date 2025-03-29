@@ -17,6 +17,7 @@ html {
   line-height: 1.4;
   background-color: #011627;
   scroll-behavior: smooth;
+  scroll-padding-top: 50px;
 }
 
 /*
