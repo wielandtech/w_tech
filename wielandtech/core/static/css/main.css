@@ -273,15 +273,19 @@ ul{
 .navbar {
   z-index:1000;
   height: 50px;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
   background-color: #011627;
   position: sticky;
   position: -webkit-sticky;
   top: 0px;
+  display: flex;
+  flex-wrap: nowrap;
+  -webkit-overflow-scrolling: touch;
 }
 /* Style the navigation bar links */
 .navbar a {
-  float: left;
+  flex: 0 0 auto;
   display: block;
   color: #FDFFFC;
   text-align: center;
