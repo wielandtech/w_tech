@@ -8,8 +8,7 @@
 <div class="content blog">
     {% block blog_content %}
     {% endblock %}
-</div>
-<div id="sidebar">
+    <div id="sidebar">
     <h2>WielandTech Blog</h2>
     <p>Welcome to my blog<br>This is where I write about life, technology, and the intersection thereof.<br>I've written
         {% total_posts %} posts so far.</p>
@@ -27,5 +26,6 @@
         </li>
         {% endfor %}
     </ul>
+</div>
 </div>
 {% endblock %}
