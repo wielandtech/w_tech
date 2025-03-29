@@ -15,9 +15,11 @@
 </head>
 <body>
     <div class="wrapper">
-        <div class="splash parallax">
-            <div class="header">WIELANDTECH</div>
-        </div>
+        {% if request.path == '/' %}
+            <div class="splash parallax">
+                <div class="header">WIELANDTECH</div>
+            </div>
+        {% endif %}
         {% include 'core/header.html' %}
         {% block content %}{% endblock %}
         {% include 'core/footer.html' %}
