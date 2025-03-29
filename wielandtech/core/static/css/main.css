@@ -291,22 +291,8 @@ ul{
 
 .navbar img {
   float:left;
-}
-
-.logo-link {
-  padding: 0;
-  margin-right: 16px;
-  display: block;
-  height: 50px; /* same as navbar height */
-}
-
-.logo-img {
   width: 50px;
   height: 50px;
-  padding: 0;
-  margin: 0;
-  border: 0;
-  vertical-align: middle;
 }
 
 /* Change color on hover */
