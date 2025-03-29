@@ -112,20 +112,6 @@ textarea {
   min-height: calc(90vh - 50px);
 }
 
-#resume_anchor {
-  position: relative;
-  top: calc(-10vh - 50px);
-  visibility: hidden;
-}
-
-
-#about_anchor {
-  position: relative;
-  top: -50px;
-  visibility: hidden;
-  
-}
-
 .profile {
   margin-top: 1vh;
   padding: 0px 0px 0px 15px;
