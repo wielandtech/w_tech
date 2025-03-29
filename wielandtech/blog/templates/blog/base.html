@@ -1,13 +1,18 @@
 {% extends "core/base.html" %}
 {% load blog_tags %}
 {% load static %}
+{% block extra_css %}
+<link href="{% static 'css/blog.css' %}" rel="stylesheet" />
+{% endblock %}
 
 {% block title %}WielandTech Blog{% endblock %}
 
 {% block content %}
-<div class="content blog">
-    {% block blog_content %}
-    {% endblock %}
+<div class="content blog-layout">
+    <div class="blog">
+        {% block blog_content %}
+        {% endblock %}
+    </div>
     <div id="sidebar">
     <h2>WielandTech Blog</h2>
     <p>Welcome to my blog<br>This is where I write about life, technology, and the intersection thereof.<br>I've written
