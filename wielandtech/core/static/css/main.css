@@ -308,6 +308,10 @@ ul{
   color: white;
 }
 
+.projects {
+  scroll-margin-top: calc(10vh + 50px);
+}
+
 .footer {
   padding: 20px;
   background-color: #35A89C;
