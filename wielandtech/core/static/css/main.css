@@ -309,7 +309,7 @@ ul{
 }
 
 .work {
-  scroll-margin-top: calc(10vh + 50px);
+  scroll-margin-top: calc(10vh);
 }
 
 .footer {
