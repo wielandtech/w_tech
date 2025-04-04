@@ -7,7 +7,7 @@
     "{{ post.title }}" was successfully sent to {{ form.cleaned_data.to }}.
 </p>
 {% else %}
-<h2 class="primary">Share "{{ post.title }}" by e-mail</h2>
+<h2 class="secondary">Share "{{ post.title }}" by e-mail</h2>
 <form method="post">
     {{ form.as_p }}
     {% csrf_token %}
