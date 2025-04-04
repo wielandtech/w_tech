@@ -65,25 +65,27 @@ def post_detail(request, year, month, day, post):
 
 
 def post_search(request):
-     form = SearchForm()
-     query = None
-     results = []
-     if 'query' in request.GET:
-         form = SearchForm(request.GET)
-         if form.is_valid():
-             query = form.cleaned_data['query']
-             search_vector = SearchVector('title', 'body')
-             search_query = SearchQuery(query)
-             results = Post.published.annotate(
-                 search=search_vector,
-                 rank=SearchRank(search_vector, search_query)
-             ).filter(search=search_query).order_by('-rank')
-     return render(
-         request,
-         'blog/post/search.html',
-         {'form': form, 'query': query, 'results': results}
-     )
+    query = request.GET.get('query')
+    results = []
 
+    if query:
+        form = SearchForm(request.GET)
+        if form.is_valid():
+            query = form.cleaned_data['query']
+            search_vector = SearchVector('title', weight='A') + SearchVector('body', weight='B')
+            search_query = SearchQuery(query)
+            results = Post.published.annotate(
+                search=search_vector,
+                rank=SearchRank(search_vector, search_query)
+            ).filter(search=search_query).order_by('-rank')
+    else:
+        form = SearchForm()
+
+    return render(
+        request,
+        'blog/post/search.html',
+        {'form': form, 'query': query, 'results': results}
+    )
 
 def post_share(request, post_id):
     # Retrieve post by id
