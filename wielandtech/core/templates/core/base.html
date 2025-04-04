@@ -1,0 +1,29 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>{% block title %}Welcome to WielandTech{% endblock %}</title>
+    <meta name="description" content="An online portfolio">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="site.webmanifest" rel="manifest" />
+    <link href="icon.png" rel="apple-touch-icon" />
+    <link href="{% static 'css/normalize.css' %}" rel="stylesheet" />
+    <link href="{% static 'css/main.css' %}" rel="stylesheet" />
+    {% block extra_css %}{% endblock %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <meta name="theme-color" content="#fafafa">
+</head>
+<body>
+    <div class="wrapper">
+        {% if request.path == '/' %}
+            <div class="splash parallax">
+                <div class="header">WIELANDTECH</div>
+            </div>
+        {% endif %}
+        {% include 'core/header.html' %}
+        {% block content %}{% endblock %}
+        {% include 'core/footer.html' %}
+    </div>
+</body>
+</html>

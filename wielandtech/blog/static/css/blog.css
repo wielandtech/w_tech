@@ -1,92 +1,60 @@
-body {
-    margin:0;
-    padding:0;
-    font-family:helvetica, sans-serif;
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
-a {
-    color:#00abff;
-    text-decoration:none;
+.content {
+  flex: 1;
+  padding: 20px 0;
 }
 
-h1 {
-    font-weight:normal;
-    border-bottom:1px solid #bbb;
-    padding:0 0 10px 0;
+.blog-layout {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
 }
 
-h2 {
-    font-weight:normal;
-    margin:30px 0 0;
+.blog {
+    flex: 3;
+    min-width: 0;
 }
 
-#content {
-    float:left;
-    width:60%;
-    padding:0 0 0 30px;
+.post {
+    background-color: #f7f7f7;
+}
+
+.secondary a {
+    color: inherit;
+    text-decoration: underline;
+}
+
+.secondary a:hover {
+    text-decoration: None;
 }
 
 #sidebar {
-    float:right;
-    width:30%;
-    padding:10px;
-    background:#efefef;
-    height:100%;
+    flex: 1;
+    max-width: 300px;
+    padding: 1rem;
+    background-color: #f9f9f9;
+    border-left: 1px solid #ddd;
+    font-size: 0.9rem;
 }
 
-p.date {
-    color:#ccc;
-    font-family: georgia, serif;
-    font-size: 12px;
-    font-style: italic;
+#sidebar h2,
+#sidebar h3 {
+    margin-top: 0;
 }
 
-/* pagination */
-.pagination {
-    margin:40px 0;
-    font-weight:bold;
-}
+@media (max-width: 768px) {
+    .blog-layout {
+        flex-direction: column;
+    }
 
-/* forms */
-label {
-    float:left;
-    clear:both;
-    color:#333;
-    margin-bottom:4px;
-}
-input, textarea {
-    clear:both;
-    float:left;
-    margin:0 0 10px;
-    background:#ededed;
-    border:0;
-    padding:6px 10px;
-    font-size:12px;
-}
-input[type=submit] {
-    font-weight:bold;
-    background:#00abff;
-    color:#fff;
-    padding:10px 20px;
-    font-size:14px;
-    text-transform:uppercase;
-}
-.errorlist {
-    color:#cc0033;
-    float:left;
-    clear:both;
-    padding-left:10px;
-}
-
-/* comments */
-.comment {
-    padding:10px;
-}
-.comment:nth-child(even) {
-    background:#efefef;
-}
-.comment .info {
-    font-weight:bold;
-    font-size:12px;
-    color:#666;
+    #sidebar {
+        border-left: none;
+        border-top: 1px solid #ddd;
+        margin-top: 2rem;
+    }
 }
