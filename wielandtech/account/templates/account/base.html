@@ -6,7 +6,8 @@
 
 {% block title %}WielandTech Photo Gallery{% endblock %}
 
-<div class="content">
-    {% block content %}
-    {% endblock %}
-</div>
+{% block content %}
+    <div class="content">
+        {% block account_content %}{% endblock %}
+    </div>
+{% endblock %}
