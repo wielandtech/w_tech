@@ -176,6 +176,12 @@ textarea {
   background-image: url("../img/img_parallax6.jpg");
   height: 50vh;
 }
+
+.primary{
+  margin-top: 1vh;
+  color: #011627;
+}
+
 .secondary{
   margin-top: 1vh;
   color: #CC352A;
