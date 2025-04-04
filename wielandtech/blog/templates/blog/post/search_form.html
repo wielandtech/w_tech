@@ -1,4 +1,7 @@
-<form method="get" action="{% url 'blog:post_search' %}">
-    {{ form.as_p }}
-    <input type="submit" value="Search">
-</form>
+{% if not request.path == '/blog/search/' %}
+    <h3>Search</h3>
+    <form method="get" action="{% url 'blog:post_search' %}">
+        {{ form.query }}
+        <input type="submit" value="Search" />
+    </form>
+{% endif %}
