@@ -1,11 +1,11 @@
 {% load static %}
 <div class="navbar">
-    <a href="/" class="logo-link">
+    <a href="/#homepage" class="logo-link" data-link="homepage">
         <img src="{% static 'img/logo.png' %}" alt="WielandTech Logo" class="logo-img">
     </a>
-    <a href="/#about">About</a>
-    <a href="/#resume">Resume</a>
-    <a href="/#education">Education</a>
-    <a href="/#projects">Projects</a>
+    <a href="/#about" data-link="about">About</a>
+    <a href="/#resume" data-link="resume">Resume</a>
+    <a href="/#education" data-link="education">Education</a>
+    <a href="/#projects" data-link="projects">Projects</a>
     <a href="{% url 'blog:post_list' %}">Blog</a>
 </div>

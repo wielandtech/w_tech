@@ -15,7 +15,7 @@
     <meta name="theme-color" content="#fafafa">
 </head>
 <body>
-    <div class="wrapper">
+    <div class="wrapper" id="homepage">
         {% if request.path == '/' %}
             <div class="splash parallax">
                 <div class="header">WIELANDTECH</div>
@@ -25,5 +25,6 @@
         {% block content %}{% endblock %}
         {% include 'core/footer.html' %}
     </div>
+    <script src="{% static 'js/main.js' %}"></script>
 </body>
 </html>
