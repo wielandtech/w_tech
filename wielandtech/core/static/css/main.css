@@ -314,6 +314,11 @@ ul{
   color: white;
 }
 
+.navbar a.active:not(.logo-link) {
+  background-color: white;
+  color: #35A89C;
+}
+
 .work {
   scroll-margin-top: calc(10vh);
 }
