@@ -20,6 +20,10 @@
     min-width: 0;
 }
 
+.post {
+    background-color: #f7f7f7;
+}
+
 .secondary a {
     color: inherit;
     text-decoration: underline;
