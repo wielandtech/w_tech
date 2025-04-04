@@ -310,13 +310,8 @@ ul{
 
 /* Active/current link */
 .navbar a.active {
-  background-color: #35A89C;
-  color: white;
-}
-
-.navbar a.active:not(.logo-link) {
-  background-color: white;
-  color: #35A89C;
+  background-color: #FDFFFC;
+  color: black;
 }
 
 .work {
