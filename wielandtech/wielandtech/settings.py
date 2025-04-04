@@ -136,6 +136,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'core/static',
+    BASE_DIR / 'account/static',
 ]
 STATIC_ROOT = os.path.join('/home/wieland2/public_html', 'static')
 
