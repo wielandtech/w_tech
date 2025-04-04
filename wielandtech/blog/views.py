@@ -77,7 +77,7 @@ def post_search(request):
             results = Post.published.annotate(
                 search=search_vector,
                 rank=SearchRank(search_vector, search_query)
-            ).filter(search=search_query).order_by('-rank')
+            ).filter(rank__gte=0.3).order_by('-rank')
     else:
         form = SearchForm()
 
