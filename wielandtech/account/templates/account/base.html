@@ -4,7 +4,7 @@
 <link href="{% static 'css/account.css' %}" rel="stylesheet" />
 {% endblock %}
 
-{% block title %}WielandTech Photo Gallery{% endblock %}
+{% block title %}Yet Another Social App{% endblock %}
 
 {% block content %}
     <div class="account">
@@ -35,6 +35,16 @@
             {% endif %}
             </span>
         </div>
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li class="{{ message.tags }}">
+                        {{ message|safe }}
+                        <a href="#" class="close">x</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
         <div class="content">
             {% block account_content %}{% endblock %}
         </div>
