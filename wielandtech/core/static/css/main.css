@@ -135,16 +135,13 @@ html, body {
 
 
 .parallax {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
   position: relative;
-  opacity: 0.85;
   background-attachment: fixed;
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
+  height: 30vh;
+  overflow: hidden;
 }
 
 
@@ -214,16 +211,27 @@ html, body {
   mix-blend-mode: screen; /* This makes the cutout text possible */
 }
 
-.split-transition {
+.split_transition{
+  color: #FDFFFC;
   font-size: 4vw;
   font-weight: bold;
-  color: #FDFFFC;
-  background-color: rgba(253, 255, 252, 0.2);
+  padding: 20px;
+  background-color: rgba(1, 22, 39, 0.7); /* Optional overlay for readability */
+  mix-blend-mode: screen;
+}
+
+.blend-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 4vw;
+  font-weight: bold;
+  mix-blend-mode: screen;
+  background-color: #FDFFFC;
+  color: #011627;
   padding: 20px 40px;
-  border: 2px solid rgba(253, 255, 252, 0.4);
-  backdrop-filter: blur(4px);
-  text-shadow: 0 2px 10px rgba(0,0,0,0.6);
-  border-radius: 16px;
+  z-index: 2;
 }
 
 .institution {
