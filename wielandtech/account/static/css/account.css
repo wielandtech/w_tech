@@ -277,7 +277,9 @@ img.user-detail {
 }
 
 .account {
-    overflow: hidden;
+    display: flex;
+    justify-content: flex-start; /* or flex-end or space-between */
+    align-items: center;
 }
 
 .content {
@@ -285,7 +287,8 @@ img.user-detail {
 }
 
 p a {
-  display: inline-block;
-  float: none;
-  text-align: left;
+    display: inline-block;
+    float: none;
+    text-align: left;
+    overflow: hidden;
 }
