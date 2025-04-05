@@ -96,7 +96,6 @@ textarea {
 
 .wrapper {
   background-color: #FDFFFC;
-  min-height: 100vh;
 }
 
 .content {
@@ -324,7 +323,6 @@ ul{
 }
 
 .footer {
-  margin-top: auto;
   padding: 20px;
   background-color: #35A89C;
   color: #FDFFFC;
