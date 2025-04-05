@@ -136,12 +136,11 @@ html, body {
 
 .parallax {
   position: relative;
+  opacity: 0.85;
   background-attachment: fixed;
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
-  height: 30vh;
-  overflow: hidden;
 }
 
 
@@ -218,20 +217,6 @@ html, body {
   padding: 20px;
   background-color: rgba(1, 22, 39, 0.7); /* Optional overlay for readability */
   mix-blend-mode: screen;
-}
-
-.blend-overlay {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 4vw;
-  font-weight: bold;
-  mix-blend-mode: screen;
-  background-color: #FDFFFC;
-  color: #011627;
-  padding: 20px 40px;
-  z-index: 2;
 }
 
 .institution {
