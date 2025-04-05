@@ -135,16 +135,13 @@ html, body {
 
 
 .parallax {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
   position: relative;
   opacity: 0.85;
   background-attachment: fixed;
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
+
 }
 
 
@@ -215,12 +212,21 @@ html, body {
 }
 
 .split_transition{
-  color: #FDFFFC;
-  font-size: 4vw;
+  overflow: hidden;
+  background-color: #FDFFFC;
+  color: #011627;
+  font-size: 4vw; /* Responsive font size */
   font-weight: bold;
-  padding: 20px;
-  background-color: rgba(1, 22, 39, 0.7); /* Optional overlay for readability */
-  mix-blend-mode: screen;
+  margin: 0 auto; /* Center the text container */
+  padding: 10px;
+  width: 50%;
+  text-align: center; /* Center text */
+  position: absolute; /* Position text */
+  bottom: 50%; /* Position text in the middle */
+  left: 50%; /* Position text in the middle */
+  transform: translate(-50%, -50%); /* Position text in the middle */
+  mix-blend-mode: screen; /* This makes the cutout text possible */
+  z-index: 999;
 }
 
 .institution {
@@ -420,11 +426,8 @@ ul{
    Modify as content requires.
    ========================================================================== */
 
-@media screen and (max-width: 768px) {
-  .split-transition, .header {
-    font-size: 6vw;
-    padding: 10px 20px;
-  }
+@media only screen and (min-width: 35em) {
+  /* Style adjustments for viewports that meet the condition */
 }
 
 @media print,
