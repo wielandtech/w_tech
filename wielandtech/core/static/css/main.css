@@ -100,6 +100,7 @@ textarea {
 
 .content {
   max-width: 70%;
+  min-height: 20vh;
   margin: auto;
   padding: 20px 0;
 }
