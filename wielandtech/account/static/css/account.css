@@ -277,5 +277,5 @@ img.user-detail {
 }
 
 .account {
-    height: 100vh;
+    flex: 1;
 }
