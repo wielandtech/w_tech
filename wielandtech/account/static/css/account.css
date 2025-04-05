@@ -280,6 +280,10 @@ img.user-detail {
     overflow: hidden;
 }
 
+.content {
+    height: 100%;
+}
+
 p a {
   display: inline-block;
   float: none;
