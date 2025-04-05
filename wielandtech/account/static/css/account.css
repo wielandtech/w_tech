@@ -127,6 +127,7 @@ ul.messages li.warning { background: #de9404; }
 }
 
 .content {
+    align-items: center;
     flex: 1;
     padding: 20px 100px;
 }
