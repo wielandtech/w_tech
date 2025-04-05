@@ -99,9 +99,11 @@ textarea {
 }
 
 .content {
-  max-width: 70%;
-  margin: auto;
-  padding: 20px 0px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 30vh;
+  padding: 20px 0;
 }
 
 .about {
@@ -323,7 +325,8 @@ ul{
 }
 
 .footer {
-  padding: 20px;
+  margin-top: auto;
+  padding: 1rem;
   background-color: #35A89C;
   color: #FDFFFC;
   text-align: center;
