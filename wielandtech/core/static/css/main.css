@@ -99,10 +99,8 @@ textarea {
 }
 
 .content {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  min-height: 30vh;
+  max-width: 70%;
+  margin: auto;
   padding: 20px 0;
 }
 
@@ -326,7 +324,7 @@ ul{
 
 .footer {
   margin-top: auto;
-  padding: 1rem;
+  padding: 20px;
   background-color: #35A89C;
   color: #FDFFFC;
   text-align: center;
