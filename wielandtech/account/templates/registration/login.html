@@ -11,7 +11,7 @@
         <p>Please, use the following form to log-in:</p>
     {% endif %}
     <div class="login-form">
-        <form action="{% url 'account:login' %}" method="post">
+        <form action="{% url 'login' %}" method="post">
             {{ form.as_p }}
             {% csrf_token %}
             <input type="hidden" name="next" value="{{ next }}" />
@@ -19,5 +19,5 @@
         </form>
     </div>
     <br>
-    <a href="{% url "account:password_reset" %}"><p>Forgotten your password?</p></a>
+    <a href="{% url "password_reset" %}"><p>Forgotten your password?</p></a>
 {% endblock %}
