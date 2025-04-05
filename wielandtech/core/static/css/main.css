@@ -89,6 +89,9 @@ textarea {
 /* ==========================================================================
    Author's custom styles
    ========================================================================== */
+html, body {
+  height: 100%;
+}
 
 * {
   box-sizing: border-box;
@@ -96,9 +99,13 @@ textarea {
 
 .wrapper {
   background-color: #FDFFFC;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 .content {
+  flex: 1;
   max-width: 70%;
   margin: auto;
   padding: 20px 0;
