@@ -279,3 +279,9 @@ img.user-detail {
 .account {
     overflow: hidden;
 }
+
+p a {
+  display: inline-block;
+  float: none;
+  text-align: left;
+}
