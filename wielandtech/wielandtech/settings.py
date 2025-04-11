@@ -34,11 +34,6 @@ ALLOWED_HOSTS = ['wielandtech.com', 'www.wielandtech.com']
 
 SITE_ID = 1
 
-ABSOLUTE_URL_OVERRIDES = {
-    'auth.user': lambda u: reverse_lazy('user_detail',
-                                        args=[u.username])
-}
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -195,3 +190,8 @@ SOCIAL_AUTH_PIPELINE = [
     'social_core.pipeline.user.user_details',
     'account.social_auth_pipeline.create_profile',
 ]
+
+ABSOLUTE_URL_OVERRIDES = {
+    'auth.user': lambda u: reverse_lazy('user_detail',
+                                        args=[u.username])
+}
