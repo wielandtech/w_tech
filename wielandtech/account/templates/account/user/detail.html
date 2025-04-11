@@ -1,7 +1,7 @@
 {% extends "account/base.html" %}
 {% load thumbnail %}
 {% block title %}{{ user.get_full_name }}{% endblock %}
-{% block content %}
+{% block account_content %}
     <h1>{{ user.get_full_name }}</h1>
     <div class="profile-info">
         <img src="{% thumbnail user.profile.photo 180x180 %}" class="user-detail">
