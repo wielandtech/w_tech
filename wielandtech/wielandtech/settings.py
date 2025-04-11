@@ -164,12 +164,6 @@ LOGIN_REDIRECT_URL = '/account/'
 LOGIN_URL = '/account/login/'
 LOGOUT_URL = '/account/logout/'
 
-# Add secure URL handling for login
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-
 SOCIAL_AUTH_FACEBOOK_KEY = os.getenv("SOCIAL_AUTH_FACEBOOK_KEY") # Facebook App ID
 SOCIAL_AUTH_FACEBOOK_SECRET = os.getenv("SOCIAL_AUTH_FACEBOOK_SECRET") # Facebook App Secret
 SOCIAL_AUTH_FACEBOOK_SCOPE = ['email']
