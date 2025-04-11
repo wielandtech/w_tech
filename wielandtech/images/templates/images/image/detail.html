@@ -1,6 +1,6 @@
 {% extends "images/base.html" %}
 {% block title %}{{ image.title }}{% endblock %}
-{% block content %}
+{% block images_content %}
     <h1>{{ image.title }}</h1>
     <img src="{{ image.image.url }}" class="image-detail">
     {% with total_likes=image.users_like.count %}
