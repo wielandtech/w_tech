@@ -45,7 +45,7 @@ def post_detail(request, year, month, day, post):
     new_comment = None
     if request.method == 'POST':
         # A comment was posted
-        comment_form = CommentForm(data=request.POST)
+        comment_form = CommentForm(data=request.POST, user=request.user)
         if comment_form.is_valid():
             # Create Comment object but don't save to database yet
             new_comment = comment_form.save(commit=False)
@@ -54,7 +54,7 @@ def post_detail(request, year, month, day, post):
             # Save the comment to the database
             new_comment.save()
     else:
-        comment_form = CommentForm()
+        comment_form = CommentForm(user=request.user)
     # List of similar posts
     post_tags_ids = post.tags.values_list('id', flat=True)
     similar_posts = Post.published.filter(tags__in=post_tags_ids).exclude(id=post.id)
