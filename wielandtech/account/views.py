@@ -1,11 +1,31 @@
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 
 from .forms import LoginForm, ProfileEditForm, UserEditForm, UserRegistrationForm
 from .models import Profile
+
+@login_required
+def user_list(request):
+    users = User.objects.filter(is_active=True)
+    return render(request,
+                  'account/user/list.html',
+                  {'section': 'people',
+                   'users': users})
+
+
+@login_required
+def user_detail(request, username):
+    user = get_object_or_404(User,
+                             username=username,
+                             is_active=True)
+    return render(request,
+                  'account/user/detail.html',
+                  {'section': 'people',
+                   'user': user})
 
 def user_login(request):
     if request.method == 'POST':

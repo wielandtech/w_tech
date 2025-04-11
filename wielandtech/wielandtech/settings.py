@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 import os
 
 from dotenv import load_dotenv
+from django.urls import reverse_lazy
 from pathlib import Path
 
 load_dotenv()
@@ -33,6 +34,10 @@ ALLOWED_HOSTS = ['wielandtech.com', 'www.wielandtech.com']
 
 SITE_ID = 1
 
+ABSOLUTE_URL_OVERRIDES = {
+    'auth.user': lambda u: reverse_lazy('user_detail',
+                                        args=[u.username])
+}
 
 # Application definition
 
