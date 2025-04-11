@@ -27,11 +27,12 @@ sitemaps = {
 }
 
 urlpatterns = [
+    path('', include('core.urls')),
     path('account/', include('account.urls', namespace='account')),
     path('account/', include('django.contrib.auth.urls')),
     path('admin/', admin.site.urls),
-    path('', include('core.urls')),
     path('blog/', include('blog.urls', namespace='blog')),
+    path('images/', include('images.urls', namespace='images')),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
     path('social-auth/', include('social_django.urls', namespace='social')),
 ]
