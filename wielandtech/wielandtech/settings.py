@@ -192,6 +192,6 @@ SOCIAL_AUTH_PIPELINE = [
 ]
 
 ABSOLUTE_URL_OVERRIDES = {
-    'auth.user': lambda u: reverse_lazy('user_detail',
+    'auth.user': lambda u: reverse_lazy('account:user_detail',
                                         args=[u.username])
 }
