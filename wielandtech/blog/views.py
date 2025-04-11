@@ -1,6 +1,4 @@
-from django.contrib.postgres.search import (
-    SearchVector, SearchQuery, SearchRank
-)
+from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.mail import send_mail
 from django.db.models import Count
@@ -36,22 +34,12 @@ def post_list(request, tag_slug=None):
     except EmptyPage:
         # If page is out of range deliver last page of results
         posts = paginator.page(paginator.num_pages)
-    return render(
-        request,
-        'blog/post/list.html',
-        {'page': page, 'posts': posts, 'tag': tag}
-    )
+    return render(request, 'blog/post/list.html', {'page': page, 'posts': posts, 'tag': tag})
 
 
 def post_detail(request, year, month, day, post):
-    post = get_object_or_404(
-        Post,
-        slug=post,
-        status='published',
-        publish__year=year,
-        publish__month=month,
-        publish__day=day
-    )
+    post = get_object_or_404(Post, slug=post, status='published', publish__year=year, publish__month=month,
+                             publish__day=day)
     # List of active comments for this post
     comments = post.comments.filter(active=True)
     new_comment = None
@@ -69,23 +57,11 @@ def post_detail(request, year, month, day, post):
         comment_form = CommentForm(user=request.user)
     # List of similar posts
     post_tags_ids = post.tags.values_list('id', flat=True)
-    similar_posts = Post.published.filter(tags__in=post_tags_ids).exclude(
-        id=post.id
-    )
-    similar_posts = similar_posts.annotate(
-        same_tags=Count('tags')
-    ).order_by('-same_tags', '-publish')[:4]
-    return render(
-        request,
-        'blog/post/detail.html',
-        {
-            'comments': comments,
-            'comment_form': comment_form,
-            'new_comment': new_comment,
-            'post': post,
-            'similar_posts': similar_posts
-        }
-    )
+    similar_posts = Post.published.filter(tags__in=post_tags_ids).exclude(id=post.id)
+    similar_posts = similar_posts.annotate(same_tags=Count('tags')).order_by('-same_tags', '-publish')[:4]
+    return render(request, 'blog/post/detail.html',
+                  {'comments': comments, 'comment_form': comment_form, 'new_comment': new_comment, 'post': post,
+                   'similar_posts': similar_posts})
 
 
 def post_search(request):
@@ -96,10 +72,7 @@ def post_search(request):
         form = SearchForm(request.GET)
         if form.is_valid():
             query = form.cleaned_data['query']
-            search_vector = (
-                SearchVector('title', weight='A') +
-                SearchVector('body', weight='B')
-            )
+            search_vector = SearchVector('title', weight='A') + SearchVector('body', weight='B')
             search_query = SearchQuery(query)
             results = Post.published.annotate(
                 search=search_vector,
@@ -114,7 +87,6 @@ def post_search(request):
         {'form': form, 'query': query, 'results': results}
     )
 
-
 def post_share(request, post_id):
     # Retrieve post by id
     post = get_object_or_404(Post, id=post_id, status='published')
@@ -128,16 +100,9 @@ def post_share(request, post_id):
             cd = form.cleaned_data
             post_url = request.build_absolute_uri(post.get_absolute_url())
             subject = f"{cd['name']} recommends you read {post.title}"
-            message = (
-                f"Read {post.title} at {post_url}\n\n"
-                f"{cd['name']}\'s comments: {cd['comments']}"
-            )
+            message = f"Read {post.title} at {post_url}\n\n {cd['name']}\'s comments: {cd['comments']}"
             send_mail(subject, message, 'no-reply@wielandtech.com', [cd['to']])
             sent = True
     else:
         form = EmailPostForm()
-    return render(
-        request,
-        'blog/post/share.html',
-        {'post': post, 'form': form, 'sent': sent}
-    )
+    return render(request, 'blog/post/share.html', {'post': post, 'form': form, 'sent': sent})
