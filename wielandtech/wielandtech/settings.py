@@ -24,13 +24,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-your-secret-key-here'
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
-# SECURITY WARNING: don't run with debug turned on in production!
+# SECURITY WARNING: don't run with debug turned on in production! TODO: turn off
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['wielandtech.com', 'www.wielandtech.com']
 
 SITE_ID = 1
 
@@ -38,18 +37,21 @@ SITE_ID = 1
 # Application definition
 
 INSTALLED_APPS = [
+    'account.apps.AccountConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
+    'django.contrib.postgres',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.postgres',
-    'taggit',
     'blog.apps.BlogConfig',
-    'account.apps.AccountConfig',
-    'images.apps.ImagesConfig',
+    'taggit',
+    'django.contrib.sites',
+    'django.contrib.sitemaps',
+    'core.apps.CoreConfig',
     'social_django',
+    'images.apps.ImagesConfig'
 ]
 
 MIDDLEWARE = [
@@ -92,11 +94,11 @@ WSGI_APPLICATION = 'wielandtech.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'blog',
-        'USER': 'blog',
-        'PASSWORD': 'your-password-here',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': 'wieland2_blog',  # Remote database name
+        'USER': 'wieland2_blog_admin',  # Remote database username
+        'PASSWORD': os.getenv("DATABASE_PASSWORD"),  # Remote database password
+        'HOST': 'localhost',  # Remote database IP or domain
+        'PORT': '5432',  # Default PostgreSQL port
     }
 }
 
@@ -135,34 +137,38 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    BASE_DIR / 'core/static',
+    BASE_DIR / 'account/static',
+]
+STATIC_ROOT = os.path.join('/home/wieland2/public_html', 'static')
 
-MEDIA_URL = 'media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join('/home/wieland2/public_html', 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Email settings
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'your-email@gmail.com'
-EMAIL_HOST_PASSWORD = 'your-password'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+EMAIL_HOST = 'mail.wielandtech.com'
+EMAIL_HOST_USER = 'no-reply@wielandtech.com'
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_PASSWORD")
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True
 
 LOGIN_REDIRECT_URL = '/account/'
 LOGIN_URL = '/account/login/'
 LOGOUT_URL = '/account/logout/'
 
-# Social auth settings
-SOCIAL_AUTH_GITHUB_KEY = 'your-github-key'
-SOCIAL_AUTH_GITHUB_SECRET = 'your-github-secret'
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = 'your-google-key'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'your-google-secret'
+SOCIAL_AUTH_FACEBOOK_KEY = os.getenv("SOCIAL_AUTH_FACEBOOK_KEY") # Facebook App ID
+SOCIAL_AUTH_FACEBOOK_SECRET = os.getenv("SOCIAL_AUTH_FACEBOOK_SECRET") # Facebook App Secret
+SOCIAL_AUTH_FACEBOOK_SCOPE = ['email']
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv("SOCIAL_AUTH_GOOGLE_OAUTH2_KEY") # Google Consumer Key
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv("SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET") # Google Consumer Secret
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['email', 'profile']
 
 AUTHENTICATION_BACKENDS = [
     'social_core.backends.facebook.FacebookOAuth2',
