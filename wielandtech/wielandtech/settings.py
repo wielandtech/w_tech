@@ -208,7 +208,6 @@ CACHES = {
         "LOCATION": f"redis://:{REDIS_KEY}@{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "PARSER_CLASS": "redis.connection.PythonParser",
             "SOCKET_CONNECT_TIMEOUT": 5,
             "SOCKET_TIMEOUT": 5,
             "CONNECTION_POOL_CLASS": "redis.BlockingConnectionPool",
