@@ -198,13 +198,14 @@ ABSOLUTE_URL_OVERRIDES = {
 }
 
 REDIS_HOST = os.getenv("REDIS_IP")
+REDIS_KEY = os.getenv("REDIS_KEY")
 REDIS_PORT = 6379
 REDIS_DB = 0
 
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f"redis://:{os.getenv("REDIS_KEY")}@{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}",
+        "LOCATION": f"redis://:{REDIS_KEY}@{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
