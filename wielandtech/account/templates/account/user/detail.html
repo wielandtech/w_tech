@@ -19,8 +19,7 @@
             {% endif %}
         </a>
         <div id="image-list" class="image-container">
-            {% include "images/image/list_ajax.html" with images=user.
-            images_created.all %}
+            {% include "images/image/list_ajax.html" with images=user.images_created.all %}
         </div>
     {% endwith %}
 {% endblock %}
