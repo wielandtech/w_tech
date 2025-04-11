@@ -38,6 +38,7 @@ SITE_ID = 1
 
 INSTALLED_APPS = [
     'account.apps.AccountConfig',
+    'actions.apps.ActionsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
