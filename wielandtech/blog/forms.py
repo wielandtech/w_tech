@@ -12,11 +12,15 @@ class CommentForm(forms.ModelForm):
         self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         if self.user and self.user.is_authenticated:
-            self.fields['body'].widget.attrs.update({'placeholder': 'Write your comment here...'})
+            self.fields['body'].widget.attrs.update(
+                {'placeholder': 'Write your comment here...'}
+            )
         else:
             self.fields['name'] = forms.CharField(max_length=80)
             self.fields['email'] = forms.EmailField()
-            self.fields['body'].widget.attrs.update({'placeholder': 'Write your comment here...'})
+            self.fields['body'].widget.attrs.update(
+                {'placeholder': 'Write your comment here...'}
+            )
 
     def save(self, commit=True):
         comment = super().save(commit=False)
