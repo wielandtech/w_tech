@@ -20,7 +20,7 @@ from django.contrib.sitemaps.views import sitemap
 from django.urls import include, path
 
 from blog.sitemaps import PostSitemap
-from . import settings
+from wielandtech import settings
 
 sitemaps = {
     'blog': PostSitemap
