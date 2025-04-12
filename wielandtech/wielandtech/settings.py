@@ -87,7 +87,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'wielandtech.wsgi.application'
+WSGI_APPLICATION = 'wielandtech.wielandtech.wsgi.application'
 
 
 # Database
