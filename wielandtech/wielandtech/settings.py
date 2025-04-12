@@ -144,10 +144,10 @@ STATICFILES_DIRS = [
     BASE_DIR / 'core/static',
     BASE_DIR / 'account/static',
 ]
-STATIC_ROOT = os.path.join('/home/wielandtech/public_html', 'static')
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join('/home/wielandtech/public_html', 'media')
+MEDIA_ROOT = BASE_DIR / 'mediafiles'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
