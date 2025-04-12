@@ -12,8 +12,8 @@ services:
     depends_on:
       - db
     environment:
-      - DB_NAME=wielandtechdb
-      - DB_USER=wielanduser
+      - DB_NAME=w_tech_db
+      - DB_USER=w_tech_user
       - DB_PASSWORD=yourpassword
       - DB_HOST=db
       - DB_PORT=5432
@@ -23,8 +23,8 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_DB=wielandtechdb
-      - POSTGRES_USER=wielanduser
+      - POSTGRES_DB=w_tech_db
+      - POSTGRES_USER=w_tech_user
       - POSTGRES_PASSWORD=yourpassword
 
   nginx:
