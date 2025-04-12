@@ -30,7 +30,7 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production! TODO: turn off
 DEBUG = True
 
-ALLOWED_HOSTS = ['wielandtech.com', 'www.wielandtech.com']
+ALLOWED_HOSTS = ['app.com', 'www.app.com']
 
 SITE_ID = 1
 
