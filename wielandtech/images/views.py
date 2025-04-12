@@ -12,7 +12,7 @@ from .forms import ImageCreateForm
 from .models import Image
 
 # connect to redis
-r = redis.Redis(
+C = redis.Redis(
     host=settings.REDIS_HOST,
     port=settings.REDIS_PORT,
     db=settings.REDIS_DB,
