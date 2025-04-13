@@ -18,8 +18,10 @@ echo "Starting containers..."
 docker compose -f docker-compose.yml up -d
 
 # Wait for the web container to be ready (optional, replace 'healthcheck' with your container's name if applicable)
-echo "Waiting for web container to be ready..."
-docker compose exec web bash -c 'until curl -s http://localhost:8000/ > /dev/null; do sleep 1; done'
+until [ "$(docker inspect -f '{{.State.Health.Status}}' $(docker compose ps -q web))" == "healthy" ]; do
+  echo "Waiting for web container to become healthy..."
+  sleep 2
+done
 
 echo "Running Django management commands..."
 docker compose -f docker-compose.yml exec web python manage.py makemigrations --noinput
