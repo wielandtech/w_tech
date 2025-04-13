@@ -100,9 +100,6 @@ def image_list(request):
 @login_required
 def image_upload(request):
     if request.method == 'POST':
-        # Set the upload handler to use temporary files
-        request.upload_handlers = [TemporaryFileUploadHandler(request)]
-        
         form = ImageUploadForm(request.POST, request.FILES)
         if form.is_valid():
             new_item = form.save(commit=False)
