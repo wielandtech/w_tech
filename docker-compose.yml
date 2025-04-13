@@ -38,6 +38,19 @@ services:
     ports:
       - "6379:6379"
 
+  webhook:
+    image: ghcr.io/adnanh/webhook:latest
+    container_name: webhook
+    volumes:
+      - /deploy/webhooks/hooks.json:/etc/webhook/hooks.json:ro
+      - /deploy/scripts:/scripts:ro
+    command: >
+      -hooks /etc/webhook/hooks.json
+      -port 9001
+      -verbose
+    expose:
+      - "9001"
+
   nginx:
     image: nginx:alpine
     volumes:
