@@ -100,19 +100,31 @@ def image_list(request):
 @login_required
 def image_upload(request):
     if request.method == 'POST':
-        # Set the upload handler to use temporary files
-        request.upload_handlers = [TemporaryFileUploadHandler(request)]
-        
-        form = ImageUploadForm(request.POST, request.FILES)
-        if form.is_valid():
-            new_item = form.save(commit=False)
-            new_item.user = request.user
-            new_item.save()
-            create_action(request.user, 'uploaded image', new_item)
-            messages.success(request, 'Image uploaded successfully')
-            return redirect(new_item.get_absolute_url())
+        try:
+            # Set the upload handler to use temporary files
+            request.upload_handlers = [TemporaryFileUploadHandler(request)]
+            
+            form = ImageUploadForm(request.POST, request.FILES)
+            if form.is_valid():
+                try:
+                    new_item = form.save(commit=False)
+                    new_item.user = request.user
+                    new_item.save()
+                    create_action(request.user, 'uploaded image', new_item)
+                    messages.success(request, 'Image uploaded successfully')
+                    return redirect(new_item.get_absolute_url())
+                except Exception as e:
+                    messages.error(request, f'Error saving image: {str(e)}')
+                    return render(request,
+                                'images/image/upload.html',
+                                {'section': 'images',
+                                 'form': form})
+        except Exception as e:
+            messages.error(request, f'Error processing upload: {str(e)}')
+            form = ImageUploadForm()
     else:
         form = ImageUploadForm()
+    
     return render(request,
                   'images/image/upload.html',
                   {'section': 'images',
