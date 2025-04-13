@@ -45,6 +45,11 @@ class ImageUploadForm(forms.ModelForm):
             'url': forms.URLInput(attrs={'placeholder': 'Enter image URL (optional)'}),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['url'].required = False
+        self.fields['image'].required = False
+
     def clean(self):
         cleaned_data = super().clean()
         url = cleaned_data.get('url')
