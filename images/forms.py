@@ -3,6 +3,7 @@ from django import forms
 from django.core.files.base import ContentFile
 from django.utils.text import slugify
 from django.conf import settings
+import requests
 from .models import Image
 
 class ImageCreateForm(forms.ModelForm):
@@ -15,7 +16,6 @@ class ImageCreateForm(forms.ModelForm):
 
     def clean_url(self):
         url = self.cleaned_data['url']
-
         valid_extensions = ['jpg', 'jpeg', 'png']
         extension = url.rsplit('.', 1)[1].lower()
         if extension not in valid_extensions:
@@ -31,12 +31,21 @@ class ImageCreateForm(forms.ModelForm):
         name = slugify(image.title)
         extension = image_url.rsplit('.', 1)[1].lower()
         image_name = f'{name}.{extension}'
-        # download image from the given URL
-        response = request.urlopen(image_url)
-        image.image.save(image_name, ContentFile(response.read()), save=False)
-        if commit:
-            image.save()
-        return image
+        
+        try:
+            # Use requests with timeout instead of urllib
+            response = requests.get(image_url, timeout=10)
+            response.raise_for_status()  # Raise an exception for bad status codes
+            
+            # Save the image
+            image.image.save(image_name, ContentFile(response.content), save=False)
+            if commit:
+                image.save()
+            return image
+        except requests.exceptions.Timeout:
+            raise forms.ValidationError('The image download timed out. Please try again.')
+        except requests.exceptions.RequestException as e:
+            raise forms.ValidationError(f'Error downloading image: {str(e)}')
 
 class ImageUploadForm(forms.ModelForm):
     class Meta:
@@ -107,7 +116,6 @@ class ImageUploadForm(forms.ModelForm):
                     )
                 
                 # Check if URL is accessible
-                import requests
                 response = requests.head(url)
                 if not response.ok:
                     raise forms.ValidationError('The provided URL is not accessible.')
@@ -131,10 +139,13 @@ class ImageUploadForm(forms.ModelForm):
                 name = slugify(image.title)
                 extension = image_url.rsplit('.', 1)[1].lower()
                 image_name = f'{name}.{extension}'
-                response = request.urlopen(image_url)
-                image.image.save(image_name, ContentFile(response.read()), save=False)
-            except Exception as e:
-                raise forms.ValidationError(f'Error downloading image from URL: {str(e)}')
+                response = requests.get(image_url, timeout=10)
+                response.raise_for_status()  # Raise an exception for bad status codes
+                image.image.save(image_name, ContentFile(response.content), save=False)
+            except requests.exceptions.Timeout:
+                raise forms.ValidationError('The image download timed out. Please try again.')
+            except requests.exceptions.RequestException as e:
+                raise forms.ValidationError(f'Error downloading image: {str(e)}')
         
         if commit:
             image.save()
