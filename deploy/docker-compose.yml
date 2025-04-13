@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
   web:
-    build: ..
+    build: .
     command: gunicorn wielandtech.wsgi:application --bind 0.0.0.0:8000
     volumes:
       - .:/app
@@ -12,20 +12,31 @@ services:
     depends_on:
       - db
     environment:
-      - DB_NAME=w_tech_db
-      - DB_USER=w_tech_user
-      - DB_PASSWORD=yourpassword
-      - DB_HOST=db
-      - DB_PORT=5432
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
+      DEBUG: ${DEBUG}
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_PORT: ${DATABASE_PORT}
+      REDIS_IP: ${REDIS_IP}
+      REDIS_KEY: ${REDIS_KEY}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_DB: ${REDIS_DB}
 
   db:
     image: postgres:16-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_DB=w_tech_db
-      - POSTGRES_USER=w_tech_user
-      - POSTGRES_PASSWORD=yourpassword
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
 
   nginx:
     image: nginx:alpine
