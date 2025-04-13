@@ -7,9 +7,8 @@ services:
     volumes:
       - .:/app
       - static_volume:/app/static
-    ports:
-      - "80:80"
-      - "443:443"
+    expose:
+      - "8000"
     depends_on:
       - db
     environment:
