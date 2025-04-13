@@ -8,6 +8,16 @@ cd /opt/w_tech
 echo "Pulling latest code..."
 git pull origin development
 
+echo "Building maintenance page image..."
+docker build -t w_tech_maintenance -f deploy/Dockerfile.maintenance .
+
+echo "Starting maintenance page..."
+docker run -d --name maintenance_page \
+    -p 80:80 \
+    -p 443:443 \
+    -v /etc/letsencrypt:/etc/letsencrypt:ro \
+    w_tech_maintenance
+
 echo "Stopping old containers..."
 docker compose -f docker-compose.yml down
 
@@ -27,5 +37,9 @@ echo "Running Django management commands..."
 docker compose -f docker-compose.yml exec web python manage.py makemigrations --noinput
 docker compose -f docker-compose.yml exec web python manage.py migrate --noinput
 docker compose -f docker-compose.yml exec web python manage.py collectstatic --noinput
+
+echo "Stopping maintenance page..."
+docker stop maintenance_page
+docker rm maintenance_page
 
 echo "Deployment complete."
