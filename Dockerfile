@@ -19,11 +19,17 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 # Copy Django project
 COPY . .
 
+# Make entrypoint script executable
+RUN chmod +x deploy/scripts/docker-entrypoint.sh
+
 # Collect static files
 RUN python manage.py collectstatic --noinput
 
 # Expose port
 EXPOSE 8000
+
+# Set entrypoint
+ENTRYPOINT ["deploy/scripts/docker-entrypoint.sh"]
 
 # Start Gunicorn server
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "wielandtech.wsgi:application"]

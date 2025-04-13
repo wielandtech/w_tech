@@ -8,6 +8,7 @@ from django.contrib import messages
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_POST
+from django.core.files.uploadhandler import TemporaryFileUploadHandler
 from .forms import ImageCreateForm, ImageUploadForm
 from .models import Image
 
@@ -99,6 +100,9 @@ def image_list(request):
 @login_required
 def image_upload(request):
     if request.method == 'POST':
+        # Set the upload handler to use temporary files
+        request.upload_handlers = [TemporaryFileUploadHandler(request)]
+        
         form = ImageUploadForm(request.POST, request.FILES)
         if form.is_valid():
             new_item = form.save(commit=False)
