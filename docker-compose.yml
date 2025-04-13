@@ -42,12 +42,11 @@ services:
     image: almir/webhook
     container_name: webhook
     volumes:
-      - ./deploy/webhooks/hooks.json:/etc/webhook/hooks.json:ro
       - ./deploy/scripts:/scripts:ro
-    command: >
-      -hooks /etc/webhook/hooks.json
-      -port 9001
-      -verbose
+      - ./deploy/webhooks:/etc/webhook:rw
+    entrypoint: [ "/etc/webhook/generate-hooks.sh" ]
+    environment:
+      - GITHUB_WEBHOOK_SECRET=${GITHUB_WEBHOOK_SECRET}
     expose:
       - "9001"
 
