@@ -1,5 +1,4 @@
 import redis
-import logging
 from actions.utils import create_action
 from common.decorators import ajax_required
 from django.shortcuts import get_object_or_404, render, redirect
@@ -13,24 +12,12 @@ from django.core.files.uploadhandler import TemporaryFileUploadHandler
 from .forms import ImageCreateForm, ImageUploadForm
 from .models import Image
 
-# Get an instance of a logger
-logger = logging.getLogger(__name__)
-
 # connect to redis
-try:
-    r = redis.Redis(
-        host=settings.REDIS_HOST,
-        port=settings.REDIS_PORT,
-        db=settings.REDIS_DB,
-        socket_timeout=5,
-        socket_connect_timeout=5,
-        retry_on_timeout=True
-    )
-    # Test the connection
-    r.ping()
-except redis.ConnectionError as e:
-    logger.error(f"Redis connection error: {str(e)}")
-    r = None
+r = redis.Redis(
+    host=settings.REDIS_HOST,
+    port=settings.REDIS_PORT,
+    db=settings.REDIS_DB
+)
 
 @login_required
 def image_create(request):
@@ -57,26 +44,14 @@ def image_create(request):
                    'form': form})
 
 def image_detail(request, id, slug):
-    try:
-        image = get_object_or_404(Image, id=id, slug=slug)
-        # increment total image views by 1
-        if r:
-            try:
-                total_views = r.incr(f'image:{image.id}:views')
-            except redis.RedisError as e:
-                logger.error(f"Redis error in image_detail: {str(e)}")
-                total_views = 0
-        else:
-            total_views = 0
-            
-        return render(request,
-                  'images/image/detail.html',
-                  {'section': 'images',
-                   'image': image,
-                   'total_views': total_views})
-    except Exception as e:
-        logger.error(f"Error in image_detail view: {str(e)}", exc_info=True)
-        raise
+    image = get_object_or_404(Image, id=id, slug=slug)
+    # increment total image views by 1
+    total_views = r.incr(f'image:{image.id}:views')
+    return render(request,
+              'images/image/detail.html',
+              {'section': 'images',
+               'image': image,
+               'total_views': total_views})
 
 @ajax_required
 @login_required
