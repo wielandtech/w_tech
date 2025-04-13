@@ -1,8 +1,6 @@
 #!/bin/bash
 echo "Redeploying the WielandTech Django App, plus stack..."
 
-docker compose version
-
 set -e  # Exit on error
 
 cd /opt/w_tech
