@@ -42,8 +42,8 @@ services:
     image: almir/webhook
     container_name: webhook
     volumes:
-      - /deploy/webhooks/hooks.json:/etc/webhook/hooks.json:ro
-      - /deploy/scripts:/scripts:ro
+      - ./deploy/webhooks/hooks.json:/etc/webhook/hooks.json:ro
+      - ./deploy/scripts:/scripts:ro
     command: >
       -hooks /etc/webhook/hooks.json
       -port 9001
