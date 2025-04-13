@@ -11,14 +11,10 @@ git pull origin development
 echo "Building maintenance page image..."
 docker build -t w_tech_maintenance -f deploy/Dockerfile.maintenance .
 
-echo "Setting up port forwarding..."
-sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8080
-sudo iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDIRECT --to-port 8443
-
 echo "Starting maintenance page..."
 docker run -d --name maintenance_page \
-    -p 8080:80 \
-    -p 8443:443 \
+    -p 80:80 \
+    -p 443:443 \
     -v /etc/letsencrypt:/etc/letsencrypt:ro \
     w_tech_maintenance
 
@@ -45,9 +41,5 @@ docker compose -f docker-compose.yml exec web python manage.py collectstatic --n
 echo "Stopping maintenance page..."
 docker stop maintenance_page
 docker rm maintenance_page
-
-echo "Removing port forwarding..."
-sudo iptables -t nat -D PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8080
-sudo iptables -t nat -D PREROUTING -p tcp --dport 443 -j REDIRECT --to-port 8443
 
 echo "Deployment complete."
