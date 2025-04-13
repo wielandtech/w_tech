@@ -113,6 +113,7 @@ USE_TZ = True
 # Static and media files (Docker paths)
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
+    BASE_DIR / 'static',
     BASE_DIR / 'core/static',
     BASE_DIR / 'account/static',
 ]
