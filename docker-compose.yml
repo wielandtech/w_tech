@@ -43,6 +43,8 @@ services:
     volumes:
       - static_volume:/app/static
       - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/maintenance.html:/var/www/html/maintenance.html
+      - ./nginx:/var/www/html
       - /etc/letsencrypt:/etc/letsencrypt:ro
     ports:
       - "80:80"
