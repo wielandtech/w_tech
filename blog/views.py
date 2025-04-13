@@ -14,7 +14,7 @@ class PostListView(ListView):
     queryset = Post.published.all()
     context_object_name = 'posts'
     paginate_by = 3
-    template_name = 'blog/post/templates/blog/post/list.html'
+    template_name = 'blog/templates/blog/post/list.html'
 
 
 def post_list(request, tag_slug=None):
@@ -34,7 +34,7 @@ def post_list(request, tag_slug=None):
     except EmptyPage:
         # If page is out of range deliver last page of results
         posts = paginator.page(paginator.num_pages)
-    return render(request, 'blog/post/templates/blog/post/list.html', {'page': page, 'posts': posts, 'tag': tag})
+    return render(request, 'blog/templates/blog/post/list.html', {'page': page, 'posts': posts, 'tag': tag})
 
 
 def post_detail(request, year, month, day, post):
@@ -83,7 +83,7 @@ def post_search(request):
 
     return render(
         request,
-        'blog/post/templates/blog/post/search.html',
+        'blog/templates/blog/post/search.html',
         {'form': form, 'query': query, 'results': results}
     )
 
@@ -105,4 +105,4 @@ def post_share(request, post_id):
             sent = True
     else:
         form = EmailPostForm()
-    return render(request, 'blog/post/templates/blog/post/share.html', {'post': post, 'form': form, 'sent': sent})
+    return render(request, 'blog/templates/blog/post/share.html', {'post': post, 'form': form, 'sent': sent})
