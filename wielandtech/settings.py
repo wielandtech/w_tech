@@ -121,7 +121,12 @@ STATIC_ROOT = '/app/static/'
 
 # Media files configuration
 MEDIA_URL = '/media/'
-MEDIA_ROOT = '/app/media/'
+if DEBUG:
+    # In development, serve media files through Django
+    MEDIA_ROOT = BASE_DIR / 'media'
+else:
+    # In production, use the Docker volume path
+    MEDIA_ROOT = '/app/media/'
 
 # Default primary key field
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
