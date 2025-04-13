@@ -52,7 +52,6 @@ services:
       - media_volume:/app/media
       - ./nginx/conf.d:/etc/nginx/conf.d
       - ./nginx/maintenance.html:/var/www/html/maintenance.html
-      - ./nginx/502.html:/var/www/html/502.html
       - ./nginx:/var/www/html
       - /etc/letsencrypt:/etc/letsencrypt:ro
     ports:
