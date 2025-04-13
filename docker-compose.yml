@@ -8,7 +8,7 @@ services:
       - .:/app
       - static_volume:/app/static
     expose:
-      - "8000"
+      - 8000
     depends_on:
       - db
     environment:
@@ -50,19 +50,6 @@ services:
       - "443:443"
     depends_on:
       - web
-
-  certbot:
-    image: certbot/certbot
-    volumes:
-      - ./nginx/certbot/webroot:/var/www/certbot
-      - ./nginx/certbot/conf:/etc/letsencrypt
-    entrypoint: >
-      sh -c "certbot certonly --webroot
-      --webroot-path=/var/www/certbot
-      --email raphael@wielandtech.com
-      --agree-tos
-      --no-eff-email
-      -d wielandtech.com -d www.wielandtech.com"
 
 volumes:
   postgres_data:
