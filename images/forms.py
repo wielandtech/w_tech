@@ -2,6 +2,7 @@ from urllib import request
 from django import forms
 from django.core.files.base import ContentFile
 from django.utils.text import slugify
+from django.conf import settings
 from .models import Image
 
 class ImageCreateForm(forms.ModelForm):
@@ -62,6 +63,13 @@ class ImageUploadForm(forms.ModelForm):
             raise forms.ValidationError('Please provide either a URL or upload a file, not both.')
 
         return cleaned_data
+
+    def clean_image(self):
+        image = self.cleaned_data.get('image')
+        if image:
+            if image.size > settings.MAX_UPLOAD_SIZE:
+                raise forms.ValidationError(f'Image file too large ( > {settings.MAX_UPLOAD_SIZE/1024/1024}MB )')
+        return image
 
     def clean_url(self):
         url = self.cleaned_data.get('url')
