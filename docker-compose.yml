@@ -4,7 +4,7 @@ services:
   web:
     build:
       context: ./deploy
-      dockerfile: Dockerfile
+      dockerfile: deploy/Dockerfile
     command: gunicorn wielandtech.wsgi:application --bind 0.0.0.0:8000
     volumes:
       - .:/app
