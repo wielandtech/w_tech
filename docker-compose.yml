@@ -42,7 +42,7 @@ services:
     image: almir/webhook
     container_name: webhook
     volumes:
-      - ./deploy/webhooks/generate-hooks.sh:/etc/webhook/generate-hooks.sh:ro
+      - ./deploy/webhooks/generate-hooks.sh:/etc/webhook/generate-hooks.sh
       - ./deploy/webhooks:/etc/webhook:rw
     entrypoint: [ "/etc/webhook/generate-hooks.sh" ]
     environment:
