@@ -177,7 +177,6 @@ REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
 REDIS_DB = int(os.getenv("REDIS_DB", "0"))
 
 CSRF_COOKIE_SECURE = True
-SECURE_SSL_REDIRECT = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # File upload settings
