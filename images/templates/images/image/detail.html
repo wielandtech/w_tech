@@ -30,7 +30,7 @@
         <div class="image-likes">
             {% for user in users_like %}
                 <div>
-                    <img src="{{ user.profile.photo.url }}">
+                    <img src="{% thumbnail user.profile.photo 180x180 %}" class="user-detail">
                     <p>{{ user.first_name }}</p>
                 </div>
             {% empty %}
