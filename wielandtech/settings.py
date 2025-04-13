@@ -16,7 +16,17 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "unsafe-secret-key-dev")
 
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "www.wielandtech.com,wielandtech.com,159.89.246.9").split(",")
+ALLOWED_HOSTS = [
+    "wielandtech.com",
+    "www.wielandtech.com",
+    "127.0.0.1",
+    "localhost",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://www.wielandtech.com",
+    "https://wielandtech.com",
+]
 
 SITE_ID = 1
 
@@ -164,4 +174,3 @@ REDIS_HOST = os.getenv("REDIS_IP", "redis")
 REDIS_KEY = os.getenv("REDIS_KEY", "")
 REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
 REDIS_DB = int(os.getenv("REDIS_DB", "0"))
-
