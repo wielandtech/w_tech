@@ -39,7 +39,7 @@ services:
       - "6379:6379"
 
   webhook:
-    image: adnanh/webhook:2.8.1
+    image: almir/webhook
     container_name: webhook
     volumes:
       - /deploy/webhooks/hooks.json:/etc/webhook/hooks.json:ro
