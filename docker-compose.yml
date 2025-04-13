@@ -12,6 +12,7 @@ services:
       - 8000
     depends_on:
       - db
+      - redis
     environment:
       DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
       DEBUG: ${DEBUG}
@@ -20,10 +21,9 @@ services:
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
       DATABASE_HOST: ${DATABASE_HOST}
       DATABASE_PORT: ${DATABASE_PORT}
-      REDIS_IP: ${REDIS_IP}
-      REDIS_KEY: ${REDIS_KEY}
-      REDIS_PORT: ${REDIS_PORT}
-      REDIS_DB: ${REDIS_DB}
+      REDIS_IP: redis
+      REDIS_PORT: 6379
+      REDIS_DB: 0
     healthcheck:
       test: ["CMD", "python", "-c", "import socket; s=socket.socket(); s.connect(('localhost', 8000))" ]
       interval: 10s
@@ -43,6 +43,13 @@ services:
     image: redis:alpine
     ports:
       - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   nginx:
     image: nginx:alpine
@@ -63,3 +70,4 @@ volumes:
   postgres_data:
   static_volume:
   media_volume:
+  redis_data:
