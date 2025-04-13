@@ -58,6 +58,8 @@ services:
       - "443:443"
     depends_on:
       - web
+    environment:
+      DEBUG: ${DEBUG}
 
 volumes:
   postgres_data:
