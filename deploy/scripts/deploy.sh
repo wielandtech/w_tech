@@ -11,10 +11,6 @@ git pull origin development
 echo "Building maintenance page image..."
 docker build -t w_tech_maintenance -f deploy/Dockerfile.maintenance .
 
-# Clean up any existing maintenance container
-echo "Cleaning up any existing maintenance container..."
-docker rm -f maintenance_page 2>/dev/null || true
-
 echo "Setting up port forwarding..."
 sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8080
 sudo iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDIRECT --to-port 8443
