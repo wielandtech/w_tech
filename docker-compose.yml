@@ -24,7 +24,7 @@ services:
       REDIS_PORT: ${REDIS_PORT}
       REDIS_DB: ${REDIS_DB}
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8000/" ]
+      test: ["CMD", "python", "-c", "import socket; s=socket.socket(); s.connect(('localhost', 8000))" ]
       interval: 10s
       timeout: 5s
       retries: 5
