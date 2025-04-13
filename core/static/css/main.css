@@ -117,15 +117,6 @@ textarea {
   padding: 0px 0px 0px 15px;
   max-height: 30vh;
   max-width: 30vw;
-  width: auto;
-  height: auto;
-  object-fit: contain;
-}
-
-.profile-full {
-  max-width: 100%;
-  height: auto;
-  object-fit: contain;
 }
 
 .logo {
@@ -224,7 +215,7 @@ textarea {
   width: 50%;
   text-align: center; /* Center text */
   position: absolute; /* Position text */
-  bottom: 50%; /* Position text in the middle */
+  bottom 50%; /* Position text in the middle */
   left: 50%; /* Position text in the middle */
   transform: translate(-50%, -50%); /* Position text in the middle */
   mix-blend-mode: screen; /* This makes the cutout text possible */
@@ -247,7 +238,7 @@ textarea {
 .job {
   margin: 0 0;
   padding: 5px 0;
-  font-size: 2em;
+  font-size; 2em;
   font-weight: bold;
 }
 
@@ -438,12 +429,11 @@ ul{
   /* Style adjustments for high resolution devices */
 }
 
-@media screen and (max-width: 768px) {
-  .profile {
-    max-height: 25vh;
-    max-width: 80vw;
+/*@media screen and (max-width: 700px) {
+  .row {   
+    flex-direction: column;
   }
-}
+}*/
 
 /* ==========================================================================
    Print styles.
