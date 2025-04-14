@@ -1,9 +1,11 @@
-/* Light theme variables (default) */
+/* Light theme (default) */
 :root {
   --text-primary: #011627;
   --text-secondary: #2a2a2a;
   --background-primary: #FDFFFC;
   --background-secondary: #f5f5f5;
+  --nav-background: #011627;
+  --nav-text: #FDFFFC;
   --accent-primary: #35A89C;
   --accent-secondary: #CC352A;
   --highlight: #FF9F1C;
@@ -11,12 +13,14 @@
   --shadow-color: rgba(0, 0, 0, 0.1);
 }
 
-/* Dark theme variables */
+/* Dark theme */
 [data-theme="dark"] {
   --text-primary: #FDFFFC;
   --text-secondary: #e0e0e0;
   --background-primary: #011627;
   --background-secondary: #0D2538;
+  --nav-background: #0D2538;
+  --nav-text: #FDFFFC;
   --accent-primary: #35A89C;
   --accent-secondary: #FF4C42;
   --highlight: #FFB74D;
@@ -24,13 +28,15 @@
   --shadow-color: rgba(0, 0, 0, 0.3);
 }
 
-/* System dark mode preference */
+/* System preference handling */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --text-primary: #FDFFFC;
     --text-secondary: #e0e0e0;
     --background-primary: #011627;
     --background-secondary: #0D2538;
+    --nav-background: #0D2538;
+    --nav-text: #FDFFFC;
     --accent-primary: #35A89C;
     --accent-secondary: #FF4C42;
     --highlight: #FFB74D;

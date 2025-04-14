@@ -1,40 +1,38 @@
-// Check for saved theme preference, otherwise use system preference
-const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
-const currentTheme = localStorage.getItem('theme');
-const toggleSwitch = document.querySelector('#theme-toggle');
+document.addEventListener('DOMContentLoaded', () => {
+    const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    const toggleSwitch = document.querySelector('#theme-toggle');
+    const currentTheme = localStorage.getItem('theme');
 
-// Function to update theme
-function setTheme(theme, saveToStorage = true) {
-    document.documentElement.setAttribute('data-theme', theme);
-    if (saveToStorage) {
+    // Function to update theme
+    function setTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        if (toggleSwitch) {
+            toggleSwitch.checked = theme === 'dark';
+        }
         localStorage.setItem('theme', theme);
     }
+
+    // Initialize theme
+    if (currentTheme) {
+        setTheme(currentTheme);
+    } else if (prefersDarkScheme.matches) {
+        setTheme('dark');
+    } else {
+        setTheme('light');
+    }
+
+    // Listen for toggle switch change
     if (toggleSwitch) {
-        toggleSwitch.checked = theme === 'dark';
+        toggleSwitch.addEventListener('change', (e) => {
+            const theme = e.target.checked ? 'dark' : 'light';
+            setTheme(theme);
+        });
     }
-}
 
-// Initialize theme
-if (currentTheme) {
-    // Use saved preference if it exists
-    setTheme(currentTheme);
-} else {
-    // Use system preference if no saved preference
-    setTheme(prefersDarkScheme.matches ? 'dark' : 'light', false);
-}
-
-// Listen for toggle switch change
-if (toggleSwitch) {
-    toggleSwitch.addEventListener('change', (e) => {
-        const theme = e.target.checked ? 'dark' : 'light';
-        setTheme(theme, true); // Save the user's explicit choice
+    // Listen for system theme changes
+    prefersDarkScheme.addEventListener('change', (e) => {
+        if (!localStorage.getItem('theme')) {
+            setTheme(e.matches ? 'dark' : 'light');
+        }
     });
-}
-
-// Listen for system theme changes
-prefersDarkScheme.addEventListener('change', (e) => {
-    // Only update theme if user hasn't set a preference
-    if (!localStorage.getItem('theme')) {
-        setTheme(e.matches ? 'dark' : 'light', false);
-    }
 });
