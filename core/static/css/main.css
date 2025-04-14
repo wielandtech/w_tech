@@ -127,6 +127,23 @@ textarea {
   max-width: 33px;
 }
 
+/* Update logo styles */
+.logo-img {
+  margin-left: 8px;
+  margin-top: 8px;
+  max-height: 33px;
+  max-width: 33px;
+  padding: 0;
+  background: transparent !important;
+}
+
+.logo-link {
+  display: flex;
+  align-items: center;
+  background: transparent;
+  padding: 0 12px !important;
+}
+
 .parallax {
   position: relative;
   opacity: 0.85;
@@ -276,7 +293,8 @@ ul {
 /* Style the navigation bar links */
 .navbar a {
   flex: 0 0 auto;
-  display: block;
+  display: flex;
+  align-items: center;
   color: var(--nav-text);
   text-align: center;
   padding: 14px 20px;
@@ -288,6 +306,10 @@ ul {
 .navbar a:hover {
   background-color: var(--nav-hover-bg);
   color: var(--nav-hover-text);
+}
+
+.navbar a.logo-link:hover {
+  background-color: transparent;
 }
 
 /* Active/current link */
@@ -319,16 +341,57 @@ ul {
   padding-right: 10px;
 }
 
+.theme-switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.theme-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
 .slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background-color: var(--nav-hover-bg);
+  transition: .4s;
+  border-radius: 34px;
 }
 
 .slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
   background-color: var(--nav-text);
+  transition: .4s;
+  border-radius: 50%;
 }
 
 input:checked + .slider {
   background-color: var(--accent-primary);
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
 }
 
 /* ========================================================================== 
