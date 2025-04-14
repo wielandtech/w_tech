@@ -9,6 +9,7 @@
 {% block content %}
     <div class="account">
         <div id="header">
+            <div id="logo"></div>
             {% if request.user.is_authenticated %}
                 <ul class="menu">
                     <li {% if section == "dashboard" %}class="selected"{% endif %}>
