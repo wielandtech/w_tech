@@ -10,7 +10,9 @@
     {% endwith %}
     <p>
         Share an image with the community.
-        <a href="{% url "images:upload" %}" class="button">Upload Now!</a></p>
+    </p>
+    <br>
+    <a href="{% url "images:upload" %}" class="button">Upload Now!</a>
     <p>
         You can also <a href="{% url "account:edit" %}">edit your profile</a>
         or <a href="{% url "password_change" %}">change your password</a>.
