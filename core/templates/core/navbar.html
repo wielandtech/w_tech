@@ -12,7 +12,7 @@
             <a href="{% url "account:user_list" %}">People</a>
         </li>
     </ul>
-    <span class="user">
+    <span>
         Hello {{ request.user.first_name }},
         <form action="{% url 'logout' %}" method="post">
             {% csrf_token %}
