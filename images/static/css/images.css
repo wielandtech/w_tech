@@ -37,7 +37,7 @@
     text-decoration: none;
     font-weight: bold;
     transition: all 0.3s ease;
-    margin-top: 10px;
+    margin: 25px;
 }
 
 .upload-button.button:hover {
