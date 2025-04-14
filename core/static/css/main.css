@@ -13,10 +13,10 @@
    ========================================================================== */
 
 html {
-  color: #011627;
+  color: var(--text-primary);
   font-size: 1em;
   line-height: 1.4;
-  background-color: #011627;
+  background-color: var(--background-secondary);
   scroll-behavior: smooth;
   scroll-padding-top: 50px;
 }
@@ -96,7 +96,7 @@ textarea {
 }
 
 .wrapper {
-  background-color: #FDFFFC;
+  background-color: var(--background-primary);
 }
 
 .content {
@@ -127,7 +127,6 @@ textarea {
   max-width: 33px;
 }
 
-
 .parallax {
   position: relative;
   opacity: 0.85;
@@ -135,9 +134,7 @@ textarea {
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
-
 }
-
 
 .splash {
   background-image: url("../img/img_parallax.jpg");
@@ -146,49 +143,49 @@ textarea {
   padding: 25px 0px;
 }
 
-.transition1{
+.transition1 {
   background-color: #222;
-  background-position:  right bottom;
+  background-position: right bottom;
   background-image: url("../img/img_parallax2.jpg");
   height: 60vh;
 }
 
-.transition2{
+.transition2 {
   background-color: #222;
-  background-position:  right bottom;
+  background-position: right bottom;
   background-image: url("../img/img_parallax3.jpg");
   height: 30vh;
 }
 
-.transition3{
+.transition3 {
   background-color: #222;
   background-image: url("../img/img_parallax4.jpg");
   height: 20vh;
 }
 
-.transition4{
+.transition4 {
   background-color: #222;
   background-image: url("../img/img_parallax5.jpg");
   height: 30vh;
 }
 
-.transition5{
+.transition5 {
   background-color: #222;
   background-image: url("../img/img_parallax6.jpg");
   height: 50vh;
 }
 
-.primary{
+.primary {
   margin-top: 1vh;
   color: #011627;
 }
 
-.secondary{
+.secondary {
   margin-top: 1vh;
   color: #CC352A;
 }
 
-.header{
+.header {
   overflow: hidden;
   background-color: #FDFFFC;
   color: #011627;
@@ -205,7 +202,7 @@ textarea {
   mix-blend-mode: screen; /* This makes the cutout text possible */
 }
 
-.split_transition{
+.split_transition {
   overflow: hidden;
   background-color: #FDFFFC;
   color: #011627;
@@ -224,7 +221,7 @@ textarea {
 
 .institution {
   margin: 0;
-  padding: 5px 0;;
+  padding: 5px 0;
   color: #35A89C;
   font-size: 1em;
   font-weight: bolder;
@@ -232,7 +229,7 @@ textarea {
 
 .float_right {
   float: right;
-  clear:both;
+  clear: both;
 }
 
 .job {
@@ -241,9 +238,8 @@ textarea {
   font-weight: bold;
 }
 
-
 a {
-	color: #011627;
+  color: var(--text-secondary);
 }
 
 .location {
@@ -254,31 +250,32 @@ a {
 
 .date {
   font-style: italic;
-  margin:0;
+  margin: 0;
   padding: 5px 0;
 }
 
-ul{
+ul {
   margin: 1em 0;
 }
 
 .navbar {
-  z-index:1000;
+  z-index: 1000;
   height: 50px;
   overflow-x: auto;
   overflow-y: hidden;
-  background-color: #011627;
+  background-color: var(--background-secondary);
   position: sticky;
   top: 0px;
   display: flex;
   flex-wrap: nowrap;
   -webkit-overflow-scrolling: touch;
 }
+
 /* Style the navigation bar links */
 .navbar a {
   flex: 0 0 auto;
   display: block;
-  color: #FDFFFC;
+  color: var(--text-secondary);
   text-align: center;
   padding: 14px 20px;
   text-decoration: none;
@@ -291,7 +288,7 @@ ul{
 }
 
 .navbar img {
-  float:left;
+  float: left;
   width: 50px;
   height: 50px;
   padding: 0;
@@ -302,8 +299,8 @@ ul{
 
 /* Change color on hover */
 .navbar a:hover {
-  background-color: #FDFFFC;
-  color: black;
+  background-color: var(--background-primary);
+  color: var(--text-primary);
 }
 
 /* Active/current link */
@@ -326,7 +323,6 @@ ul{
   color: #FDFFFC;
   text-align: center;
 }
-
 
 /* ==========================================================================
    Helper classes
@@ -506,5 +502,63 @@ ul{
   h3 {
     page-break-after: avoid;
   }
+}
+
+/* Add these styles at the end of main.css */
+
+.theme-switch-wrapper {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  padding-right: 10px;
+}
+
+.theme-switch {
+  display: inline-block;
+  height: 34px;
+  position: relative;
+  width: 60px;
+}
+
+.theme-switch input {
+  display: none;
+}
+
+.slider {
+  background-color: #ccc;
+  bottom: 0;
+  cursor: pointer;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  transition: .4s;
+}
+
+.slider:before {
+  background-color: #fff;
+  bottom: 4px;
+  content: "";
+  height: 26px;
+  left: 4px;
+  position: absolute;
+  transition: .4s;
+  width: 26px;
+}
+
+input:checked + .slider {
+  background-color: var(--accent-primary);
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
 }
 
