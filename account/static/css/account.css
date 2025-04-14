@@ -1,86 +1,56 @@
 @import url(https://fonts.googleapis.com/css?family=Muli);
 
-:root {
-    --primary-color: #35A89C;
-    --primary-dark: #2a8c82;
-    --primary-light: #f3f7cc;
-    --text-color: #333;
-    --text-light: #666;
-    --background-light: #f8f9fa;
-    --border-color: #e0e0e0;
-    --shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    --transition: all 0.3s ease;
-}
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-body {
-    font-family: 'Muli', sans-serif;
-    line-height: 1.6;
-    color: var(--text-color);
-    background-color: #fff;
-}
-
 p {
     margin-bottom: 1em;
-    color: var(--text-light);
 }
 
 a {
-    color: var(--primary-color);
+    color: #35A89C;
     text-decoration: none;
-    transition: var(--transition);
 }
 
 a:hover {
-    color: var(--primary-dark);
+    color: #35A89C;
 }
 
 h1, h2, h3, h4, h5, h6 {
     font-family: 'Muli', sans-serif;
-    font-weight: 600;
-    color: var(--text-color);
+    font-weight: normal;
 }
 
 h1 {
-    border-bottom: 2px solid var(--border-color);
-    padding-bottom: 15px;
-    margin: 30px 0;
-    font-size: 2.2em;
+    border-bottom: 1px solid #bbb;
+    padding-bottom: 10px;
+    margin: 20px 0;
 }
 
 h2 {
-    margin: 25px 0 15px;
-    font-size: 1.8em;
+    margin: 30px 0 20px;
+}
+
+ol {
+    line-height: 1.5;
 }
 
 #header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 20px;
-    background: var(--primary-color);
+    padding: 10px 100px;
+    font-size: 14px;
+    background: #35A89C;
     color: #fff;
-    box-shadow: var(--shadow);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
+    border-bottom: 4px solid #2a8c82;
 }
 
 #header .logo {
-    font-size: 1.5em;
-    color: var(--primary-light);
-    font-weight: bold;
+    font-size: 20px;
+    color: #f3f7cc;
 }
 
 #header a {
-    color: var(--primary-light);
+    color: #f3f7cc;
 }
-
 #header a:hover {
     color: #fff;
 }
@@ -88,16 +58,66 @@ h2 {
 #header ul.menu {
     list-style: none;
     display: flex;
-    gap: 20px;
+    gap: 10px;
     margin: 0;
     padding: 0;
 }
 
 #header ul.menu li.selected a {
+    color: #0f5049;
+    font-weight: bold;
+}
+
+#content {
+    padding: 30px 100px;
+}
+
+form {
+    display: block;
+    width: 100%;
+}
+form p {
+    margin-bottom: 1rem;
+}
+label {
+    display: block;
+    margin-bottom: 4px;
+}
+input, textarea {
+    width: 100%;
+    padding: 8px 10px;
+    background: #efefef;
+    border: 0;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+input[type=submit], a.button {
+    background: #35A89C;
     color: #fff;
     font-weight: bold;
-    border-bottom: 2px solid #fff;
-    padding-bottom: 5px;
+    padding: 10px 20px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: none;
+}
+
+ul.messages {
+    margin: 10px 100px;
+    padding: 0;
+    list-style: none;
+}
+ul.messages li {
+    padding: 14px 20px;
+    color: #fff;
+}
+ul.messages li.success { background: #81ce81; }
+ul.messages li.error { background: #a30029; }
+ul.messages li.info { background: #faffae; color: #696b4e; }
+ul.messages li.warning { background: #de9404; }
+
+.login-form {
+    max-width: 400px;
+    margin-top: 20px;
 }
 
 .account {
@@ -107,189 +127,7 @@ h2 {
 }
 
 .content {
-    flex: 1;
-    padding: 30px 20px;
-    max-width: 1200px;
-    margin: 0 auto;
-    width: 100%;
-}
-
-/* Form Styles */
-form {
-    background: #fff;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: var(--shadow);
-    max-width: 500px;
-    margin: 0 auto;
-}
-
-form p {
-    margin-bottom: 1.5rem;
-}
-
-label {
-    display: block;
-    margin-bottom: 8px;
-    color: var(--text-color);
-    font-weight: 500;
-}
-
-input, textarea {
-    width: 100%;
-    padding: 12px 15px;
-    background: var(--background-light);
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    font-size: 16px;
-    margin-bottom: 15px;
-    transition: var(--transition);
-}
-
-input:focus, textarea:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(53, 168, 156, 0.1);
-}
-
-input[type=submit], a.button {
-    background: var(--primary-color);
-    color: #fff;
-    font-weight: bold;
-    padding: 12px 25px;
-    text-transform: uppercase;
-    cursor: pointer;
-    border: none;
-    border-radius: 4px;
-    transition: var(--transition);
-    width: 100%;
-    font-size: 16px;
-}
-
-input[type=submit]:hover, a.button:hover {
-    background: var(--primary-dark);
-    transform: translateY(-2px);
-}
-
-/* Messages */
-ul.messages {
-    margin: 20px auto;
-    padding: 0;
-    list-style: none;
-    max-width: 500px;
-}
-
-ul.messages li {
-    padding: 15px 20px;
-    color: #fff;
-    border-radius: 4px;
-    margin-bottom: 10px;
-    display: flex;
     align-items: center;
-    gap: 10px;
-}
-
-ul.messages li.success { 
-    background: #81ce81;
-    border-left: 4px solid #4CAF50;
-}
-
-ul.messages li.error { 
-    background: #a30029;
-    border-left: 4px solid #d32f2f;
-}
-
-ul.messages li.info { 
-    background: #faffae;
-    color: #696b4e;
-    border-left: 4px solid #FFC107;
-}
-
-ul.messages li.warning { 
-    background: #de9404;
-    border-left: 4px solid #FF9800;
-}
-
-/* Login Form */
-.login-form {
-    max-width: 400px;
-    margin: 40px auto;
-}
-
-/* User List */
-#people-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 30px;
-    margin-top: 30px;
-}
-
-.user {
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: var(--shadow);
-    overflow: hidden;
-    transition: var(--transition);
-}
-
-.user:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-.user img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-}
-
-.user .info {
-    padding: 20px;
-}
-
-.user .title {
-    font-size: 1.2em;
-    font-weight: 600;
-    color: var(--text-color);
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    #header {
-        padding: 10px 15px;
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    #header ul.menu {
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-
-    .content {
-        padding: 20px 15px;
-    }
-
-    form {
-        padding: 20px;
-    }
-
-    #people-list {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 20px;
-    }
-}
-
-@media (max-width: 480px) {
-    h1 {
-        font-size: 1.8em;
-    }
-
-    #people-list {
-        grid-template-columns: 1fr;
-    }
-
-    .user img {
-        height: 180px;
-    }
+    flex: 1;
+    padding: 20px 100px;
 }
