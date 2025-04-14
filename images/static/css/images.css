@@ -24,21 +24,8 @@
 
 /* Header container with button */
 .image-list-header {
-    display: flex;
-    justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-    padding: 10px 20px;
     background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-}
-
-.image-list-header h1 {
-    margin: 0;
-    font-size: 1.8em;
-    color: #011627;
 }
 
 /* Upload button styling */
