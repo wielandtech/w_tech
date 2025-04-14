@@ -45,6 +45,10 @@ ol {
     color: #f3f7cc;
 }
 
+#header a {
+    color: #011627;
+}
+
 #header a:hover {
     color: #fff;
 }
