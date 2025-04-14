@@ -33,6 +33,6 @@ docker compose -f docker-compose.yml exec web python manage.py migrate --noinput
 docker compose -f docker-compose.yml exec web python manage.py collectstatic --noinput
 
 # Wait for all background processes to complete
-wait
+wait 15
 
 echo "Deployment complete."
