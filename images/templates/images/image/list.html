@@ -3,12 +3,12 @@
 {% block images_content %}
     <div class="image-list-header">
         <h1>Images shared</h1>
-        <a href="{% url 'images:upload' %}" class="upload-button button">Upload Image</a>
     </div>
 
     <div id="image-list" class="image-grid">
         {% include "images/image/list_ajax.html" %}
     </div>
+    <a href="{% url 'images:upload' %}" class="upload-button button">Upload Image</a>
 {% endblock %}
 
 {% block domready %}
