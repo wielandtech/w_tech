@@ -2,18 +2,20 @@
 const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
 const currentTheme = localStorage.getItem('theme');
 
-if (currentTheme === 'dark') {
-    document.documentElement.setAttribute('data-theme', 'dark');
-    document.getElementById('checkbox').checked = true;
-} else if (currentTheme === 'light') {
-    document.documentElement.setAttribute('data-theme', 'light');
-    document.getElementById('checkbox').checked = false;
+// Function to update theme
+function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+    document.getElementById('checkbox').checked = theme === 'dark';
+}
+
+// Initialize theme
+if (currentTheme) {
+    // Use saved preference if it exists
+    setTheme(currentTheme);
 } else {
-    // Use system preference
-    if (prefersDarkScheme.matches) {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        document.getElementById('checkbox').checked = true;
-    }
+    // Use system preference if no saved preference
+    setTheme(prefersDarkScheme.matches ? 'dark' : 'light');
 }
 
 // Listen for toggle switch change
@@ -21,24 +23,14 @@ const toggleSwitch = document.querySelector('#checkbox');
 toggleSwitch.addEventListener('change', switchTheme);
 
 function switchTheme(e) {
-    if (e.target.checked) {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        localStorage.setItem('theme', 'dark');
-    } else {
-        document.documentElement.setAttribute('data-theme', 'light');
-        localStorage.setItem('theme', 'light');
-    }
+    const theme = e.target.checked ? 'dark' : 'light';
+    setTheme(theme);
 }
 
 // Listen for system theme changes
 prefersDarkScheme.addEventListener('change', (e) => {
+    // Only update theme if user hasn't set a preference
     if (!localStorage.getItem('theme')) {
-        if (e.matches) {
-            document.documentElement.setAttribute('data-theme', 'dark');
-            document.getElementById('checkbox').checked = true;
-        } else {
-            document.documentElement.setAttribute('data-theme', 'light');
-            document.getElementById('checkbox').checked = false;
-        }
+        setTheme(e.matches ? 'dark' : 'light');
     }
 });
