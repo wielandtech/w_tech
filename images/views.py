@@ -8,15 +8,15 @@ from django.contrib import messages
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_POST
-from django.core.files.uploadhandler import TemporaryFileUploadHandler
-from .forms import ImageCreateForm, ImageUploadForm
+from .forms import ImageCreateForm
 from .models import Image
 
 # connect to redis
-r = redis.Redis(
+C = redis.Redis(
     host=settings.REDIS_HOST,
     port=settings.REDIS_PORT,
-    db=settings.REDIS_DB
+    db=settings.REDIS_DB,
+    password=settings.REDIS_KEY
 )
 
 @login_required
@@ -96,24 +96,3 @@ def image_list(request):
     return render(request,
                   'images/image/list.html',
                   {'section': 'images', 'images': images})
-
-@login_required
-def image_upload(request):
-    if request.method == 'POST':
-        # Set the upload handler to use temporary files
-        request.upload_handlers = [TemporaryFileUploadHandler(request)]
-        
-        form = ImageUploadForm(request.POST, request.FILES)
-        if form.is_valid():
-            new_item = form.save(commit=False)
-            new_item.user = request.user
-            new_item.save()
-            create_action(request.user, 'uploaded image', new_item)
-            messages.success(request, 'Image uploaded successfully')
-            return redirect(new_item.get_absolute_url())
-    else:
-        form = ImageUploadForm()
-    return render(request,
-                  'images/image/upload.html',
-                  {'section': 'images',
-                   'form': form})

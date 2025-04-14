@@ -7,7 +7,6 @@ services:
     volumes:
       - .:/app
       - static_volume:/app/static
-      - media_volume:/app/media
     expose:
       - 8000
     depends_on:
@@ -24,11 +23,6 @@ services:
       REDIS_KEY: ${REDIS_KEY}
       REDIS_PORT: ${REDIS_PORT}
       REDIS_DB: ${REDIS_DB}
-    healthcheck:
-      test: ["CMD", "python", "-c", "import socket; s=socket.socket(); s.connect(('localhost', 8000))" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   db:
     image: postgres:16-alpine
@@ -48,7 +42,6 @@ services:
     image: nginx:alpine
     volumes:
       - static_volume:/app/static
-      - media_volume:/app/media
       - ./nginx/conf.d:/etc/nginx/conf.d
       - ./nginx/maintenance.html:/var/www/html/maintenance.html
       - ./nginx:/var/www/html
@@ -62,4 +55,3 @@ services:
 volumes:
   postgres_data:
   static_volume:
-  media_volume:
