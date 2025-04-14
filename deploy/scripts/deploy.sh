@@ -28,9 +28,9 @@ timeout 60 bash -c 'until [ "$(docker inspect -f "{{.State.Health.Status}}" $(do
 
 # Run Django commands in parallel where possible
 echo "Running Django management commands..."
-docker compose -f docker-compose.yml exec web python manage.py makemigrations --noinput &
-docker compose -f docker-compose.yml exec web python manage.py migrate --noinput &
-docker compose -f docker-compose.yml exec web python manage.py collectstatic --noinput &
+docker compose -f docker-compose.yml exec web python manage.py makemigrations --noinput
+docker compose -f docker-compose.yml exec web python manage.py migrate --noinput
+docker compose -f docker-compose.yml exec web python manage.py collectstatic --noinput
 
 # Wait for all background processes to complete
 wait
