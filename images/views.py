@@ -8,16 +8,32 @@ from django.contrib import messages
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_POST
-from .forms import ImageCreateForm
+from django.core.files.uploadhandler import TemporaryFileUploadHandler
+from .forms import ImageCreateForm, ImageUploadForm
 from .models import Image
+import logging
 
-# connect to redis
-C = redis.Redis(
-    host=settings.REDIS_HOST,
-    port=settings.REDIS_PORT,
-    db=settings.REDIS_DB,
-    password=settings.REDIS_KEY
-)
+logger = logging.getLogger(__name__)
+
+# connect to redis with error handling
+try:
+    r = redis.Redis(
+        host=settings.REDIS_HOST,
+        port=settings.REDIS_PORT,
+        db=settings.REDIS_DB,
+        password=settings.REDIS_KEY if hasattr(settings, 'REDIS_KEY') else None,
+        socket_timeout=5,
+        socket_connect_timeout=5,
+        retry_on_timeout=True
+    )
+    # Test the connection
+    r.ping()
+except redis.ConnectionError as e:
+    logger.error(f"Redis connection error: {e}")
+    r = None
+except Exception as e:
+    logger.error(f"Redis error: {e}")
+    r = None
 
 @login_required
 def image_create(request):
@@ -46,7 +62,12 @@ def image_create(request):
 def image_detail(request, id, slug):
     image = get_object_or_404(Image, id=id, slug=slug)
     # increment total image views by 1
-    total_views = r.incr(f'image:{image.id}:views')
+    total_views = 0
+    if r is not None:
+        try:
+            total_views = r.incr(f'image:{image.id}:views')
+        except redis.RedisError as e:
+            logger.error(f"Redis error in image_detail: {e}")
     return render(request,
               'images/image/detail.html',
               {'section': 'images',
@@ -96,3 +117,21 @@ def image_list(request):
     return render(request,
                   'images/image/list.html',
                   {'section': 'images', 'images': images})
+
+@login_required
+def image_upload(request):
+    if request.method == 'POST':
+        form = ImageUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            new_item = form.save(commit=False)
+            new_item.user = request.user
+            new_item.save()
+            create_action(request.user, 'uploaded image', new_item)
+            messages.success(request, 'Image uploaded successfully')
+            return redirect(new_item.get_absolute_url())
+    else:
+        form = ImageUploadForm()
+    return render(request,
+                  'images/image/upload.html',
+                  {'section': 'images',
+                   'form': form})
