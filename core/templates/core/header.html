@@ -7,7 +7,7 @@
     <a href="/#resume" data-link="resume">Resume</a>
     <a href="/#education" data-link="education">Education</a>
     <a href="/#projects" data-link="projects">Projects</a>
-    <a href="{% url 'blog:post_list' %}">Blog</a>
+    <a href="{% url 'blog:post_list' %}" {% if section == 'blog' %}class="active"{% endif %}>Blog</a>
     <a href="{% url 'images:list' %}">Photography</a>
     <div class="theme-switch-wrapper">
         <label class="theme-switch" for="theme-toggle">
