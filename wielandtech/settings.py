@@ -25,11 +25,6 @@ ALLOWED_HOSTS = [
     "localhost",
 ]
 
-CSRF_TRUSTED_ORIGINS = [
-    "https://www.wielandtech.com",
-    "https://wielandtech.com",
-]
-
 SITE_ID = 1
 
 # Application definition
@@ -177,7 +172,6 @@ REDIS_HOST = os.getenv("REDIS_IP", "redis")
 REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
 REDIS_DB = int(os.getenv("REDIS_DB", "0"))
 
-CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 SECURE_SSL_REDIRECT = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
