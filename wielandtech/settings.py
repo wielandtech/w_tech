@@ -20,6 +20,7 @@ ALLOWED_HOSTS = [
     "wielandtech.com",
     "www.wielandtech.com",
     "159.89.246.9",
+    "174.138.92.200",
     "127.0.0.1",
     "localhost",
 ]
