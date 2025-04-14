@@ -99,6 +99,7 @@ input[type=submit], a.button {
     background: #35A89C;
     color: #fff;
     font-weight: bold;
+    margin: auto;
     padding: 10px 20px;
     text-transform: uppercase;
     cursor: pointer;
