@@ -37,12 +37,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
         sections.forEach((section) => observer.observe(section));
     } else {
-        // If on another page (like /blog), match by pathname
+        // If on another page, match by pathname
         navLinks.forEach((link) => {
             const linkUrl = new URL(link.href, window.location.origin);
             if (
-                linkUrl.pathname === currentPath &&
-                !linkUrl.hash // skip in-page anchors
+                // Match exact path or photography section paths
+                linkUrl.pathname === currentPath ||
+                (linkUrl.pathname === '/images/list/' && 
+                 (currentPath.startsWith('/images/') || currentPath.startsWith('/account/')))
             ) {
                 link.classList.add("active");
             }
