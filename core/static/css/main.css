@@ -379,7 +379,7 @@ ul {
 }
 
 input:checked + .slider {
-  background-color: var(--accent-primary);
+  background-color: var(--nav-hover-bg);
 }
 
 input:checked + .slider:before {
