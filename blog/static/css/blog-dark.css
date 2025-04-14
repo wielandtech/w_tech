@@ -1,0 +1,124 @@
+/* Blog post list styles */
+.post-list {
+  background-color: var(--blog-background);
+  color: var(--blog-text);
+}
+
+.post-card {
+  background-color: var(--blog-card-bg);
+  border: 1px solid var(--blog-border);
+  box-shadow: 0 2px 4px var(--blog-card-shadow);
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+}
+
+.post-title {
+  color: var(--blog-text);
+  font-size: 1.5em;
+  margin-bottom: 10px;
+}
+
+.post-title a {
+  color: var(--blog-text);
+  text-decoration: none;
+}
+
+.post-title a:hover {
+  color: var(--blog-link-hover);
+}
+
+.post-meta {
+  color: var(--blog-meta);
+  font-size: 0.9em;
+  margin-bottom: 15px;
+}
+
+.post-body {
+  color: var(--blog-text);
+  line-height: 1.6;
+}
+
+/* Tags */
+.tags {
+  margin-top: 15px;
+}
+
+.tag {
+  display: inline-block;
+  background-color: var(--blog-tag-bg);
+  color: var(--blog-tag-text);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  margin-right: 8px;
+  text-decoration: none;
+}
+
+.tag:hover {
+  background-color: var(--blog-link);
+  color: #FDFFFC;
+}
+
+/* Blog post detail styles */
+.post-detail {
+  background-color: var(--blog-card-bg);
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px var(--blog-card-shadow);
+}
+
+/* Comments section */
+.comments {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid var(--blog-border);
+}
+
+.comment {
+  background-color: var(--blog-card-bg);
+  border: 1px solid var(--blog-border);
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+}
+
+/* Form elements */
+.form-control {
+  background-color: var(--blog-card-bg);
+  border: 1px solid var(--blog-border);
+  color: var(--blog-text);
+  padding: 8px 12px;
+}
+
+.form-control:focus {
+  border-color: var(--blog-link);
+  outline: none;
+}
+
+/* Code blocks */
+pre, code {
+  background-color: var(--blog-tag-bg);
+  color: var(--blog-text);
+  padding: 8px;
+  border-radius: 4px;
+  font-family: 'Consolas', monospace;
+}
+
+/* Blockquotes */
+blockquote {
+  border-left: 4px solid var(--blog-link);
+  margin-left: 0;
+  padding-left: 20px;
+  color: var(--blog-meta);
+}
+
+/* Links */
+a {
+  color: var(--blog-link);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--blog-link-hover);
+}
