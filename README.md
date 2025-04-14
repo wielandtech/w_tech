@@ -81,4 +81,4 @@ python manage.py runserver
 
 - Website: [wielandtech.com](https://wielandtech.com)
 - Email: raphael@wielandtech.com
-- GitHub: [@username](https://github.com/wielandtech)
+- GitHub: [@wielandtech](https://github.com/wielandtech)
