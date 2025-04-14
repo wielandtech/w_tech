@@ -7,34 +7,8 @@
 {% block title %}Yet Another Social App{% endblock %}
 
 {% block content %}
-    <div class="account">
-        <div id="header">
-            <div id="logo"></div>
-            {% if request.user.is_authenticated %}
-                <ul class="menu">
-                    <li {% if section == "dashboard" %}class="selected"{% endif %}>
-                        <a href="{% url "account:dashboard" %}">My dashboard</a>
-                    </li>
-                    <li {% if section == "images" %}class="selected"{% endif %}>
-                        <a href="{% url "images:list" %}">Images</a>
-                    </li>
-                    <li {% if section == "people" %}class="selected"{% endif %}>
-                        <a href="{% url "account:user_list" %}">People</a>
-                    </li>
-                </ul>
-            {% endif %}
-            <span class="user">
-            {% if request.user.is_authenticated %}
-                Hello {{ request.user.first_name }},
-                <form action="{% url 'logout' %}" method="post">
-                    {% csrf_token %}
-                    <button type="submit">Logout</button>
-                </form>
-            {% else %}
-                <a href="{% url "login" %}">Log-in</a>
-            {% endif %}
-            </span>
-        </div>
+    <div class="app">
+        {% include "core/navbar.html" %}
         {% if messages %}
             <ul class="messages">
                 {% for message in messages %}

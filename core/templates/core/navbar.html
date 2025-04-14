@@ -1,0 +1,23 @@
+{% if request.user.is_authenticated %}
+<div id="header">
+    <div id="logo"></div>
+    <ul class="menu">
+        <li {% if section == "dashboard" %}class="selected"{% endif %}>
+            <a href="{% url "account:dashboard" %}">My dashboard</a>
+        </li>
+        <li {% if section == "images" %}class="selected"{% endif %}>
+            <a href="{% url "images:list" %}">Images</a>
+        </li>
+        <li {% if section == "people" %}class="selected"{% endif %}>
+            <a href="{% url "account:user_list" %}">People</a>
+        </li>
+    </ul>
+    <span class="user">
+        Hello {{ request.user.first_name }},
+        <form action="{% url 'logout' %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Logout</button>
+        </form>
+    </span>
+</div>
+{% endif %} 

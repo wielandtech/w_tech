@@ -1,5 +1,6 @@
 @import url(https://fonts.googleapis.com/css?family=Muli);
 
+/* Base styles */
 p {
     margin-bottom: 1em;
 }
@@ -32,6 +33,7 @@ ol {
     line-height: 1.5;
 }
 
+/* Navbar styles */
 #header {
     display: flex;
     justify-content: space-between;
@@ -51,6 +53,7 @@ ol {
 #header a {
     color: #f3f7cc;
 }
+
 #header a:hover {
     color: #fff;
 }
@@ -68,21 +71,21 @@ ol {
     font-weight: bold;
 }
 
-#content {
-    padding: 30px 100px;
-}
-
+/* Form styles */
 form {
     display: block;
     width: 100%;
 }
+
 form p {
     margin-bottom: 1rem;
 }
+
 label {
     display: block;
     margin-bottom: 4px;
 }
+
 input, textarea {
     width: 100%;
     padding: 8px 10px;
@@ -91,6 +94,7 @@ input, textarea {
     font-size: 14px;
     margin-bottom: 10px;
 }
+
 input[type=submit], a.button {
     background: #35A89C;
     color: #fff;
@@ -101,25 +105,30 @@ input[type=submit], a.button {
     border: none;
 }
 
+/* Messages */
 ul.messages {
     margin: 10px 100px;
     padding: 0;
     list-style: none;
 }
+
 ul.messages li {
     padding: 14px 20px;
     color: #fff;
 }
+
 ul.messages li.success { background: #81ce81; }
 ul.messages li.error { background: #a30029; }
 ul.messages li.info { background: #faffae; color: #696b4e; }
 ul.messages li.warning { background: #de9404; }
 
+/* Login form */
 .login-form {
     max-width: 400px;
     margin-top: 20px;
 }
 
+/* Account layout */
 .account {
     display: flex;
     flex-direction: column;
@@ -169,8 +178,16 @@ ul.messages li.warning { background: #de9404; }
     color: #333;
 }
 
-/* Responsive User List */
+/* Responsive styles */
 @media (max-width: 768px) {
+    #header {
+        padding: 10px 20px;
+    }
+    
+    .content {
+        padding: 20px;
+    }
+    
     #people-list {
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
         gap: 20px;
@@ -178,10 +195,21 @@ ul.messages li.warning { background: #de9404; }
 }
 
 @media (max-width: 480px) {
+    #header {
+        flex-direction: column;
+        padding: 10px;
+    }
+    
+    #header ul.menu {
+        flex-direction: column;
+        width: 100%;
+        margin: 10px 0;
+    }
+    
     #people-list {
         grid-template-columns: 1fr;
     }
-
+    
     .user img {
         height: 180px;
     }
