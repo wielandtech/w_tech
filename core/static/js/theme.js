@@ -1,8 +1,3 @@
-// Add to your base template head section
-<link rel="stylesheet" href="{% static 'css/dark-mode.css' %}">
-<link rel="stylesheet" href="{% static 'css/main.css' %}">
-<script defer src="{% static 'js/theme.js' %}"></script>
-
 // Check for saved theme preference, otherwise use system preference
 const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
 const currentTheme = localStorage.getItem('theme');
