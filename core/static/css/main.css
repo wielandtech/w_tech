@@ -373,7 +373,7 @@ ul {
   width: 26px;
   left: 4px;
   bottom: 4px;
-  background-color: var(--nav-text);
+  background-color: var(--accent-primary);
   transition: .4s;
   border-radius: 50%;
 }
