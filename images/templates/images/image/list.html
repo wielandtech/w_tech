@@ -2,6 +2,9 @@
 {% block title %}Images shared{% endblock %}
 {% block images_content %}
     <h1>Images shared</h1>
+    <div class="upload-button">
+        <a href="{% url 'images:upload' %}" class="button">Upload Image</a>
+    </div>
     <div id="image-list">
         {% include "images/image/list_ajax.html" %}
     </div>
