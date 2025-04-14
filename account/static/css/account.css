@@ -1,25 +1,54 @@
 @import url(https://fonts.googleapis.com/css?family=Muli);
 
+:root {
+    --primary-color: #35A89C;
+    --primary-dark: #2a8c82;
+    --primary-light: #FDFFFC;
+    --text-color: #011627;
+    --background-color: #FDFFFC;
+    --input-background: #efefef;
+    --success-color: #81ce81;
+    --error-color: #CC352A;
+    --warning-color: #FF9F1C;
+    --info-color: #faffae;
+    --border-color: #ccc;
+    --spacing-unit: 1rem;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Muli', sans-serif;
+    line-height: 1.4;
+    color: var(--text-color);
+    background-color: var(--background-color);
+}
+
 p {
-    margin-bottom: 1em;
+    margin-bottom: var(--spacing-unit);
 }
 
 a {
-    color: #35A89C;
+    color: var(--text-color);
     text-decoration: none;
+    transition: color 0.3s ease;
 }
 
 a:hover {
-    color: #35A89C;
+    color: var(--primary-color);
 }
 
 h1, h2, h3, h4, h5, h6 {
-    font-family: 'Muli', sans-serif;
     font-weight: normal;
+    margin-bottom: var(--spacing-unit);
 }
 
 h1 {
-    border-bottom: 1px solid #bbb;
+    border-bottom: 1px solid var(--border-color);
     padding-bottom: 10px;
     margin: 20px 0;
 }
@@ -36,88 +65,120 @@ ol {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 100px;
-    font-size: 14px;
-    background: #35A89C;
-    color: #fff;
-    border-bottom: 4px solid #2a8c82;
+    padding: 1rem 2rem;
+    background: var(--primary-color);
+    color: var(--primary-light);
+    border-bottom: 4px solid var(--primary-dark);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
 #header .logo {
-    font-size: 20px;
-    color: #f3f7cc;
+    font-size: 1.25rem;
+    color: var(--primary-light);
 }
 
 #header a {
-    color: #f3f7cc;
+    color: var(--primary-light);
 }
+
 #header a:hover {
-    color: #fff;
+    color: var(--background-color);
 }
 
 #header ul.menu {
     list-style: none;
     display: flex;
-    gap: 10px;
+    gap: 1rem;
     margin: 0;
     padding: 0;
 }
 
 #header ul.menu li.selected a {
-    color: #0f5049;
+    color: var(--background-color);
     font-weight: bold;
 }
 
 #content {
-    padding: 30px 100px;
+    padding: 2rem;
+    max-width: 70%;
+    margin: auto;
 }
 
 form {
-    display: block;
     width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
 }
+
 form p {
-    margin-bottom: 1rem;
+    margin-bottom: var(--spacing-unit);
 }
+
 label {
     display: block;
-    margin-bottom: 4px;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
 }
+
 input, textarea {
     width: 100%;
-    padding: 8px 10px;
-    background: #efefef;
-    border: 0;
-    font-size: 14px;
-    margin-bottom: 10px;
+    padding: 0.75rem 1rem;
+    background: var(--input-background);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
 }
+
+input:focus, textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
 input[type=submit], a.button {
-    background: #35A89C;
-    color: #fff;
+    background: var(--primary-color);
+    color: var(--primary-light);
     font-weight: bold;
-    padding: 10px 20px;
+    padding: 0.75rem 1.5rem;
     text-transform: uppercase;
     cursor: pointer;
     border: none;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+input[type=submit]:hover, a.button:hover {
+    background: var(--primary-dark);
 }
 
 ul.messages {
-    margin: 10px 100px;
+    margin: 1rem auto;
     padding: 0;
     list-style: none;
+    max-width: 600px;
 }
+
 ul.messages li {
-    padding: 14px 20px;
-    color: #fff;
+    padding: 1rem;
+    color: var(--primary-light);
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
 }
-ul.messages li.success { background: #81ce81; }
-ul.messages li.error { background: #a30029; }
-ul.messages li.info { background: #faffae; color: #696b4e; }
-ul.messages li.warning { background: #de9404; }
+
+ul.messages li.success { background: var(--success-color); }
+ul.messages li.error { background: var(--error-color); }
+ul.messages li.info { background: var(--info-color); color: var(--text-color); }
+ul.messages li.warning { background: var(--warning-color); }
 
 .login-form {
     max-width: 400px;
-    margin-top: 20px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: var(--background-color);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .account {
@@ -127,7 +188,24 @@ ul.messages li.warning { background: #de9404; }
 }
 
 .content {
-    align-items: center;
     flex: 1;
-    padding: 20px 100px;
+    padding: 2rem;
+}
+
+@media (max-width: 768px) {
+    #header {
+        padding: 1rem;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    #content {
+        padding: 1rem;
+        max-width: 100%;
+    }
+
+    .login-form {
+        margin: 1rem;
+        padding: 1rem;
+    }
 }
