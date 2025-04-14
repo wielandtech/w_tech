@@ -1,4 +1,5 @@
 #!/bin/bash
+#deploy/scripts/deploy.sh
 echo "Redeploying the WielandTech Django App, plus stack..."
 
 set -e  # Exit on error
@@ -31,8 +32,5 @@ echo "Running Django management commands..."
 docker compose -f docker-compose.yml exec web python manage.py makemigrations --noinput
 docker compose -f docker-compose.yml exec web python manage.py migrate --noinput
 docker compose -f docker-compose.yml exec web python manage.py collectstatic --noinput
-
-# Wait for all background processes to complete
-wait 15
 
 echo "Deployment complete."
