@@ -263,20 +263,19 @@ ul {
   height: 50px;
   overflow-x: auto;
   overflow-y: hidden;
-  background-color: var(--nav-background);
+  background-color: var(--background-secondary);
   position: sticky;
-  top: 0;
+  top: 0px;
   display: flex;
   flex-wrap: nowrap;
   -webkit-overflow-scrolling: touch;
-  box-shadow: 0 2px 4px var(--shadow-color);
 }
 
 /* Style the navigation bar links */
 .navbar a {
   flex: 0 0 auto;
   display: block;
-  color: var(--nav-text);
+  color: var(--text-secondary);
   text-align: center;
   padding: 14px 20px;
   text-decoration: none;
@@ -511,7 +510,7 @@ ul {
   display: flex;
   align-items: center;
   margin-left: auto;
-  padding: 8px 16px;
+  padding-right: 10px;
 }
 
 .theme-switch {
@@ -519,6 +518,10 @@ ul {
   height: 34px;
   position: relative;
   width: 60px;
+}
+
+.theme-switch input {
+  display: none;
 }
 
 .slider {
@@ -533,7 +536,7 @@ ul {
 }
 
 .slider:before {
-  background-color: white;
+  background-color: #fff;
   bottom: 4px;
   content: "";
   height: 26px;
