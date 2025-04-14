@@ -2,21 +2,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const navLinks = document.querySelectorAll(".navbar a");
     const currentPath = window.location.pathname;
 
-    // Photography section paths
-    const photographyPaths = [
-        '/images',
-        '/images/create',
-        '/images/upload',
-        '/images/detail',
-        '/images/like',
-        '/account',
-        '/account/edit',
-        '/account/register',
-        '/account/users'
-    ];
+    // Define section paths
+    const sections = {
+        photography: {
+            paths: ['/images', '/account'],
+            navPath: '/images'
+        },
+        blog: {
+            paths: ['/blog'],
+            navPath: '/blog'
+        }
+    };
 
-    const isPhotographySection = () => {
-        return photographyPaths.some(path => currentPath.startsWith(path));
+    // Check if current path matches any of a section's paths
+    const isSection = (sectionPaths) => {
+        return sectionPaths.some(path => currentPath.startsWith(path));
     };
 
     // Handle homepage scroll highlighting
@@ -54,15 +54,20 @@ document.addEventListener("DOMContentLoaded", () => {
         // Remove any existing active classes
         navLinks.forEach(link => link.classList.remove("active"));
 
-        // Handle other pages highlighting
+        // Handle section highlighting
         navLinks.forEach(link => {
             const linkUrl = new URL(link.href, window.location.origin);
             
-            if (linkUrl.pathname === '/images/' && isPhotographySection()) {
-                // Highlight Photography link for all photography and account paths
-                link.classList.add("active");
-            } else if (linkUrl.pathname === currentPath) {
-                // Exact match for other pages
+            // Check if link matches any section
+            for (const [section, config] of Object.entries(sections)) {
+                if (linkUrl.pathname.startsWith(config.navPath) && isSection(config.paths)) {
+                    link.classList.add("active");
+                    return;
+                }
+            }
+
+            // More permissive matching for other pages, exclude root path
+            if (currentPath.startsWith(linkUrl.pathname) && linkUrl.pathname !== '/') {
                 link.classList.add("active");
             }
         });
