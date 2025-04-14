@@ -1,3 +1,4 @@
+/*main.css*/
 /*! HTML5 Boilerplate v8.0.0 | MIT License | https://html5boilerplate.com/ */
 
 /* main.css 2.1.0 | MIT License | https://github.com/h5bp/main.css#readme */
@@ -215,7 +216,7 @@ textarea {
   width: 50%;
   text-align: center; /* Center text */
   position: absolute; /* Position text */
-  bottom 50%; /* Position text in the middle */
+  bottom: 50%; /* Position text in the middle */
   left: 50%; /* Position text in the middle */
   transform: translate(-50%, -50%); /* Position text in the middle */
   mix-blend-mode: screen; /* This makes the cutout text possible */
@@ -238,7 +239,7 @@ textarea {
 .job {
   margin: 0 0;
   padding: 5px 0;
-  font-size; 2em;
+  font-size: 2em;
   font-weight: bold;
 }
 
@@ -270,7 +271,6 @@ ul{
   overflow-y: hidden;
   background-color: #011627;
   position: sticky;
-  position: -webkit-sticky;
   top: 0px;
   display: flex;
   flex-wrap: nowrap;

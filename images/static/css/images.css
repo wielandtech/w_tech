@@ -1,3 +1,4 @@
+/*images.css*/
 .image-detail-container {
     max-width: 1200px;
     margin: 0 auto;
@@ -19,6 +20,131 @@
 
 .image-wrapper:hover {
     transform: translateY(-5px);
+}
+
+/* Header container with button */
+.image-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    padding: 10px 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.image-list-header h1 {
+    margin: 0;
+    font-size: 1.8em;
+    color: #011627;
+}
+
+/* Upload button styling */
+.upload-button.button {
+    background: #35A89C;
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.upload-button.button:hover {
+    background-color: #2a8c82;
+    transform: translateY(-2px);
+}
+
+/* Grid layout for images */
+.image-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+/* Optional: card styling for each image (if not already styled in list_ajax.html) */
+.image-grid .image-card {
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease;
+}
+
+.image-grid .image-card:hover {
+    transform: translateY(-5px);
+}
+
+.image-grid .image-card img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+/* Responsive header layout */
+@media (max-width: 600px) {
+    .image-list-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .upload-button.button {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+.image-card {
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
+.image-card:hover {
+    transform: translateY(-5px);
+}
+
+.image-card .image-link {
+    display: block;
+    width: 100%;
+}
+
+.image-card img.image-thumbnail {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-bottom: 1px solid #eee;
+    transition: transform 0.3s ease;
+}
+
+.image-card img.image-thumbnail:hover {
+    transform: scale(1.03);
+}
+
+.image-card .info {
+    padding: 15px;
+}
+
+.image-card .title {
+    display: inline-block;
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #011627;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.image-card .title:hover {
+    color: #35A89C;
 }
 
 .image-detail {
