@@ -28,14 +28,16 @@
             {{ image.description|linebreaks }}
         </div>
         <div class="image-likes">
-            {% for user in users_like %}
-                <div>
+        {% for user in users_like %}
+            <div>
+                <a href="{{ user.get_absolute_url }}">
                     <img src="{% thumbnail user.profile.photo 180x180 %}" class="user-detail">
-                    <p>{{ user.first_name }}</p>
-                </div>
-            {% empty %}
-                Nobody likes this image yet.
-            {% endfor %}
+                </a>
+                <p>{{ user.first_name }}</p>
+            </div>
+        {% empty %}
+            <p>Nobody likes this image yet.</p>
+        {% endfor %}
         </div>
     {% endwith %}
 {% endblock %}
