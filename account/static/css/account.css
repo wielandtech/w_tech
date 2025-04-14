@@ -131,3 +131,58 @@ ul.messages li.warning { background: #de9404; }
     flex: 1;
     padding: 20px 100px;
 }
+
+/* User List */
+#people-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.user {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.user:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.user img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.user .info {
+    padding: 20px;
+}
+
+.user .title {
+    font-size: 1.2em;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Responsive User List */
+@media (max-width: 768px) {
+    #people-list {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    #people-list {
+        grid-template-columns: 1fr;
+    }
+
+    .user img {
+        height: 180px;
+    }
+}
