@@ -4,9 +4,11 @@ const currentTheme = localStorage.getItem('theme');
 const toggleSwitch = document.querySelector('#theme-toggle');
 
 // Function to update theme
-function setTheme(theme) {
+function setTheme(theme, saveToStorage = true) {
     document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
+    if (saveToStorage) {
+        localStorage.setItem('theme', theme);
+    }
     if (toggleSwitch) {
         toggleSwitch.checked = theme === 'dark';
     }
@@ -18,14 +20,14 @@ if (currentTheme) {
     setTheme(currentTheme);
 } else {
     // Use system preference if no saved preference
-    setTheme(prefersDarkScheme.matches ? 'dark' : 'light');
+    setTheme(prefersDarkScheme.matches ? 'dark' : 'light', false);
 }
 
 // Listen for toggle switch change
 if (toggleSwitch) {
     toggleSwitch.addEventListener('change', (e) => {
         const theme = e.target.checked ? 'dark' : 'light';
-        setTheme(theme);
+        setTheme(theme, true); // Save the user's explicit choice
     });
 }
 
@@ -33,6 +35,6 @@ if (toggleSwitch) {
 prefersDarkScheme.addEventListener('change', (e) => {
     // Only update theme if user hasn't set a preference
     if (!localStorage.getItem('theme')) {
-        setTheme(e.matches ? 'dark' : 'light');
+        setTheme(e.matches ? 'dark' : 'light', false);
     }
 });
