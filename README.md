@@ -73,6 +73,33 @@ python manage.py migrate
 python manage.py runserver
 ```
 
+## 🔧 Development
+
+### Prerequisites
+- Python 3.10+
+- PostgreSQL 14+
+- Redis 6+
+- Docker & Docker Compose
+
+### Testing
+```bash
+# Run tests
+python manage.py test
+
+# Run with coverage
+coverage run manage.py test
+coverage report
+```
+
+### Docker Development
+```bash
+# Build and start services
+docker compose up --build
+
+# Run migrations in container
+docker compose exec web python manage.py migrate
+```
+
 ## 📝 License
 
 [BSD 3-Clause License](LICENSE)
