@@ -22,17 +22,14 @@ docker compose -f docker-compose.yml up -d
 # Wait for build to complete
 wait $BUILD_PID
 
-# Optimized health check with timeout
-echo "Waiting for web container to become healthy..."
-timeout 60 bash -c 'until [ "$(docker inspect -f "{{.State.Health.Status}}" $(docker compose ps -q web))" == "healthy" ]; do sleep 2; done'
+# Improved: Wait for Django to be fully ready
+echo "Waiting for Django app to be ready..."
+timeout 60 bash -c 'until docker compose exec web python manage.py check --deploy --fail-level ERROR; do sleep 2; done'
 
-# Run Django commands in parallel where possible
+# Run Django management commands
 echo "Running Django management commands..."
 docker compose -f docker-compose.yml exec web python manage.py makemigrations --noinput
 docker compose -f docker-compose.yml exec web python manage.py migrate --noinput
 docker compose -f docker-compose.yml exec web python manage.py collectstatic --noinput
-
-# Wait for all background processes to complete
-wait
 
 echo "Deployment complete."
