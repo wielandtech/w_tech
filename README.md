@@ -1,6 +1,6 @@
 # WielandTech Portfolio & Blog
 
-A modern Django-based personal portfolio and blog platform built with best practices and clean architecture.
+A modern Django-based personal portfolio and blog platform.
 
 ## 🌟 Features
 
