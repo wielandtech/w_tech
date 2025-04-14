@@ -50,6 +50,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 20px;
+    margin-bottom: auto;
 }
 
 /* Optional: card styling for each image (if not already styled in list_ajax.html) */
