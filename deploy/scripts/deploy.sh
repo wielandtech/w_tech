@@ -11,21 +11,28 @@ git pull origin development
 echo "Stopping old containers..."
 docker compose -f docker-compose.yml down
 
-echo "Building new images..."
-docker compose -f docker-compose.yml build
+# Build and start containers in parallel
+echo "Building and starting containers..."
+docker compose -f docker-compose.yml build --parallel &
+BUILD_PID=$!
 
-echo "Starting containers..."
+# Start containers while build is still running
 docker compose -f docker-compose.yml up -d
 
-# Wait for the web container to be ready (optional, replace 'healthcheck' with your container's name if applicable)
-until [ "$(docker inspect -f '{{.State.Health.Status}}' $(docker compose ps -q web))" == "healthy" ]; do
-  echo "Waiting for web container to become healthy..."
-  sleep 2
-done
+# Wait for build to complete
+wait $BUILD_PID
 
+# Optimized health check with timeout
+echo "Waiting for web container to become healthy..."
+timeout 60 bash -c 'until [ "$(docker inspect -f "{{.State.Health.Status}}" $(docker compose ps -q web))" == "healthy" ]; do sleep 2; done'
+
+# Run Django commands in parallel where possible
 echo "Running Django management commands..."
-docker compose -f docker-compose.yml exec web python manage.py makemigrations --noinput
-docker compose -f docker-compose.yml exec web python manage.py migrate --noinput
-docker compose -f docker-compose.yml exec web python manage.py collectstatic --noinput
+docker compose -f docker-compose.yml exec web python manage.py makemigrations --noinput &
+docker compose -f docker-compose.yml exec web python manage.py migrate --noinput &
+docker compose -f docker-compose.yml exec web python manage.py collectstatic --noinput &
+
+# Wait for all background processes to complete
+wait
 
 echo "Deployment complete."
