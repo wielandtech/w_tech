@@ -9,8 +9,6 @@ services:
       - static_volume:/app/static
     expose:
       - 8000
-    dns:
-      - 8.8.8.8
     depends_on:
       - db
     environment:
