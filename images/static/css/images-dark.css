@@ -1,4 +1,4 @@
-[data-theme="dark"] {
+    [data-theme="dark"] {
     /* Image grid and cards */
     .image-grid {
         background-color: var(--photo-background);
