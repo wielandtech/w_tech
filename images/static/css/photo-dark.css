@@ -7,6 +7,7 @@
     }
 
     .image-card {
+        color: var(--blog-text);
         background-color: var(--photo-card-bg);
         border-radius: 8px;
         box-shadow: 0 2px 8px var(--photo-card-shadow);
