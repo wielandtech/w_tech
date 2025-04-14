@@ -22,7 +22,7 @@
 
 .post {
     background-color: #f7f7f7;
-    padding: 0 1rem;
+    padding: 1rem;
 }
 
 .secondary a {
@@ -37,7 +37,7 @@
 #sidebar {
     flex: 1;
     max-width: 300px;
-    padding: 0 1rem;
+    padding: 1rem;
     background-color: #f9f9f9;
     border-left: 1px solid #ddd;
     font-size: 0.9rem;
@@ -45,7 +45,7 @@
 
 #sidebar h2,
 #sidebar h3 {
-    margin-top: 0;
+    margin-top: 1vh;;
 }
 
 @media (max-width: 768px) {
