@@ -1,7 +1,3 @@
-.images {
-    justify-content: center;
-}
-
 /*images.css*/
 .image-detail-container {
     max-width: 1200px;
@@ -26,10 +22,11 @@
     transform: translateY(-5px);
 }
 
-/* Header container with button */
-.image-list-header {
-    align-items: center;
-    background: #fff;
+/* Wrapper to center the button */
+.upload-button-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
 }
 
 /* Upload button styling */
