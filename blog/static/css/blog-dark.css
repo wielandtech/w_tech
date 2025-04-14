@@ -122,3 +122,96 @@ a {
 a:hover {
   color: var(--blog-link-hover);
 }
+
+/* Blog dark theme specific styles */
+[data-theme="dark"] {
+    /* Sidebar styles */
+    #sidebar {
+        background-color: var(--blog-card-bg);
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    #sidebar h2, #sidebar h3 {
+        color: var(--blog-text);
+        border-bottom: 1px solid var(--blog-border);
+        padding-bottom: 10px;
+    }
+
+    #sidebar ul li {
+        border-bottom: 1px solid var(--blog-border);
+        padding: 8px 0;
+    }
+
+    #sidebar ul li:last-child {
+        border-bottom: none;
+    }
+
+    /* Post styles */
+    .post {
+        background-color: var(--blog-card-bg);
+        padding: 25px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .post-title {
+        color: var(--blog-text);
+    }
+
+    .post-meta {
+        color: var(--blog-meta);
+        border-bottom: 1px solid var(--blog-border);
+        padding-bottom: 10px;
+    }
+
+    .post-body {
+        color: var(--blog-text);
+    }
+
+    /* Search form */
+    .search-form input[type="text"] {
+        background-color: var(--background-primary);
+        color: var(--blog-text);
+        border: 1px solid var(--blog-border);
+    }
+
+    .search-form input[type="submit"] {
+        background-color: var(--accent-primary);
+        color: #FDFFFC;
+    }
+
+    /* Tags */
+    .tags a {
+        background-color: var(--blog-tag-bg);
+        color: var(--blog-tag-text);
+    }
+
+    .tags a:hover {
+        background-color: var(--accent-primary);
+        color: #FDFFFC;
+    }
+}
+
+/* System dark mode preference */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        /* Same styles as above */
+        #sidebar {
+            background-color: var(--blog-card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .post {
+            background-color: var(--blog-card-bg);
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+    }
+}
