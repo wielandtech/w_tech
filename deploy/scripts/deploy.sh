@@ -9,7 +9,7 @@ echo "Pulling latest code..."
 git pull origin development
 
 echo "Stopping old containers..."
-docker compose -f docker-compose.yml down
+docker compose -f docker-compose.yml down --remove-orphans
 
 # Build and start containers in parallel
 echo "Building and starting containers..."
