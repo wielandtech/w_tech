@@ -182,17 +182,6 @@ a:hover {
         background-color: var(--accent-primary);
         color: #FDFFFC;
     }
-
-    /* Tags */
-    .tags a {
-        background-color: var(--blog-tag-bg);
-        color: var(--blog-tag-text);
-    }
-
-    .tags a:hover {
-        background-color: var(--accent-primary);
-        color: #FDFFFC;
-    }
 }
 
 /* System dark mode preference */
