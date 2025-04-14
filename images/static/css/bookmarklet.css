@@ -1,90 +1,53 @@
-:root {
-    --primary-color: #35A89C;
-    --text-color: #011627;
-    --background-color: #FDFFFC;
-    --border-color: #ccc;
-    --shadow-color: rgba(0, 0, 0, 0.2);
-    --hover-opacity: 1;
-    --default-opacity: 0.8;
-}
-
 #bookmarklet {
-    background: var(--background-color);
-    border-bottom: 8px solid var(--primary-color);
-    font-family: "Helvetica Neue", helvetica, arial, sans-serif;
-    padding: 1rem;
-    overflow: auto;
-    box-shadow: 0 4px 8px var(--shadow-color);
-    position: fixed;
-    width: 400px;
-    min-height: 200px;
-    top: 10px;
-    right: 10px;
-    z-index: 1000000000000;
-    border-radius: 4px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background:#fff;
+    border-bottom:8px solid #12c064;
+    font-family:"Helvetica Neue", helvetica, arial, sans-serif !important;
+    padding:10px; overflow:auto;
+    box-shadow:0px 0px 8px 0 #666;
+    position:fixed;
+    width:400px;
+    min-height:200px;
+    top:10px;
+    right:10px;
+    z-index:1000000000000;
 }
 
-#bookmarklet:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px var(--shadow-color);
-}
-
-#bookmarklet h1 {
-    font-family: "Helvetica Neue", helvetica, arial, sans-serif;
-    font-weight: normal;
-    color: var(--text-color);
-    font-size: 1.125rem;
-    padding: 0.25rem 0 1.25rem 0;
-    margin: 0;
-}
+#bookmarklet h1{
+    font-family:"Helvetica Neue", helvetica, arial, sans-serif;
+    font-weight:normal;
+    color:#333;
+    font-size:18px;
+    padding:4px 0 20px 0;
+ }
 
 #bookmarklet #close {
-    float: right;
-    font-size: 1.125rem;
-    text-decoration: none;
-    color: var(--text-color);
-    margin-top: -0.375rem;
-    opacity: 0.7;
-    transition: opacity 0.3s ease;
+    float:right;
+    font-size:18px;
+    text-decoration:none;
+    color:#666;
+    margin-top:-6px;
 }
 
 #bookmarklet #close:hover {
-    opacity: 1;
+    color:#000;
 }
 
 #bookmarklet .images {
-    margin-bottom: 1.25rem;
-    overflow: auto;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-    gap: 0.5rem;
+    margin-bottom:20px;
+    overflow:auto;
 }
 
 #bookmarklet .images img {
-    border: 1px solid var(--border-color);
-    padding: 0.125rem;
-    margin: 0;
-    opacity: var(--default-opacity);
-    width: 100%;
-    height: auto;
-    transition: all 0.3s ease;
-    cursor: pointer;
+    border:1px solid #ccc;
+    padding:2px;
+    margin:2px;
+    opacity:0.8;
+    width:90px;
+    float:left;
 }
 
 #bookmarklet .images img.selected,
 #bookmarklet .images img:hover {
-    border: 1px solid var(--primary-color);
-    opacity: var(--hover-opacity);
-    transform: scale(1.02);
-}
-
-@media (max-width: 480px) {
-    #bookmarklet {
-        width: 100%;
-        max-width: 400px;
-        right: 0;
-        left: 0;
-        margin: 0 auto;
-    }
+    border:1px solid #12c064;
+    opacity:1;
 }
