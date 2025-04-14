@@ -1,0 +1,163 @@
+.image-detail-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.image-wrapper {
+    margin-bottom: 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.image-wrapper:hover {
+    transform: translateY(-5px);
+}
+
+.image-detail {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.image-info {
+    margin: 20px 0;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.image-info .count {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 20px;
+    font-size: 1.1em;
+    color: #666;
+    gap: 0.5rem;
+}
+
+.image-info .count .total {
+    font-weight: bold;
+    color: #35A89C;
+}
+
+.image-info .button {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 20px;
+    background: #35A89C;
+    color: white;
+    border-radius: 8px;
+    text-decoration: none;
+    margin-left: 10px;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.image-info .button:hover {
+    background: #2a8c82;
+    transform: translateY(-2px);
+}
+
+.image-likes {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 25px;
+    margin-top: 20px;
+}
+
+.image-likes div {
+    text-align: center;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    transition: transform 0.3s ease;
+}
+
+.image-likes div:hover {
+    transform: translateY(-5px);
+}
+
+.user-detail {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+    object-fit: cover;
+    border: 3px solid #35A89C;
+    transition: transform 0.3s ease;
+}
+
+.user-detail:hover {
+    transform: scale(1.05);
+}
+
+/* Responsive styles */
+@media (max-width: 1024px) {
+    .image-detail-container {
+        padding: 15px;
+    }
+    
+    .image-likes {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .image-detail-container {
+        padding: 10px;
+    }
+
+    .image-info {
+        padding: 15px;
+    }
+
+    .image-info .count {
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    .image-info .button {
+        display: block;
+        margin: 10px 0;
+        text-align: center;
+        width: 100%;
+    }
+
+    .image-likes {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 15px;
+    }
+
+    .user-detail {
+        width: 80px;
+        height: 80px;
+    }
+}
+
+@media (max-width: 480px) {
+    .image-likes {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 10px;
+    }
+
+    .user-detail {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .image-info .count {
+        font-size: 1em;
+    }
+}
