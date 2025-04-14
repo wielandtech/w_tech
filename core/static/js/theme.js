@@ -1,12 +1,15 @@
 // Check for saved theme preference, otherwise use system preference
 const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
 const currentTheme = localStorage.getItem('theme');
+const toggleSwitch = document.querySelector('#theme-toggle');
 
 // Function to update theme
 function setTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
-    document.getElementById('checkbox').checked = theme === 'dark';
+    if (toggleSwitch) {
+        toggleSwitch.checked = theme === 'dark';
+    }
 }
 
 // Initialize theme
@@ -19,12 +22,11 @@ if (currentTheme) {
 }
 
 // Listen for toggle switch change
-const toggleSwitch = document.querySelector('#checkbox');
-toggleSwitch.addEventListener('change', switchTheme);
-
-function switchTheme(e) {
-    const theme = e.target.checked ? 'dark' : 'light';
-    setTheme(theme);
+if (toggleSwitch) {
+    toggleSwitch.addEventListener('change', (e) => {
+        const theme = e.target.checked ? 'dark' : 'light';
+        setTheme(theme);
+    });
 }
 
 // Listen for system theme changes
