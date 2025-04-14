@@ -144,38 +144,115 @@ ul.messages li.warning { background: #de9404; }
 /* User List */
 #people-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 30px;
     margin-top: 30px;
+    padding: 20px;
 }
 
 .user {
     background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     overflow: hidden;
     transition: all 0.3s ease;
+    position: relative;
+    border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .user:hover {
     transform: translateY(-5px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
 }
 
 .user img {
     width: 100%;
     height: 200px;
     object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.user:hover img {
+    transform: scale(1.05);
 }
 
 .user .info {
     padding: 20px;
+    background: #fff;
 }
 
 .user .title {
     font-size: 1.2em;
     font-weight: 600;
     color: #333;
+    margin-bottom: 8px;
+}
+
+.user .meta {
+    color: #666;
+    font-size: 0.9em;
+    margin-top: 8px;
+}
+
+.user .stats {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.user .stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.user .stat-value {
+    font-weight: 600;
+    color: #35A89C;
+    font-size: 1.1em;
+}
+
+.user .stat-label {
+    font-size: 0.8em;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Responsive User List */
+@media (max-width: 768px) {
+    #people-list {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 20px;
+        padding: 15px;
+    }
+    
+    .user img {
+        height: 180px;
+    }
+    
+    .user .info {
+        padding: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    #people-list {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        padding: 10px;
+    }
+    
+    .user img {
+        height: 160px;
+    }
+    
+    .user .stats {
+        flex-direction: column;
+        gap: 10px;
+    }
 }
 
 /* Responsive styles */
