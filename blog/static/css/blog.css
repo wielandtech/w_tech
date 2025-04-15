@@ -219,6 +219,11 @@
     transform: scale(1.2);
 }
 
+.like-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 .post-actions {
     display: flex;
     align-items: center;

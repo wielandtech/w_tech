@@ -7,6 +7,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const postId = this.dataset.id;
             const action = this.dataset.action;
 
+            // Disable button during request
+            this.disabled = true;
+
             fetch('/blog/like/', {
                 method: 'POST',
                 headers: {
@@ -15,14 +18,31 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 body: `id=${postId}&action=${action}`
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.status === 'ok') {
                     const likes = data.likes;
                     this.dataset.action = action === 'like' ? 'unlike' : 'like';
                     this.textContent = action === 'like' ? '❤️' : '🤍';
                     document.querySelector(`#likes-count-${postId}`).textContent = likes;
+                } else {
+                    throw new Error(data.message || 'Like action failed');
                 }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Revert button state on error
+                this.textContent = action === 'unlike' ? '❤️' : '🤍';
+                alert('Could not process like action. Please try again.');
+            })
+            .finally(() => {
+                // Re-enable button after request
+                this.disabled = false;
             });
         });
     });
@@ -31,5 +51,6 @@ document.addEventListener('DOMContentLoaded', function() {
         let value = `; ${document.cookie}`;
         let parts = value.split(`; ${name}=`);
         if (parts.length === 2) return parts.pop().split(';').shift();
+        return null;
     }
 });
