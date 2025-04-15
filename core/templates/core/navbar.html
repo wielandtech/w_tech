@@ -1,5 +1,5 @@
 {% if request.user.is_authenticated %}
-<nav class="navbar">
+<nav class="account-navbar">
     <ul class="menu">
         <li {% if section == "dashboard" %}class="selected"{% endif %}>
             <a href="{% url "account:dashboard" %}">My dashboard</a>
