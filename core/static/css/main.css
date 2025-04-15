@@ -129,8 +129,8 @@ textarea {
 
 /* Update logo styles */
 .logo-img {
-  max-height: 33px;
-  max-width: 33px;
+  max-height: 50px;
+  max-width: 50px;
   padding: 0;
   background: transparent !important;
   object-fit: contain;
