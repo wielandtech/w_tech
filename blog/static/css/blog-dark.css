@@ -6,11 +6,8 @@
 
 .post-card {
   background-color: var(--blog-card-bg);
-  border: 1px solid var(--blog-border);
-  box-shadow: 0 2px 4px var(--blog-card-shadow);
   padding: 20px;
   margin-bottom: 20px;
-  border-radius: 8px;
 }
 
 .post-title {
