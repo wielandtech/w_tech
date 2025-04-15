@@ -50,21 +50,7 @@
 }
 
 /* Search form styling */
-.search-form {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-.search-form input[type="text"] {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid var(--blog-border);
-    border-radius: 4px;
-}
-
-.search-form input[type="submit"] {
+input {
     width: fit-content;
     margin: 0 auto;
     padding: 8px 16px;
@@ -76,7 +62,7 @@
     transition: background-color 0.3s ease;
 }
 
-.search-form input[type="submit"]:hover {
+input:hover {
     background-color: var(--blog-link-hover);
 }
 
