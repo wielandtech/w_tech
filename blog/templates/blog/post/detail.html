@@ -57,13 +57,24 @@
 
 {% if user.is_authenticated %}
     {% if new_comment %}
-        <h2>Your comment has been added.</h2>
+        <div class="alert alert-success">
+            <h2>Your comment has been added.</h2>
+        </div>
     {% else %}
         <h2>Add a new comment</h2>
-        <form method="post">
+        <form method="post" id="comment-form" enctype="multipart/form-data">
+            {% if form.errors %}
+                <div class="alert alert-error">
+                    Please correct the errors below.
+                </div>
+            {% endif %}
+            
             {{ comment_form.as_p }}
             {% csrf_token %}
-            <p><input type="submit" value="Add comment"></p>
+            
+            <p class="form-actions">
+                <input type="submit" value="Add comment" class="button">
+            </p>
         </form>
     {% endif %}
 {% else %}
