@@ -44,6 +44,7 @@ def image_detail(request, id, slug):
     image = get_object_or_404(Image, id=id, slug=slug)
     # increment total image views by 1
     total_views = 0
+    r = get_redis()
     if r is not None:
         try:
             total_views = r.incr(f'image:{image.id}:views')
