@@ -64,6 +64,40 @@
         border-color: var(--blog-link);
         outline: none;
     }
+
+    /* Image detail page elements */
+    .image-info {
+        background-color: var(--blog-card-bg);
+        box-shadow: 0 2px 4px var(--blog-card-shadow);
+        border: 1px solid var(--blog-border);
+        color: var(--blog-text);
+    }
+
+    .image-likes {
+        background-color: var(--blog-card-bg);
+        box-shadow: 0 2px 4px var(--blog-card-shadow);
+        border: 1px solid var(--blog-border);
+        color: var(--blog-text);
+    }
+
+    /* Image list page elements */
+    .image-card {
+        background-color: var(--blog-card-bg);
+        box-shadow: 0 2px 4px var(--blog-card-shadow);
+        border: 1px solid var(--blog-border);
+    }
+
+    .image-card:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .image-card .title {
+        color: var(--blog-text);
+    }
+
+    .image-card .meta {
+        color: var(--blog-meta);
+    }
 }
 
 /* System dark mode preference */
@@ -106,6 +140,36 @@
             background-color: var(--blog-card-bg);
             color: var(--blog-text);
             border: 1px solid var(--blog-border);
+        }
+
+        /* Image detail page elements */
+        .image-info {
+            background-color: var(--blog-card-bg);
+            box-shadow: 0 2px 4px var(--blog-card-shadow);
+            border: 1px solid var(--blog-border);
+            color: var(--blog-text);
+        }
+
+        .image-likes {
+            background-color: var(--blog-card-bg);
+            box-shadow: 0 2px 4px var(--blog-card-shadow);
+            border: 1px solid var(--blog-border);
+            color: var(--blog-text);
+        }
+
+        /* Image list page elements */
+        .image-card {
+            background-color: var(--blog-card-bg);
+            box-shadow: 0 2px 4px var(--blog-card-shadow);
+            border: 1px solid var(--blog-border);
+        }
+
+        .image-card .title {
+            color: var(--blog-text);
+        }
+
+        .image-card .meta {
+            color: var(--blog-meta);
         }
     }
 }
