@@ -1,6 +1,13 @@
 {% extends "blog/base.html" %}
 {% load blog_tags %}
+{% load static %}
+
 {% block title %}{{ post.title }}{% endblock %}
+
+{% block extra_head %}
+<script src="{% static 'js/likes.js' %}"></script>
+{% endblock %}
+
 {% block blog_content %}
 <div class="post">
     <h2 class="secondary">
@@ -21,7 +28,17 @@
         Published {{ post.publish }} by {{ post.author }}
     </p>
     {{ post.body|markdown }}
-    <p class="share-post">
+    
+    <div class="post-actions">
+        {% if request.user.is_authenticated %}
+            <button class="like-button" 
+                    data-id="{{ post.id }}" 
+                    data-action="{% if request.user.id|stringformat:'i' in post.user_has_liked %}unlike{% else %}like{% endif %}">
+                {% if request.user.id|stringformat:'i' in post.user_has_liked %}❤️{% else %}🤍{% endif %}
+            </button>
+        {% endif %}
+        <span id="likes-count-{{ post.id }}">{{ post.get_likes }}</span> likes
+        
         {% if user.is_authenticated %}
             <a href="{% url 'blog:post_share' post.id %}" class="share-link">
                 Share this post
@@ -31,7 +48,7 @@
                 Log in to share this post
             </a>
         {% endif %}
-    </p>
+    </div>
 </div>
 
 <h2>Similar posts</h2>
