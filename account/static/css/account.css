@@ -317,8 +317,8 @@ ul.messages li.warning { background: #de9404; }
 
 .logout-button {
     background-color: transparent;
-    color: #fff;
-    border: 2px solid #fff;
+    color: var(--text-secondary);
+    border: 2px solid var(--text-secondary);
     border-radius: 4px;
     padding: 0.5rem 1rem;
     font-size: 0.9rem;
@@ -328,8 +328,8 @@ ul.messages li.warning { background: #de9404; }
 }
 
 .logout-button:hover {
-    background-color: #fff;
-    color: #35A89C;
+    background-color: var(--text-secondary);
+    color: var(--accent-primary);
     transform: translateY(-1px);
 }
 
