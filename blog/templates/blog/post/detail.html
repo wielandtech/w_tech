@@ -27,19 +27,22 @@
         </a>
     </p>
 </div>
+
 <h2>Similar posts</h2>
 {% for post in similar_posts %}
 <p>
     <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
 </p>
 {% empty %}
-There are no similar posts yet.
+<p>There are no similar posts yet.</p>
 {% endfor %}
+
 {% with comments.count as total_comments %}
 <h2>
     {{ total_comments }} comment{{ total_comments|pluralize }}
 </h2>
 {% endwith %}
+
 {% for comment in comments %}
 <div class="comment">
     <p class="info">
@@ -51,14 +54,31 @@ There are no similar posts yet.
 {% empty %}
 <p>There are no comments yet.</p>
 {% endfor %}
-{% if new_comment %}
-<h2>Your comment has been added.</h2>
+
+{% if user.is_authenticated %}
+    {% if new_comment %}
+        <h2>Your comment has been added.</h2>
+    {% else %}
+        <h2>Add a new comment</h2>
+        <form method="post">
+            {{ comment_form.as_p }}
+            {% csrf_token %}
+            <p><input type="submit" value="Add comment"></p>
+        </form>
+    {% endif %}
 {% else %}
-<h2>Add a new comment</h2>
-<form method="post">
-    {{ comment_form.as_p }}
-    {% csrf_token %}
-    <p><input type="submit" value="Add comment"></p>
-</form>
+    <div class="login-prompt">
+        <h3>Please sign in to comment</h3>
+        <p>
+            <a href="{% url 'account:login' %}" class="button">Log in</a>
+            or
+            <a href="{% url 'account:register' %}" class="button">Register</a>
+        </p>
+        <p class="social-login">
+            Or sign in with:
+            <a href="{% url 'social:begin' 'facebook' %}" class="social-button">Facebook</a>
+            <a href="{% url 'social:begin' 'google-oauth2' %}" class="social-button">Google</a>
+        </p>
+    </div>
 {% endif %}
 {% endblock %}

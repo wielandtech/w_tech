@@ -82,6 +82,40 @@ ul.messages li.warning { background: #de9404; }
     margin-top: 20px;
 }
 
+.login-prompt {
+    background: var(--image-card-bg);
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    margin: 20px 0;
+}
+
+.login-prompt h3 {
+    color: var(--text-primary);
+    margin-bottom: 15px;
+}
+
+.social-login {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border-color);
+}
+
+.social-button {
+    display: inline-block;
+    padding: 8px 15px;
+    margin: 0 5px;
+    background: var(--accent-primary);
+    color: white;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+social-button:hover {
+    background: var(--accent-secondary);
+    transform: translateY(-1px);
+}
+
 /* Account layout */
 .account {
     display: flex;
