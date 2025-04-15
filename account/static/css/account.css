@@ -281,7 +281,7 @@ ul.messages li.warning { background: #de9404; }
 /* Navbar styles */
 .navbar {
     background: #35A89C;
-    padding: 1rem 2rem;
+    padding: 0.75rem 2rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     display: flex;
     justify-content: space-between;
@@ -294,10 +294,16 @@ ul.messages li.warning { background: #de9404; }
 
 .menu {
     display: flex;
-    gap: 2rem;
+    gap: 1.5rem;
     list-style: none;
     margin: 0;
     padding: 0;
+    flex-wrap: nowrap;
+    align-items: center;
+}
+
+.menu li {
+    white-space: nowrap;
 }
 
 .menu li a {
@@ -307,6 +313,7 @@ ul.messages li.warning { background: #de9404; }
     padding: 0.5rem 0;
     position: relative;
     transition: all 0.3s ease;
+    font-size: 0.95rem;
 }
 
 .menu li a:hover {
@@ -386,27 +393,37 @@ ul.messages li.warning { background: #de9404; }
     }
 
     .navbar {
-        flex-direction: column;
-        padding: 1rem;
-        gap: 1rem;
+        flex-direction: row;
+        flex-wrap: wrap;
+        padding: 0.75rem 1rem;
+        gap: 0.5rem;
     }
 
     .menu {
-        flex-direction: column;
-        align-items: center;
+        order: 2;
+        flex-direction: row;
+        justify-content: center;
         gap: 1rem;
-        width: 100%;
+        width: auto;
+        margin: 0 auto;
     }
 
     .user-controls {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        width: 100%;
+        order: 1;
+        flex-direction: row;
+        justify-content: flex-end;
+        width: auto;
+        margin-left: auto;
+    }
+
+    .user-greeting {
+        display: none; /* Hide greeting on mobile to save space */
     }
 
     .logout-button {
-        width: 100%;
+        width: auto;
+        padding: 0.35rem 0.75rem;
+        font-size: 0.9rem;
     }
 }
 
@@ -440,5 +457,19 @@ ul.messages li.warning { background: #de9404; }
     .profile-info .follow.button {
         width: 100%;
         justify-content: center;
+    }
+
+    .navbar {
+        padding: 0.5rem;
+    }
+
+    .menu {
+        gap: 0.75rem;
+        font-size: 0.9rem;
+    }
+
+    .logout-button {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.85rem;
     }
 }
