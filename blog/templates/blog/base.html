@@ -6,6 +6,12 @@
 <link rel="stylesheet" href="{% static 'css/blog-dark.css' %}">
 {% endblock %}
 
+<head>
+    {% if user.is_authenticated %}
+    <meta name="user-authenticated" content="true">
+    {% endif %}
+</head>
+
 {% block title %}WielandTech Blog{% endblock %}
 
 {% block content %}
