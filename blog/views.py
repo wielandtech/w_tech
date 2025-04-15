@@ -5,6 +5,7 @@ from django.db.models import Count
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from taggit.models import Tag
 
 from .forms import CommentForm, EmailPostForm, SearchForm
@@ -111,3 +112,24 @@ def post_share(request, post_id):
     else:
         form = EmailPostForm()
     return render(request, 'blog/post/share.html', {'post': post, 'form': form, 'sent': sent})
+
+
+@login_required
+def post_like(request):
+    post_id = request.POST.get('id')
+    action = request.POST.get('action')
+    if post_id and action:
+        try:
+            post = Post.objects.get(id=post_id)
+            r = post.get_redis_connection()
+            key = f'blog:post:{post_id}:likes'
+            
+            if action == 'like':
+                r.sadd(key, request.user.id)
+            else:
+                r.srem(key, request.user.id)
+            
+            return JsonResponse({'status': 'ok', 'likes': post.get_likes()})
+        except Post.DoesNotExist:
+            pass
+    return JsonResponse({'status': 'error'})

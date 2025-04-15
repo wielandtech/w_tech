@@ -1,7 +1,12 @@
 {% extends "blog/base.html" %}
 {% load blog_tags %}
+{% load static %}
 
 {% block title %}WielandTech Blog{% endblock %}
+
+{% block extra_head %}
+<script src="{% static 'js/likes.js' %}"></script>
+{% endblock %}
 
 {% block blog_content %}
     {% if tag %}
@@ -27,7 +32,17 @@
             Published {{ post.publish }} by {{ post.author }}
         </p>
         {{ post.body|markdown|truncatewords_html:140 }}
-        <a href="{{ post.get_absolute_url }}">Comment or Share</a>
+        <div class="post-actions">
+            <a href="{{ post.get_absolute_url }}">Comment or Share</a>
+            {% if request.user.is_authenticated %}
+                <button class="like-button" 
+                        data-id="{{ post.id }}" 
+                        data-action="{% if request.user.id|stringformat:'i' in post.user_has_liked %}unlike{% else %}like{% endif %}">
+                    {% if request.user.id|stringformat:'i' in post.user_has_liked %}❤️{% else %}🤍{% endif %}
+                </button>
+            {% endif %}
+            <span id="likes-count-{{ post.id }}">{{ post.get_likes }}</span> likes
+        </div>
     </div>
     {% empty %}
     <div class="no-posts">

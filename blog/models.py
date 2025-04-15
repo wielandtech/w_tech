@@ -4,6 +4,8 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from taggit.managers import TaggableManager
 from django.conf import settings
+from redis import Redis
+import json
 
 
 class PublishedManager(models.Manager):
@@ -38,6 +40,22 @@ class Post(models.Model):
 
     def get_absolute_url(self):
         return reverse('blog:post_detail', args=[self.publish.year, self.publish.month, self.publish.day, self.slug])
+
+    def get_redis_connection(self):
+        return Redis(
+            host=settings.REDIS_IP,
+            port=settings.REDIS_PORT,
+            db=settings.REDIS_DB,
+            password=settings.REDIS_KEY
+        )
+
+    def get_likes(self):
+        r = self.get_redis_connection()
+        return r.scard(f'blog:post:{self.id}:likes')
+
+    def user_has_liked(self, user_id):
+        r = self.get_redis_connection()
+        return r.sismember(f'blog:post:{self.id}:likes', user_id)
 
 
 class Comment(models.Model):
