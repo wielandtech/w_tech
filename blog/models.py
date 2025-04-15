@@ -46,6 +46,7 @@ class Comment(models.Model):
                             related_name='comments')
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                             on_delete=models.CASCADE)
+    name = models.CharField(max_length=80)
     body = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -54,5 +55,10 @@ class Comment(models.Model):
     class Meta:
         ordering = ('created',)
     
+    def save(self, *args, **kwargs):
+        if not self.name and self.user:
+            self.name = self.user.get_full_name() or self.user.username
+        super().save(*args, **kwargs)
+    
     def __str__(self):
-        return f'Comment by {self.user.username} on {self.post}'
+        return f'Comment by {self.name} on {self.post}'

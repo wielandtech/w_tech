@@ -14,9 +14,6 @@ class CommentForm(forms.ModelForm):
                 'placeholder': 'Enter your comment here'
             })
         }
-        labels = {
-            'body': 'Comment'
-        }
 
 
 class EmailPostForm(forms.Form):
