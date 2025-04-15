@@ -55,7 +55,7 @@
 
 /* Optional: card styling for each image (if not already styled in list_ajax.html) */
 .image-grid .image-card {
-    background: #fff;
+    background: var(--image-card-bg);
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 2px 6px rgba(0,0,0,0.08);
@@ -87,7 +87,7 @@
 }
 
 .image-card {
-    background: #fff;
+    background: var(--image-card-bg);
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
@@ -110,7 +110,7 @@
     width: 100%;
     height: auto;
     object-fit: cover;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border-color);
     transition: transform 0.3s ease;
 }
 
@@ -126,13 +126,13 @@
     display: inline-block;
     font-size: 1.1em;
     font-weight: bold;
-    color: #011627;
+    color: var(--text-primary);
     text-decoration: none;
     transition: color 0.3s ease;
 }
 
 .image-card .title:hover {
-    color: #35A89C;
+    color: var(--accent-primary);
 }
 
 .image-detail {
@@ -146,7 +146,7 @@
 .image-info {
     margin: 20px 0;
     padding: 20px;
-    background: #f8f9fa;
+    background: var(--background-secondary);
     border-radius: 12px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
@@ -156,33 +156,33 @@
     align-items: center;
     margin-right: 20px;
     font-size: 1.1em;
-    color: #666;
+    color: var(--text-secondary);
     gap: 0.5rem;
 }
 
 .image-info .count .total {
     font-weight: bold;
-    color: #35A89C;
+    color: var(--accent-primary);
 }
 
 .count {
     display: inline-block;
     padding: 0.5rem 1rem;
     margin-right: 1rem;
-    background-color: #f0f2f5;
+    background-color: var(--image-count-bg);
     border-radius: 20px;
     font-size: 0.9rem;
-    color: #555;
+    color: var(--text-secondary);
 }
 
 .count .total {
     font-weight: bold;
-    color: #333;
+    color: var(--text-primary);
     margin-right: 0.3rem;
 }
 
 .count:hover {
-    background-color: #e4e6e9;
+    background-color: var(--image-count-hover);
     transition: background-color 0.2s ease;
 }
 
@@ -190,8 +190,8 @@
     display: inline-flex;
     align-items: center;
     padding: 10px 20px;
-    background: #35A89C;
-    color: white;
+    background: var(--accent-primary);
+    color: var(--background-primary);
     border-radius: 8px;
     text-decoration: none;
     margin-left: 10px;
@@ -201,7 +201,7 @@
 }
 
 .image-info .button:hover {
-    background: #2a8c82;
+    background: var(--accent-secondary);
     transform: translateY(-2px);
 }
 
@@ -210,18 +210,44 @@
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 25px;
     margin-top: 20px;
+    padding: 20px;
+    background-color: var(--image-count-bg);
+    border-radius: 20px;
 }
 
 .image-likes div {
     text-align: center;
     padding: 15px;
-    background: #f8f9fa;
-    border-radius: 8px;
+    background: var(--image-card-bg);
+    border-radius: 15px;
     transition: transform 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .image-likes div:hover {
     transform: translateY(-5px);
+    background-color: var(--image-hover-bg);
+}
+
+.image-likes p {
+    color: var(--text-secondary);
+    margin-top: 8px;
+    font-size: 0.9rem;
+}
+
+.image-likes p:empty {
+    display: none;
+}
+
+/* Update the empty state message styling */
+.image-likes > p {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-secondary);
+    font-style: italic;
+    background: var(--image-card-bg);
+    border-radius: 15px;
 }
 
 .user-detail {
@@ -230,7 +256,7 @@
     border-radius: 50%;
     margin-bottom: 10px;
     object-fit: cover;
-    border: 3px solid #35A89C;
+    border: 3px solid var(--image-border-teal);
     transition: transform 0.3s ease;
 }
 
