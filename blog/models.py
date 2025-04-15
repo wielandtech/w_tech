@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.contrib.auth.models import User
 from taggit.managers import TaggableManager
+from django.conf import settings
 
 
 class PublishedManager(models.Manager):
@@ -40,19 +41,14 @@ class Post(models.Model):
 
 
 class Comment(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments', null=True, blank=True)
-    name = models.CharField(max_length=80, blank=True)
-    email = models.EmailField(blank=True)
-    body = models.TextField()
+    post = models.ForeignKey('Post', on_delete=models.CASCADE, related_name='comments')
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    content = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
-    active = models.BooleanField(default=False)
+    active = models.BooleanField(default=True)
 
     class Meta:
         ordering = ('created',)
 
     def __str__(self):
-        if self.user:
-            return f'Comment by {self.user.username} on {self.post}'
-        return f'Comment by {self.name} on {self.post}'
+        return f'Comment by {self.author} on {self.post}'
