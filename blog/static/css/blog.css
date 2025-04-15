@@ -20,10 +20,6 @@
     min-width: 0;
 }
 
-input {
-    background-color: var(--background-primary);
-}
-
 .post {
     background-color: #f7f7f7;
     padding: 1rem;
