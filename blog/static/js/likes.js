@@ -4,8 +4,12 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Found like buttons:', likeButtons.length);
     
     likeButtons.forEach(button => {
+        // Initialize button state based on data attributes
+        const action = button.dataset.action;
+        button.textContent = action === 'unlike' ? '❤️' : '🤍';
+        
         button.addEventListener('click', async function(e) {
-            console.log('Like button clicked:', this.dataset.id);
+            console.log('Like button clicked:', this.dataset.id, 'Current action:', this.dataset.action);
             e.preventDefault();
             
             // Check if user is authenticated
@@ -46,14 +50,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 const data = await response.json();
                 
                 if (data.status === 'ok' && typeof data.likes === 'number') {
-                    // Update button state
-                    this.dataset.action = action === 'like' ? 'unlike' : 'like';
-                    this.textContent = action === 'like' ? '❤️' : '🤍';
+                    // Update button state and persist in dataset
+                    const newAction = action === 'like' ? 'unlike' : 'like';
+                    this.dataset.action = newAction;
+                    this.textContent = newAction === 'like' ? '🤍' : '❤️';
                     
                     // Update likes count
                     if (likesCount) {
                         likesCount.textContent = data.likes;
                     }
+
+                    console.log('Like state updated:', {
+                        postId,
+                        newAction,
+                        likes: data.likes
+                    });
                 } else {
                     throw new Error(data.message || 'Invalid response format');
                 }

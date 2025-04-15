@@ -38,7 +38,6 @@
                 <button class="like-button" 
                         data-id="{{ post.id }}" 
                         data-action="{% if request.user.id|stringformat:'i' in post.user_has_liked %}unlike{% else %}like{% endif %}">
-                    {% if request.user.id|stringformat:'i' in post.user_has_liked %}❤️{% else %}🤍{% endif %}
                 </button>
             {% endif %}
             <span id="likes-count-{{ post.id }}">{{ post.get_likes }}</span> likes
