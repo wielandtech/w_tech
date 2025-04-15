@@ -179,12 +179,6 @@ a:hover {
         background-color: var(--accent-primary);
         color: #FDFFFC;
     }
-
-    .search-form input[type="email"] {
-        background-color: var(--background-primary);
-        color: var(--blog-text);
-        border: 1px solid var(--blog-border);
-    }
 }
 
 /* System dark mode preference */

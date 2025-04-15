@@ -17,7 +17,7 @@
     {% else %}
     <div class="post-card">
         <h2 class="secondary">Share "{{ post.title }}" by e-mail</h2>
-        <form method="post" class="search-form">
+        <form method="post" class="email-form">
             {{ form.as_p }}
             {% csrf_token %}
             <input type="submit" value="Send e-mail">
