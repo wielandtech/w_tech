@@ -86,18 +86,8 @@
         </form>
     {% endif %}
 {% else %}
-    <div class="login-prompt">
-        <h3>Please sign in to comment</h3>
-        <p>
-            <a href="{% url 'login' %}" class="button">Log in</a>
-            or
-            <a href="{% url 'account:register' %}" class="button">Register</a>
-        </p>
-        <p class="social-login">
-            Or sign in with:
-            <a href="{% url 'social:begin' 'facebook' %}" class="social-button">Facebook</a>
-            <a href="{% url 'social:begin' 'google-oauth2' %}" class="social-button">Google</a>
-        </p>
+    <div class="comment-login-prompt">
+        <p>Please <a href="{% url 'login' %}?next={{ request.path }}">log in</a> to add a comment.</p>
     </div>
 {% endif %}
 {% endblock %}
