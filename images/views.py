@@ -11,29 +11,10 @@ from django.views.decorators.http import require_POST
 from django.core.files.uploadhandler import TemporaryFileUploadHandler
 from .forms import ImageCreateForm, ImageUploadForm
 from .models import Image
+from core.redis_client import get_redis
 import logging
 
 logger = logging.getLogger(__name__)
-
-# connect to redis with error handling
-try:
-    r = redis.Redis(
-        host=settings.REDIS_HOST,
-        port=settings.REDIS_PORT,
-        db=settings.REDIS_DB,
-        password=settings.REDIS_KEY if hasattr(settings, 'REDIS_KEY') else None,
-        socket_timeout=5,
-        socket_connect_timeout=5,
-        retry_on_timeout=True
-    )
-    # Test the connection
-    r.ping()
-except redis.ConnectionError as e:
-    logger.error(f"Redis connection error: {e}")
-    r = None
-except Exception as e:
-    logger.error(f"Redis error: {e}")
-    r = None
 
 @login_required
 def image_create(request):
@@ -80,16 +61,20 @@ def image_detail(request, id, slug):
 def image_like(request):
     image_id = request.POST.get('id')
     action = request.POST.get('action')
+    
     if image_id and action:
         try:
             image = Image.objects.get(id=image_id)
+            r = get_redis()
+            key = f'image:{image_id}:likes'
+            
             if action == 'like':
-                image.users_like.add(request.user)
-                create_action(request.user, 'likes', image)
+                r.sadd(key, str(request.user.id))
             else:
-                image.users_like.remove(request.user)
-            return JsonResponse({'status':'ok'})
-        except:
+                r.srem(key, str(request.user.id))
+                
+            return JsonResponse({'status': 'ok', 'likes': r.scard(key)})
+        except Image.DoesNotExist:
             pass
     return JsonResponse({'status': 'error'})
 

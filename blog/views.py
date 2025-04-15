@@ -10,6 +10,7 @@ from taggit.models import Tag
 
 from .forms import CommentForm, EmailPostForm, SearchForm
 from .models import Post
+from core.redis_client import get_redis
 
 
 class PostListView(ListView):
@@ -121,13 +122,13 @@ def post_like(request):
     if post_id and action:
         try:
             post = Post.objects.get(id=post_id)
-            r = post.get_redis_connection()
+            r = get_redis()
             key = f'blog:post:{post_id}:likes'
             
             if action == 'like':
-                r.sadd(key, request.user.id)
+                r.sadd(key, str(request.user.id))
             else:
-                r.srem(key, request.user.id)
+                r.srem(key, str(request.user.id))
             
             return JsonResponse({'status': 'ok', 'likes': post.get_likes()})
         except Post.DoesNotExist:

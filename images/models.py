@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.urls import reverse
 from django.utils.text import slugify
+from core.redis_client import get_redis
 
 
 class Image(models.Model):
@@ -25,3 +26,11 @@ class Image(models.Model):
 
     def get_absolute_url(self):
         return reverse('images:detail', args=[self.id, self.slug])
+
+    def get_likes(self):
+        r = get_redis()
+        return r.scard(f'image:{self.id}:likes')
+
+    def user_has_liked(self, user_id):
+        r = get_redis()
+        return r.sismember(f'image:{self.id}:likes', str(user_id))
