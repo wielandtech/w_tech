@@ -45,9 +45,9 @@ class Comment(models.Model):
                             on_delete=models.CASCADE,
                             related_name='comments')
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                            on_delete=models.SET_NULL,  # Changed from CASCADE
-                            null=True,                  # Allow null values
-                            blank=True)                 # Allow blank in forms
+                            on_delete=models.SET_NULL,
+                            null=True,
+                            blank=True)
     name = models.CharField(max_length=80)
     email = models.EmailField()
     body = models.TextField()
