@@ -51,6 +51,18 @@
 
 /* Search form styling */
 input {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--blog-border);
+    background-color: var(--background-primary);;
+    border-radius: 4px;
+}
+
+.search-form input[type="submit"] {
     width: fit-content;
     margin: 0 auto;
     padding: 8px 16px;
@@ -62,7 +74,7 @@ input {
     transition: background-color 0.3s ease;
 }
 
-input:hover {
+.search-form input[type="submit"]:hover {
     background-color: var(--blog-link-hover);
 }
 
