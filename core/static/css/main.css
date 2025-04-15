@@ -129,18 +129,11 @@ textarea {
 
 /* Update logo styles */
 .logo-img {
-  margin-left: 8px;
-  margin-top: 8px;
   max-height: 33px;
-  max-width: 33px;
-  padding: 0;
-  background: transparent !important;
+  padding: 8px 0;
 }
 
 .logo-link {
-  display: flex;
-  align-items: center;
-  background: transparent;
   padding: 0 12px !important;
 }
 
@@ -283,7 +276,7 @@ ul {
   overflow-y: hidden;
   background-color: var(--nav-background);
   position: sticky;
-  top: 0px;
+  top: 0;
   display: flex;
   flex-wrap: nowrap;
   -webkit-overflow-scrolling: touch;

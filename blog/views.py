@@ -61,11 +61,13 @@ def post_detail(request, year, month, day, post):
     similar_posts = similar_posts.annotate(same_tags=Count('tags')).order_by('-same_tags', '-publish')[:4]
     return render(request,
                   'blog/post/detail.html',
-                  {'post': post,
-                   'comments': comments,
-                   'form': comment_form,
-                   'similar_posts': similar_posts,
-                   'section': 'blog'})
+                  {
+                    'post': post,
+                    'comments': comments,
+                    'form': comment_form,
+                    'similar_posts': similar_posts
+                  }
+            )
 
 
 def post_search(request):
