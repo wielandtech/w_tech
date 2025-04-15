@@ -62,23 +62,24 @@
         </div>
     {% else %}
         <h2>Add a new comment</h2>
-        <form method="post" id="comment-form" enctype="multipart/form-data">
-            {% if comment_form.errors %}
-                <div class="alert alert-error">
-                    Please correct the errors below:
-                    <ul class="error-list">
-                        {% for field, errors in comment_form.errors.items %}
-                            {% for error in errors %}
-                                <li>{{ field }}: {{ error }}</li>
-                            {% endfor %}
-                        {% endfor %}
-                    </ul>
-                </div>
-            {% endif %}
-            
-            {{ comment_form.as_p }}
+        <form method="post" id="comment-form">
             {% csrf_token %}
-            
+            {% for field in comment_form %}
+                <div class="form-field">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.help_text %}
+                        <small class="help-text">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% if field.errors %}
+                        <ul class="errorlist">
+                            {% for error in field.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            {% endfor %}
             <p class="form-actions">
                 <input type="submit" value="Add comment" class="button">
             </p>
