@@ -320,7 +320,6 @@ ul.messages li.warning { background: #de9404; }
     display: flex;
     justify-content: space-between;
     align-items: center;
-    position: sticky;
     top: 0;
     z-index: 1000;
     border-bottom: 4px solid #2a8c82;
