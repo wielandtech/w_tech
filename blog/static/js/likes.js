@@ -1,8 +1,11 @@
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Likes.js loaded');
     const likeButtons = document.querySelectorAll('.like-button');
+    console.log('Found like buttons:', likeButtons.length);
     
     likeButtons.forEach(button => {
         button.addEventListener('click', async function(e) {
+            console.log('Like button clicked:', this.dataset.id);
             e.preventDefault();
             
             // Check if user is authenticated
