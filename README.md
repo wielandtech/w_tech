@@ -24,17 +24,68 @@ A modern Django-based personal portfolio and blog platform.
 ## 📁 Project Structure
 
 ```
-wielandtech/
-├── account/          # User auth & profiles
-├── actions/          # Activity tracking
-├── blog/            # Blog functionality  
-├── common/          # Shared utilities
-├── core/            # Website core
-├── deploy/          # Deployment configs
-├── images/          # Image handling
-├── nginx/           # Nginx config
-├── static/          # Static files
-└── wielandtech/     # Project settings
+w_tech/
+├── account/                    # User auth & profiles
+│   ├── static/
+│   │   └── css/
+│   │       └── account.css    # Account styling
+│   ├── templates/
+│   ├── admin.py
+│   ├── authentication.py
+│   ├── forms.py
+│   ├── models.py
+│   ├── tests.py
+│   ├── urls.py
+│   └── views.py
+├── actions/                    # Activity tracking
+│   ├── admin.py
+│   ├── models.py
+│   ├── tests.py
+│   ├── utils.py
+│   └── views.py
+├── blog/                      # Blog functionality
+│   ├── static/
+│   │   └── css/
+│   │       ├── blog.css      # Blog styling
+│   │       └── blog-dark.css # Dark mode styling
+│   ├── templates/
+│   │   └── blog/
+│   │       ├── base.html
+│   │       └── post/
+│   └── views.py
+├── core/                      # Website core
+│   ├── static/
+│   │   ├── css/
+│   │   │   ├── dark-mode.css # Dark theme
+│   │   │   ├── main.css     # Main styling
+│   │   │   └── normalize.css # CSS reset
+│   │   └── js/
+│   │       ├── main.js      # Core JavaScript
+│   │       └── theme.js     # Theme switcher
+│   └── templates/
+│       └── core/
+│           ├── about.html
+│           ├── base.html
+│           ├── index.html
+│           └── projects.html
+├── deploy/                    # Deployment configs
+├── images/                    # Image handling
+│   ├── static/
+│   │   └── css/
+│   │       └── images.css    # Image gallery styling
+│   └── templates/
+│       └── images/
+│           └── base.html
+├── nginx/                     # Nginx config
+│   └── conf.d/
+├── static/                    # Static files
+├── wielandtech/              # Project settings
+├── .env                      # Environment variables
+├── docker-compose.yml        # Docker setup
+├── Dockerfile                # Docker image
+├── manage.py                 # Django CLI
+├── requirements.txt          # Python dependencies
+└── README.md                 # Documentation
 ```
 
 ## 🚀 Getting Started
