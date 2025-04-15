@@ -50,15 +50,17 @@
 }
 
 /* Search form styling */
-input {
+.search-form {
     display: flex;
     flex-direction: column;
     gap: 10px;
     margin-bottom: 20px;
+}
+
+.search-form input[type="text"] {
     width: 100%;
     padding: 8px;
     border: 1px solid var(--blog-border);
-    background-color: var(--background-primary);;
     border-radius: 4px;
 }
 
