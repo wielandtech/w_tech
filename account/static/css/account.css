@@ -299,6 +299,19 @@ ul.messages li.warning { background: #de9404; }
     object-fit: cover;
 }
 
+#image-list .image a {
+    display: block;
+    color: var(--text-primary);
+    text-decoration: none;
+    padding: 10px;
+}
+
+#image-list .image p {
+    margin: 8px 0;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
 /* Navbar styles */
 .account-navbar {
     background: #35A89C;
