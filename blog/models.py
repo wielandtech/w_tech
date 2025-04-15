@@ -47,6 +47,7 @@ class Comment(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                             on_delete=models.CASCADE)
     name = models.CharField(max_length=80)
+    email = models.EmailField()  # Add this field
     body = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -58,6 +59,8 @@ class Comment(models.Model):
     def save(self, *args, **kwargs):
         if not self.name and self.user:
             self.name = self.user.get_full_name() or self.user.username
+        if not self.email and self.user:
+            self.email = self.user.email
         super().save(*args, **kwargs)
     
     def __str__(self):

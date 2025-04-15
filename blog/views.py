@@ -54,6 +54,7 @@ def post_detail(request, year, month, day, post):
             new_comment.post = post
             new_comment.user = request.user
             new_comment.name = request.user.get_full_name() or request.user.username
+            new_comment.email = request.user.email or "Unknown"
             new_comment.save()
             return redirect(post.get_absolute_url())
     else:
