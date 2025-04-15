@@ -283,13 +283,17 @@ ul.messages li.warning { background: #de9404; }
     background: #35A89C;
     padding: 0.75rem 2rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
     position: sticky;
     top: 0;
     z-index: 1000;
     border-bottom: 4px solid #2a8c82;
+}
+
+.nav-section {
+    min-width: 200px; /* Ensures equal space on both sides */
 }
 
 .menu {
@@ -300,44 +304,15 @@ ul.messages li.warning { background: #de9404; }
     padding: 0;
     flex-wrap: nowrap;
     align-items: center;
+    justify-content: center;
 }
 
-.menu li {
-    white-space: nowrap;
-}
-
-.menu li a {
-    color: #fff;
-    text-decoration: none;
-    font-weight: 500;
-    padding: 0.5rem 0;
-    position: relative;
-    transition: all 0.3s ease;
-    font-size: 0.95rem;
-}
-
-.menu li a:hover {
-    color: #f3f7cc;
-}
-
-.menu li.selected a {
-    color: #f3f7cc;
-}
-
-.menu li.selected a::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background-color: #f3f7cc;
-}
-
+/* Align user controls to the right */
 .user-controls {
     display: flex;
     align-items: center;
     gap: 1rem;
+    justify-content: flex-end;
 }
 
 .user-greeting {
@@ -392,11 +367,14 @@ ul.messages li.warning { background: #de9404; }
         font-size: 1.1em;
     }
 
-    .navbar {
-        flex-direction: row;
-        flex-wrap: wrap;
-        padding: 0.75rem 1rem;
+    .account-navbar {
+        grid-template-columns: 1fr;
         gap: 0.5rem;
+        padding: 0.75rem 1rem;
+    }
+
+    .nav-section {
+        min-width: 0;
     }
 
     .menu {
