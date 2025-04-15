@@ -13,36 +13,6 @@
   --nav-hover-text: #FDFFFC;
   --nav-active: #35A89C;
   --nav-shadow: rgba(0, 0, 0, 0.1);
-
-  --accent-primary: #35A89C;
-  --accent-secondary: #CC352A;
-  --highlight: #FF9F1C;
-  --border-color: #ddd;
-  --shadow-color: rgba(0, 0, 0, 0.1);
-
-  /* Blog specific light theme variables */
-  --blog-background: #FDFFFC;
-  --blog-text: #011627;
-  --blog-card-bg: #ffffff;
-  --blog-card-shadow: rgba(0, 0, 0, 0.1);
-  --blog-border: #ddd;
-  --blog-meta: #666666;
-  --blog-tag-bg: #f0f0f0;
-  --blog-tag-text: #011627;
-  --blog-link: #35A89C;
-  --blog-link-hover: #2a8c82;
-
-  /* Photography section light theme variables */
-  --photo-background: #FDFFFC;
-  --photo-text: #011627;
-  --photo-card-bg: #ffffff;
-  --photo-card-shadow: rgba(0, 0, 0, 0.1);
-  --photo-border: #ddd;
-  --photo-meta: #666666;
-  --photo-tag-bg: #f0f0f0;
-  --photo-tag-text: #011627;
-  --photo-link: #35A89C;
-  --photo-link-hover: #2a8c82;
 }
 
 /* Dark theme */
@@ -60,36 +30,6 @@
   --nav-hover-text: #FDFFFC;
   --nav-active: #35A89C;
   --nav-shadow: rgba(0, 0, 0, 0.3);
-
-  --accent-primary: #35A89C;
-  --accent-secondary: #FF4C42;
-  --highlight: #FFB74D;
-  --border-color: #2a2a2a;
-  --shadow-color: rgba(0, 0, 0, 0.3);
-
-  /* Blog specific dark theme variables */
-  --blog-background: #011627;
-  --blog-text: #FDFFFC;
-  --blog-card-bg: #0D2538;
-  --blog-card-shadow: rgba(0, 0, 0, 0.3);
-  --blog-border: #1a3854;
-  --blog-meta: #b0b0b0;
-  --blog-tag-bg: #1a3854;
-  --blog-tag-text: #FDFFFC;
-  --blog-link: #35A89C;
-  --blog-link-hover: #40c9bb;
-
-  /* Photography section dark theme variables */
-  --photo-background: #011627;
-  --photo-text: #FDFFFC;
-  --photo-card-bg: #0D2538;
-  --photo-card-shadow: rgba(0, 0, 0, 0.3);
-  --photo-border: #1a3854;
-  --photo-meta: #b0b0b0;
-  --photo-tag-bg: #1a3854;
-  --photo-tag-text: #FDFFFC;
-  --photo-link: #35A89C;
-  --photo-link-hover: #40c9bb;
 }
 
 /* System preference handling */
