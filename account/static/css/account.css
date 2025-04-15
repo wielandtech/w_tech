@@ -29,42 +29,6 @@ ol {
     line-height: 1.5;
 }
 
-/* Navbar styles */
-#header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 100px;
-    background: #35A89C;
-    color: #fff;
-    border-bottom: 4px solid #2a8c82;
-}
-
-#header .logo {
-    font-size: 20px;
-    color: #f3f7cc;
-}
-
-#header a {
-    color: #011627;
-}
-
-#header a:hover {
-    color: #fff;
-}
-
-#header ul.menu {
-    list-style: none;
-    display: flex;
-    gap: 10px;
-    margin: 0;
-    padding: 0;
-}
-
-#header ul.menu li.selected a {
-    font-weight: bold;
-}
-
 /* Form styles */
 form {
     display: block;
@@ -314,12 +278,87 @@ ul.messages li.warning { background: #de9404; }
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
+/* Navbar styles */
+.navbar {
+    background: #35A89C;
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 4px solid #2a8c82;
+}
+
+.menu {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.menu li a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.5rem 0;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.menu li a:hover {
+    color: #f3f7cc;
+}
+
+.menu li.selected a {
+    color: #f3f7cc;
+}
+
+.menu li.selected a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #f3f7cc;
+}
+
+.user-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.user-greeting {
+    color: #fff;
+}
+
+.logout-form {
+    margin: 0;
+}
+
+.logout-button {
+    background: transparent;
+    color: white;
+    border: 2px solid #fff;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.logout-button:hover {
+    background: #fff;
+    color: #35A89C;
+}
+
 /* Responsive styles */
 @media (max-width: 768px) {
-    #header {
-        padding: 10px 20px;
-    }
-    
     .content {
         padding: 20px;
     }
@@ -345,20 +384,33 @@ ul.messages li.warning { background: #de9404; }
     .profile-info .count {
         font-size: 1.1em;
     }
+
+    .navbar {
+        flex-direction: column;
+        padding: 1rem;
+        gap: 1rem;
+    }
+
+    .menu {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        width: 100%;
+    }
+
+    .user-controls {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        width: 100%;
+    }
+
+    .logout-button {
+        width: 100%;
+    }
 }
 
 @media (max-width: 480px) {
-    #header {
-        flex-direction: column;
-        padding: 10px;
-    }
-    
-    #header ul.menu {
-        flex-direction: column;
-        width: 100%;
-        margin: 10px 0;
-    }
-    
     #people-list {
         grid-template-columns: 1fr;
     }
