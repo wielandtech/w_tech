@@ -127,14 +127,16 @@ textarea {
   max-width: 33px;
 }
 
-/* Update logo styles */
-.logo-img {
-  max-height: 33px;
-  padding: 8px 0;
-}
-
+/* Logo specific styles */
 .logo-link {
   padding: 0 12px !important;
+  margin-right: 10px;
+}
+
+.logo-img {
+  height: 33px;
+  width: auto;
+  padding: 8px 0;
 }
 
 .parallax {
@@ -268,51 +270,56 @@ ul {
   margin: 1em 0;
 }
 
-/* Update the navbar styles */
+/* Navbar styles */
 .navbar {
   z-index: 1000;
+  width: 100%;
   height: 50px;
-  overflow-x: auto;
-  overflow-y: hidden;
   background-color: var(--nav-background);
   position: sticky;
   top: 0;
   display: flex;
-  flex-wrap: nowrap;
-  -webkit-overflow-scrolling: touch;
-  box-shadow: 0 2px 4px var(--shadow-color);
+  align-items: center;
+  box-shadow: 0 2px 4px var(--nav-shadow);
 }
 
-/* Style the navigation bar links */
 .navbar a {
-  flex: 0 0 auto;
-  display: flex;
-  align-items: center;
   color: var(--nav-text);
   text-align: center;
   padding: 14px 20px;
   text-decoration: none;
   transition: all 0.3s ease;
+  white-space: nowrap;
 }
 
-/* Change color on hover */
 .navbar a:hover {
   background-color: var(--nav-hover-bg);
   color: var(--nav-hover-text);
 }
 
-.navbar a.logo-link:hover {
-  background-color: transparent;
-}
-
-/* Active/current link */
 .navbar a.active {
-  background-color: var(--accent-primary);
+  background-color: var(--nav-active);
   color: var(--nav-text);
 }
 
-.navbar a.active.logo-link {
-  background-color: white;
+/* Theme switch wrapper */
+.theme-switch-wrapper {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  padding-right: 16px;
+}
+
+/* Add responsive behavior */
+@media screen and (max-width: 768px) {
+  .navbar {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .navbar::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .work {
@@ -327,13 +334,6 @@ ul {
 }
 
 /* Update theme switch styles for better visibility */
-.theme-switch-wrapper {
-  display: flex;
-  align-items: center;
-  margin-left: auto;
-  padding-right: 10px;
-}
-
 .theme-switch {
   position: relative;
   display: inline-block;

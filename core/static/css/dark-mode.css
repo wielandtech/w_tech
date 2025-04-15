@@ -1,14 +1,19 @@
 /* Light theme (default) */
 :root {
+  /* Base theme variables */
   --text-primary: #011627;
   --text-secondary: #2a2a2a;
   --background-primary: #FDFFFC;
   --background-secondary: #f5f5f5;
-  /* Navbar stays dark in light mode */
+
+  /* Navbar specific variables */
   --nav-background: #011627;
   --nav-text: #FDFFFC;
   --nav-hover-bg: #0D2538;
   --nav-hover-text: #FDFFFC;
+  --nav-active: #35A89C;
+  --nav-shadow: rgba(0, 0, 0, 0.1);
+
   --accent-primary: #35A89C;
   --accent-secondary: #CC352A;
   --highlight: #FF9F1C;
@@ -42,15 +47,20 @@
 
 /* Dark theme */
 [data-theme="dark"] {
+  /* Base theme variables */
   --text-primary: #FDFFFC;
   --text-secondary: #e0e0e0;
   --background-primary: #011627;
   --background-secondary: #0D2538;
+
   /* Navbar stays dark in dark mode */
   --nav-background: #011627;
   --nav-text: #FDFFFC;
   --nav-hover-bg: #0D2538;
   --nav-hover-text: #FDFFFC;
+  --nav-active: #35A89C;
+  --nav-shadow: rgba(0, 0, 0, 0.3);
+
   --accent-primary: #35A89C;
   --accent-secondary: #FF4C42;
   --highlight: #FFB74D;
