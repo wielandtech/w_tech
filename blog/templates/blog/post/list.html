@@ -27,8 +27,8 @@
             Published {{ post.publish }} by {{ post.author }}
         </p>
         {{ post.body|markdown|truncatewords_html:140 }}
+        <a href="{{ post.get_absolute_url }}">Comment or Share</a>
     </div>
-    <div><p><a href="{{ post.get_absolute_url }}">Comment or Share</a></p></div>
     {% endfor %}
     {% include "pagination.html" with page=posts %}
 {% endblock %}
