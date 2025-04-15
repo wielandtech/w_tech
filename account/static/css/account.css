@@ -315,6 +315,34 @@ ul.messages li.warning { background: #de9404; }
     justify-content: flex-end;
 }
 
+.logout-button {
+    background-color: transparent;
+    color: #fff;
+    border: 2px solid #fff;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.logout-button:hover {
+    background-color: #fff;
+    color: #35A89C;
+    transform: translateY(-1px);
+}
+
+.logout-button:active {
+    transform: translateY(1px);
+}
+
+/* Update the logout form to remove any unwanted spacing */
+.logout-form {
+    margin: 0;
+    padding: 0;
+}
+
 /* Responsive styles */
 @media (max-width: 768px) {
     .content {
