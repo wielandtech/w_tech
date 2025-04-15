@@ -71,7 +71,7 @@ def post_detail(request, year, month, day, post):
 
 
 def post_search(request):
-    query = request.GET.get('query')
+    query = request.GET.get('query', '')
     results = []
 
     if query:

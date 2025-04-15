@@ -1,6 +1,6 @@
 {% if not request.path == '/blog/search/' %}
     <form class="search-form" method="get" action="{% url 'blog:post_search' %}">
-        <input type="text" name="query" placeholder="Search posts..." value="{{ form.query }}">
+        <input type="text" name="query" placeholder="Search posts..." value="{{ query }}">
         <input type="submit" value="Search">
     </form>
 {% endif %}
