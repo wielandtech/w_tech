@@ -266,6 +266,25 @@ a:hover {
         margin: 0.5rem 0;
         font-size: 0.875rem;
     }
+
+    .share-post {
+        margin: 2rem 0;
+    }
+
+    .share-link {
+        display: inline-block;
+        background: #404040;
+        color: #e0e0e0;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        text-decoration: none;
+        transition: background 0.2s ease;
+    }
+
+    .share-link:hover {
+        background: #505050;
+        color: #ffffff;
+    }
 }
 
 /* System dark mode preference */

@@ -4,6 +4,7 @@ from django.core.mail import send_mail
 from django.db.models import Count
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView
+from django.contrib.auth.decorators import login_required
 from taggit.models import Tag
 
 from .forms import CommentForm, EmailPostForm, SearchForm
@@ -90,6 +91,7 @@ def post_search(request):
         {'form': form, 'query': query, 'results': results}
     )
 
+@login_required
 def post_share(request, post_id):
     # Retrieve post by id
     post = get_object_or_404(Post, id=post_id, status='published')
