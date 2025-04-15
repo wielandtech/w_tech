@@ -21,13 +21,20 @@ class PostListView(ListView):
 
 
 def post_list(request, tag_slug=None):
-    object_list = Post.published.all()
+    post_list = Post.published.all()
+    
+    # Add user likes data
+    if request.user.is_authenticated:
+        for post in post_list:
+            # Convert likes to a list of user IDs as strings
+            post.user_has_liked = [str(user.id) for user in post.users_like.all()]
+    
     tag = None
 
     if tag_slug:
         tag = get_object_or_404(Tag, slug=tag_slug)
-        object_list = object_list.filter(tags__in=[tag])
-    paginator = Paginator(object_list, 3)  # 3 posts in each page
+        post_list = post_list.filter(tags__in=[tag])
+    paginator = Paginator(post_list, 3)  # 3 posts in each page
     page = request.GET.get('page')
     try:
         posts = paginator.page(page)
@@ -47,6 +54,10 @@ def post_detail(request, year, month, day, post):
                             publish__year=year,
                             publish__month=month,
                             publish__day=day)
+    
+    # Add user likes data
+    if request.user.is_authenticated:
+        post.user_has_liked = [str(user.id) for user in post.users_like.all()]
     
     comments = post.comments.filter(active=True)
     

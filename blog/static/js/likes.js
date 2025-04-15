@@ -5,9 +5,22 @@ document.addEventListener('DOMContentLoaded', function() {
     
     likeButtons.forEach(button => {
         // Initialize button state based on data attributes
-        const action = button.dataset.action;
-        button.textContent = action === 'unlike' ? '❤️' : '🤍';
+        const isLiked = button.dataset.initialState === 'true';
+        const action = isLiked ? 'unlike' : 'like';
+        const icon = isLiked ? '❤️' : '🤍';
         
+        // Set initial state
+        button.dataset.action = action;
+        if (!button.textContent.trim()) {
+            button.textContent = icon;
+        }
+        
+        console.log('Button initialized:', {
+            postId: button.dataset.id,
+            action: action,
+            isLiked: isLiked
+        });
+
         button.addEventListener('click', async function(e) {
             console.log('Like button clicked:', this.dataset.id, 'Current action:', this.dataset.action);
             e.preventDefault();

@@ -33,7 +33,8 @@
         {% if request.user.is_authenticated %}
             <button class="like-button" 
                     data-id="{{ post.id }}" 
-                    data-action="{% if request.user.id|stringformat:'i' in post.user_has_liked %}unlike{% else %}like{% endif %}">
+                    data-action="{% if request.user.id|stringformat:'i' in post.user_has_liked %}unlike{% else %}like{% endif %}"
+                    data-initial-state="{% if request.user.id|stringformat:'i' in post.user_has_liked %}true{% else %}false{% endif %}">
                 {% if request.user.id|stringformat:'i' in post.user_has_liked %}❤️{% else %}🤍{% endif %}
             </button>
         {% endif %}
