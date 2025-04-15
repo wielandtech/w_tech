@@ -273,17 +273,12 @@ a:hover {
 
     .share-link {
         display: inline-block;
-        background: #404040;
+        background: var(--blog-card-bg);
         color: #e0e0e0;
         padding: 0.5rem 1rem;
         border-radius: 4px;
         text-decoration: none;
         transition: background 0.2s ease;
-    }
-
-    .share-link:hover {
-        background: #505050;
-        color: #ffffff;
     }
 }
 
