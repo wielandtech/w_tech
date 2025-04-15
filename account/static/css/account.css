@@ -10,10 +10,6 @@ a {
     text-decoration: none;
 }
 
-a:hover {
-    font-weight: bold;
-}
-
 h1 {
     border-bottom: 1px solid #bbb;
     padding-bottom: 10px;
@@ -289,6 +285,10 @@ ul.messages li.warning { background: #de9404; }
     top: 0;
     z-index: 1000;
     border-bottom: 4px solid #2a8c82;
+}
+
+.account-navbar a:hover {
+    font-weight: bold;
 }
 
 .nav-section {
