@@ -28,7 +28,7 @@
         </p>
         {{ post.body|markdown|truncatewords_html:140 }}
     </div>
-    <div><p><a href="{% url "blog:post_list_by_tag" tag.slug %}>Comment or Share</a></p></div>
+    <div><p><a href="{{ post.get_absolute_url }}">Comment or Share</a></p></div>
     {% endfor %}
     {% include "pagination.html" with page=posts %}
 {% endblock %}
