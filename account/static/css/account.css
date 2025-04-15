@@ -279,7 +279,7 @@ ul.messages li.warning { background: #de9404; }
 }
 
 /* Navbar styles */
-.navbar {
+.account-navbar {
     background: #35A89C;
     padding: 0.75rem 2rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
