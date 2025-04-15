@@ -14,7 +14,7 @@
             <a href="{% url "account:user_list" %}">People</a>
         </li>
     </ul>
-    <div class="user-controls nav-section">
+    <div class="user-controls">
         <span class="user-greeting">Hello {{ request.user.first_name }}</span>
         <form action="{% url 'logout' %}" method="post" class="logout-form">
             {% csrf_token %}
