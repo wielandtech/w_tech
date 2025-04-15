@@ -135,11 +135,16 @@ textarea {
   max-width: 33px;
   padding: 0;
   background: transparent !important;
+  object-fit: contain;
 }
 
 .logo-link {
   display: flex;
   align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  text-decoration: none;
   background: transparent;
   padding: 0 12px !important;
 }
