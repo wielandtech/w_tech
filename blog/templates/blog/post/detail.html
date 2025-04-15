@@ -63,9 +63,16 @@
     {% else %}
         <h2>Add a new comment</h2>
         <form method="post" id="comment-form" enctype="multipart/form-data">
-            {% if form.errors %}
+            {% if comment_form.errors %}
                 <div class="alert alert-error">
-                    Please correct the errors below.
+                    Please correct the errors below:
+                    <ul class="error-list">
+                        {% for field, errors in comment_form.errors.items %}
+                            {% for error in errors %}
+                                <li>{{ field }}: {{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                    </ul>
                 </div>
             {% endif %}
             
