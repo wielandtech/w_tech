@@ -217,14 +217,37 @@
     transform: translateY(-2px);
 }
 
+.like.button {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 20px;
+    background: var(--accent-primary);
+    color: var(--background-primary);
+    border-radius: 8px;
+    text-decoration: none;
+    margin-left: 0;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    align-self: flex-start;
+}
+
+.like.button:hover {
+    background: var(--accent-secondary);
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px var(--shadow-color);
+}
+
 .image-likes {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 25px;
     margin-top: 20px;
     padding: 20px;
-    background-color: var(--image-count-bg);
+    background-color: var(--background-primary);
     border-radius: 20px;
+    box-shadow: 0 2px 4px var(--shadow-color);
 }
 
 .image-likes div {
@@ -307,6 +330,13 @@
         margin: 10px 0;
         text-align: center;
         width: 100%;
+    }
+
+    .like.button {
+        display: block;
+        width: 100%;
+        text-align: center;
+        margin: 10px 0;
     }
 
     .image-likes {
