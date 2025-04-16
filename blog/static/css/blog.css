@@ -21,9 +21,33 @@
 }
 
 .post {
-    background-color: #f7f7f7;
+    background-color: var(--blog-card-bg);
     padding: 1rem;
     margin-bottom: 0.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px var(--blog-card-shadow);
+}
+
+.post-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    color: var(--blog-text);
+}
+
+.post-content h2 {
+    margin: 0;
+    color: var(--blog-text);
+}
+
+.post-content .tags {
+    margin: 0;
+    color: var(--blog-meta);
+}
+
+.post-content .date {
+    margin: 0;
+    color: var(--blog-meta);
 }
 
 .secondary a {
@@ -39,9 +63,10 @@
     flex: 1;
     max-width: 300px;
     padding: 1rem;
-    background-color: #f9f9f9;
-    border-left: 1px solid var(--accent-primary);
+    background-color: var(--blog-card-bg);
+    border-left: 1px solid var(--blog-border);
     font-size: 0.9rem;
+    color: var(--blog-text);
 }
 
 #sidebar h2,
