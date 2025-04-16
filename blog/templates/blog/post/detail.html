@@ -123,7 +123,7 @@
 {% block domready %}
     $('a.like-button').click(function(e){
         e.preventDefault();
-        $.post('{% url "blog:like" %}',
+        $.post('{% url "blog:like_post" %}',
         {
             id: $(this).data('id'),
             action: $(this).data('action')

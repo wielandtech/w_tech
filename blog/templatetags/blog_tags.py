@@ -35,15 +35,3 @@ def show_latest_posts(count=5):
 @register.simple_tag
 def total_posts():
     return Post.published.count()
-
-
-@register.filter
-def user_has_liked(post, user):
-    """Check if user has liked a post using Redis"""
-    return redis_instance.sismember(f'blog:like:{post.id}', user.id)
-
-
-@register.filter
-def get_likes_count(post):
-    """Get the number of likes for a post from Redis"""
-    return redis_instance.scard(f'blog:like:{post.id}') or 0
