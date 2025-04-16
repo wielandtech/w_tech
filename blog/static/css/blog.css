@@ -49,37 +49,6 @@
     margin-top: 1vh;;
 }
 
-/* Search form styling */
-.search-form {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-.search-form input[type="text"] {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid var(--blog-border);
-    border-radius: 4px;
-}
-
-.search-form input[type="submit"] {
-    width: fit-content;
-    margin: 0 auto;
-    padding: 8px 16px;
-    background-color: var(--accent-primary);
-    color: #FDFFFC;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.search-form input[type="submit"]:hover {
-    background-color: var(--blog-link-hover);
-}
-
 /* Comment form styling */
 #comment-form {
     margin: 2em 0;
