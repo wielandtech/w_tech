@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const postId = this.dataset.id;
             const action = this.dataset.action;
 
-            fetch(`/blog/post/${postId}/${action}/`, {
+            fetch(`/blog/like/${postId}/${action}/`, {
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': getCookie('csrftoken'),
