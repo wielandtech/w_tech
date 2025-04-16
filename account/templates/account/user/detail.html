@@ -22,7 +22,7 @@
             {% endwith %}
         </div>
     </div>
-    <div id="image-list" class="image-container">
+    <div id="image-list" class="image-grid">
         {% include "images/image/list_ajax.html" with images=user.images_created.all %}
     </div>
 {% endblock %}
