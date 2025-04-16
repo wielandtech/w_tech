@@ -35,12 +35,13 @@
         <div class="post-actions">
             <a href="{{ post.get_absolute_url }}">Comment or Share</a>
             {% if request.user.is_authenticated %}
-                <button class="like-button" 
+                <a href="#" class="like button"
                         data-id="{{ post.id }}" 
                         data-action="{% if post|user_has_liked:request.user %}unlike{% else %}like{% endif %}"
                         data-initial-state="{% if post|user_has_liked:request.user %}true{% else %}false{% endif %}">
                     {% if post|user_has_liked:request.user %}❤️{% else %}🤍{% endif %}
-                </button>
+                </a>
+
             {% endif %}
             <span id="likes-count-{{ post.id }}">{{ post|get_likes_count }}</span> likes
         </div>
@@ -51,4 +52,36 @@
     </div>
     {% endfor %}
     {% include "pagination.html" with page=posts %}
+{% endblock %}
+
+{% block domready %}
+    $('a.like').click(function(e){
+        e.preventDefault();
+        $.post('{% url "images:like" %}',
+        {
+            id: $(this).data('id'),
+            action: $(this).data('action')
+        },
+        function(data){
+            if (data['status'] == 'ok')
+            {
+                var previous_action = $('a.like').data('action');
+
+                // toggle data-action
+                $('a.like').data('action', previous_action == 'like' ?
+                'unlike' : 'like');
+
+                // toggle link text
+                $('a.like').text(previous_action == 'like' ? 'Unlike' :
+                'Like');
+
+                // update total likes
+                var previous_likes = parseInt($('span.count .total').
+                text());
+                $('span.count .total').text(previous_action == 'like' ?
+                previous_likes + 1 : previous_likes - 1);
+                }
+            }
+        );
+    });
 {% endblock %}

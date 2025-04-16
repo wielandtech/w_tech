@@ -4,8 +4,6 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from taggit.managers import TaggableManager
 from django.conf import settings
-from core.redis_client import get_redis
-import json
 
 
 class PublishedManager(models.Manager):
@@ -25,9 +23,7 @@ class Post(models.Model):
     publish = models.DateTimeField(default=timezone.now)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    status = models.CharField(max_length=10,
-                              choices=Status.choices,
-                              default=Status.DRAFT)
+    status = models.CharField(max_length=10, choices=Status.choices, default=Status.DRAFT)
     objects = models.Manager()  # The default manager.
     published = PublishedManager()  # Our custom manager.
     tags = TaggableManager()
@@ -44,15 +40,6 @@ class Post(models.Model):
 
     def get_absolute_url(self):
         return reverse('blog:post_detail', args=[self.publish.year, self.publish.month, self.publish.day, self.slug])
-
-    def get_likes(self):
-        r = get_redis()
-        return r.scard(f'blog_post:{self.id}:likes')
-
-    def user_has_liked(self, user_id):
-        r = get_redis()
-        return r.sismember(f'blog_post:{self.id}:likes', str(user_id))
-
 
 class Comment(models.Model):
     post = models.ForeignKey(Post, 

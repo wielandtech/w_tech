@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from taggit.models import Tag
 
+from actions.utils import create_action
 from common.decorators import ajax_required
 from .forms import CommentForm, EmailPostForm, SearchForm
 from .models import Post
@@ -137,15 +138,12 @@ def post_like(request):
     if post_id and action:
         try:
             post = Post.objects.get(id=post_id)
-            r = get_redis()
-            key = f'blog:post:{post_id}:likes'
-            
             if action == 'like':
-                r.sadd(key, str(request.user.id))
+                post.users_like.add(request.user)
+                create_action(request.user, 'likes', post)
             else:
-                r.srem(key, str(request.user.id))
-            
-            return JsonResponse({'status': 'ok', 'likes': r.scard(key)})
+                post.users_like.remove(request.user)
+            return JsonResponse({'status':'ok'})
         except Post.DoesNotExist:
             pass
     return JsonResponse({'status': 'error'})
