@@ -182,6 +182,11 @@
     font-size: 1.2em;
     padding: 0 5px;
     transition: transform 0.2s;
+    color: inherit;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
 }
 
 .like-button:hover {
@@ -191,6 +196,10 @@
 .like-button:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+}
+
+.likes-count {
+    font-size: 0.9em;
 }
 
 .post-actions {

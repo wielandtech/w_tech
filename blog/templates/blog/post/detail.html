@@ -32,14 +32,17 @@
     
     <div class="post-actions">
         {% if request.user.is_authenticated %}
-            {% with total_likes=post.users_like.count users_like=post.users_like.all%}
-            <a href="#" data-id="{{ image.id }}" data-action="{% if request.user in users_like %}un{% endif %}like"
-               class="like button">
-                {% if request.user not in users_like %}
-                    🤍
-                {% else %}
-                    ❤️
-                {% endif %}
+            {% with total_likes=post.users_like.count users_like=post.users_like.all %}
+            <a href="#" data-id="{{ post.id }}" data-action="{% if request.user in users_like %}un{% endif %}like"
+               class="like-button">
+                <span class="like-icon">
+                    {% if request.user not in users_like %}
+                        🤍
+                    {% else %}
+                        ❤️
+                    {% endif %}
+                </span>
+                <span class="likes-count">{{ total_likes }}</span>
             </a>
             {% endwith %}
         {% endif %}
@@ -121,9 +124,9 @@
 {% endblock %}
 
 {% block domready %}
-    $('a.like-button').click(function(e){
+    $('.like-button').click(function(e){
         e.preventDefault();
-        $.post('{% url "blog:like_post" %}',
+        $.post('{% url "blog:post_like" %}',
         {
             id: $(this).data('id'),
             action: $(this).data('action')
@@ -131,20 +134,23 @@
         function(data){
             if (data['status'] === 'ok')
             {
-                var previous_action = $('a.like-button').data('action');
+                var $button = $(e.target).closest('.like-button');
+                var previous_action = $button.data('action');
                 
                 // toggle data-action
-                $('a.like-button').data('action', 
+                $button.data('action', 
                     previous_action === 'like' ? 'unlike' : 'like');
                 
                 // toggle heart icon
-                $('.like-icon').text(
-                    previous_action === 'like' ? '❤️' : '🤍');
+                $button.find('.like-icon').text(
+                    previous_action === 'like' ? '🤍' : '❤️');
                 
                 // update total likes
-                $('.likes-count').text(data.likes);
+                var current_likes = parseInt($button.find('.likes-count').text());
+                $button.find('.likes-count').text(
+                    previous_action === 'like' ? current_likes - 1 : current_likes + 1
+                );
             }
-        }
-    );
-});
+        });
+    });
 {% endblock %}
