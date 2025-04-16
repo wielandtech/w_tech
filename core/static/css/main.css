@@ -287,7 +287,6 @@ ul {
   display: flex;
   flex-wrap: nowrap;
   -webkit-overflow-scrolling: touch;
-  box-shadow: 0 2px 4px var(--shadow-color);
 }
 
 /* Style the navigation bar links */
