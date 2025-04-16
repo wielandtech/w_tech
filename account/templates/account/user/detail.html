@@ -22,16 +22,6 @@
             {% endwith %}
         </div>
     </div>
-    {% with images=user.images_created.all %}
-            {% if images %}
-                {% include "images/image/list_ajax.html" with images=images %}
-            {% else %}
-                <div class="empty-state">
-                    <div class="icon">📷</div>
-                    <p>No images uploaded yet.</p>
-                </div>
-            {% endif %}
-        {% endwith %}
     <div id="image-list" class="image-container">
         {% include "images/image/list_ajax.html" with images=user.images_created.all %}
     </div>
