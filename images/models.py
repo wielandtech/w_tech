@@ -26,11 +26,3 @@ class Image(models.Model):
 
     def get_absolute_url(self):
         return reverse('images:detail', args=[self.id, self.slug])
-
-    def get_likes(self):
-        r = get_redis()
-        return r.scard(f'image:{self.id}:likes')
-
-    def user_has_liked(self, user_id):
-        r = get_redis()
-        return r.sismember(f'image:{self.id}:likes', str(user_id))

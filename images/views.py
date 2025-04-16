@@ -62,20 +62,16 @@ def image_detail(request, id, slug):
 def image_like(request):
     image_id = request.POST.get('id')
     action = request.POST.get('action')
-    
     if image_id and action:
         try:
             image = Image.objects.get(id=image_id)
-            r = get_redis()
-            key = f'image:{image_id}:likes'
-            
             if action == 'like':
-                r.sadd(key, str(request.user.id))
+                image.users_like.add(request.user)
+                create_action(request.user, 'likes', image)
             else:
-                r.srem(key, str(request.user.id))
-                
-            return JsonResponse({'status': 'ok', 'likes': r.scard(key)})
-        except Image.DoesNotExist:
+                image.users_like.remove(request.user)
+            return JsonResponse({'status':'ok'})
+        except:
             pass
     return JsonResponse({'status': 'error'})
 
