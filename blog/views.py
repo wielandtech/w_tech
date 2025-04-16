@@ -1,5 +1,5 @@
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
-from django.core.cache.backends import redis
+import redis
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.mail import send_mail
 from django.shortcuts import render, get_object_or_404, redirect
@@ -73,9 +73,9 @@ def post_detail(request, year, month, day, post):
         r = get_redis()
         if r is not None:
             try:
-                total_views = r.incr(f'image:{post.id}:views')
+                total_views = r.incr(f'post:{post.id}:views')
             except redis.RedisError as e:
-                logger.error(f"Redis error in image_detail: {e}")
+                logger.error(f"Redis error in post_detail: {e}")
     
     return render(request,
                  'blog/post/detail.html',
