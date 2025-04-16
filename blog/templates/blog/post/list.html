@@ -60,33 +60,38 @@
 {% endblock %}
 
 {% block domready %}
-    $('.like-button').click(function(e){
+    $(document).on('click', '.like-button', function(e) {
         e.preventDefault();
-        $.post('{% url "blog:like_post" %}',
-        {
-            id: $(this).data('id'),
-            action: $(this).data('action')
-        },
-        function(data){
-            if (data['status'] === 'ok')
-            {
-                var $button = $(e.target).closest('.like-button');
-                var previous_action = $button.data('action');
-                
-                // toggle data-action
-                $button.data('action', 
-                    previous_action === 'like' ? 'unlike' : 'like');
-                
-                // toggle heart icon
-                $button.find('.like-icon').text(
-                    previous_action === 'like' ? '🤍' : '❤️');
-                
-                // update total likes
-                var current_likes = parseInt($button.find('.likes-count').text());
-                $button.find('.likes-count').text(
-                    previous_action === 'like' ? current_likes - 1 : current_likes + 1
-                );
+        var $button = $(this);
+        var $icon = $button.find('.like-icon');
+        var $count = $button.find('.likes-count');
+        var action = $button.data('action');
+        var currentLikes = parseInt($count.text());
+
+        // Disable button temporarily to prevent double-clicks
+        $button.prop('disabled', true);
+
+        $.post('{% url "blog:post_like" %}', {
+            id: $button.data('id'),
+            action: action
+        })
+        .done(function(data) {
+            if (data['status'] === 'ok') {
+                // Update count based on the action we just performed
+                if (action === 'like') {
+                    $count.text(currentLikes + 1);
+                    $icon.text('❤️');
+                    $button.data('action', 'unlike');
+                } else {
+                    $count.text(currentLikes - 1);
+                    $icon.text('🤍');
+                    $button.data('action', 'like');
+                }
             }
+        })
+        .always(function() {
+            // Re-enable button after request completes
+            $button.prop('disabled', false);
         });
     });
 {% endblock %}
