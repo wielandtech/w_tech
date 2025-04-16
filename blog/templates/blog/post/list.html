@@ -4,10 +4,6 @@
 
 {% block title %}WielandTech Blog{% endblock %}
 
-{% block extra_head %}
-<script src="{% static 'js/likes.js' %}" defer></script>
-{% endblock %}
-
 {% block blog_content %}
     {% if tag %}
     <h2 class="primary">Posts tagged with "{{ tag.name }}"</h2>
@@ -60,41 +56,4 @@
     </div>
     {% endfor %}
     {% include "pagination.html" with page=posts %}
-{% endblock %}
-
-{% block domready %}
-    $(document).on('click', '.like-button', function(e) {
-        e.preventDefault();
-        var $button = $(this);
-        var $icon = $button.find('.like-icon');
-        var $count = $button.find('.likes-count');
-        var action = $button.data('action');
-        var currentLikes = parseInt($count.text());
-
-        // Disable button temporarily to prevent double-clicks
-        $button.prop('disabled', true);
-
-        $.post('{% url "blog:like_post" %}', {
-            id: $button.data('id'),
-            action: action
-        })
-        .done(function(data) {
-            if (data['status'] === 'ok') {
-                // Update count based on the action we just performed
-                if (action === 'like') {
-                    $count.text(currentLikes + 1);
-                    $icon.text('❤️');
-                    $button.data('action', 'unlike');
-                } else {
-                    $count.text(currentLikes - 1);
-                    $icon.text('🤍');
-                    $button.data('action', 'like');
-                }
-            }
-        })
-        .always(function() {
-            // Re-enable button after request completes
-            $button.prop('disabled', false);
-        });
-    });
 {% endblock %}
