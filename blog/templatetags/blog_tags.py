@@ -10,7 +10,7 @@ from ..models import Post
 
 register = template.Library()
 redis_instance = redis.Redis(
-    host=settings.REDIS_IP,
+    host=settings.REDIS_HOST,
     port=settings.REDIS_PORT,
     db=settings.REDIS_DB
 )
