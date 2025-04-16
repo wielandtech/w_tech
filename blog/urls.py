@@ -13,5 +13,5 @@ urlpatterns = [
     path('<int:post_id>/share/', views.post_share, name='post_share'),
     path('feed/', LatestPostsFeed(), name='post_feed'),
     path('search/', views.post_search, name='post_search'),
-    path('like/', views.post_like, name='post_like')
+    path('like/', views.post_like, name='like')
 ]
