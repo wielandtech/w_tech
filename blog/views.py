@@ -57,10 +57,7 @@ def post_detail(request, year, month, day, post):
                             publish__year=year,
                             publish__month=month,
                             publish__day=day)
-    
-    # Add user likes data using Redis
-    if request.user.is_authenticated:
-        post.user_has_liked = [str(request.user.id)] if post.user_has_liked(request.user.id) else []
+
     
     comments = post.comments.filter(active=True)
     
