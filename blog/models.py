@@ -46,18 +46,12 @@ class Post(models.Model):
         return reverse('blog:post_detail', args=[self.publish.year, self.publish.month, self.publish.day, self.slug])
 
     def get_likes(self):
-        return self.total_likes
+        r = get_redis()
+        return r.scard(f'blog_post:{self.id}:likes')
 
-    def user_has_liked(self, user):
-        return user in self.users_like.all()
-    
-    def toggle_like(self, user):
-        if self.user_has_liked(user):
-            self.users_like.remove(user)
-            return False
-        else:
-            self.users_like.add(user)
-            return True
+    def user_has_liked(self, user_id):
+        r = get_redis()
+        return r.sismember(f'blog_post:{self.id}:likes', str(user_id))
 
 
 class Comment(models.Model):

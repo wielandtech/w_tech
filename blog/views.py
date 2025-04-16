@@ -3,11 +3,13 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.mail import send_mail
 from django.db.models import Count
 from django.shortcuts import render, get_object_or_404, redirect
+from django.views.decorators.http import require_POST
 from django.views.generic import ListView
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from taggit.models import Tag
 
+from common.decorators import ajax_required
 from .forms import CommentForm, EmailPostForm, SearchForm
 from .models import Post
 from core.redis_client import get_redis
@@ -126,7 +128,9 @@ def post_share(request, post_id):
     return render(request, 'blog/post/share.html', {'post': post, 'form': form, 'sent': sent})
 
 
+@ajax_required
 @login_required
+@require_POST
 def post_like(request):
     post_id = request.POST.get('id')
     action = request.POST.get('action')
@@ -141,7 +145,7 @@ def post_like(request):
             else:
                 r.srem(key, str(request.user.id))
             
-            return JsonResponse({'status': 'ok', 'likes': post.get_likes()})
+            return JsonResponse({'status': 'ok', 'likes': r.scard(key)})
         except Post.DoesNotExist:
             pass
     return JsonResponse({'status': 'error'})

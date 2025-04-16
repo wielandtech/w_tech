@@ -182,6 +182,87 @@ docker compose up --build
 docker compose exec web python manage.py migrate
 ```
 
+### Managing Migrations in Docker
+```bash
+# Drop into a shell in the web container
+docker compose exec web bash
+
+# Reset migrations for a specific app
+python manage.py migrate app_name zero
+
+# Remove migration files
+rm app_name/migrations/0*.py
+
+# Create fresh migration
+python manage.py makemigrations app_name
+
+# Apply new migration
+python manage.py migrate app_name
+```
+
+### Troubleshooting Migrations
+
+If you encounter `relation already exists` errors during migrations:
+
+```bash
+# Stop the containers first
+docker compose down
+
+# Remove the PostgreSQL volume to start fresh
+docker volume rm w_tech_postgres_data
+
+# Rebuild and start the containers
+docker compose up --build -d
+
+# Run migrations again
+docker compose exec web python manage.py migrate
+```
+
+Alternatively, if you want to keep the database but fix specific app migrations:
+
+```bash
+# Access container shell
+docker compose exec web bash
+
+# Reset specific app migrations (e.g., for blog app)
+python manage.py migrate blog zero
+
+# Remove old migration files
+rm blog/migrations/0*.py
+touch blog/migrations/__init__.py
+
+# Create and apply fresh migrations
+python manage.py makemigrations blog
+python manage.py migrate blog
+```
+
+### Creating a Superuser
+
+To create a superuser account in Docker:
+
+```bash
+# Access the container shell
+docker compose exec web python manage.py createsuperuser
+
+# Follow the prompts:
+# - Enter username
+# - Enter email
+# - Enter password (it won't be visible)
+# - Confirm password
+```
+
+Alternatively, create a superuser non-interactively:
+
+```bash
+# Create superuser with predefined credentials
+docker compose exec web python manage.py createsuperuser --noinput --username admin --email admin@example.com
+```
+
+Note: When using --noinput, set the DJANGO_SUPERUSER_PASSWORD environment variable first:
+```bash
+export DJANGO_SUPERUSER_PASSWORD="your-secure-password"
+```
+
 ## 📝 License
 
 [BSD 3-Clause License](LICENSE)

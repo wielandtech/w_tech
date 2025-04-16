@@ -5,7 +5,8 @@
 {% block title %}{{ post.title }}{% endblock %}
 
 {% block extra_head %}
-<script src="{% static 'js/likes.js' %}"></script>
+{{ block.super }}
+<script src="{% static 'js/likes.js' %}" defer></script>
 {% endblock %}
 
 {% block blog_content %}
@@ -31,13 +32,13 @@
     
     <div class="post-actions">
         {% if request.user.is_authenticated %}
-            <form action="{% url 'blog:toggle_like' post.id %}" method="post" class="like-form">
-                {% csrf_token %}
-                <button type="submit" class="like-button">
-                    {% if post.user_has_liked %}❤️{% else %}🤍{% endif %}
-                </button>
+            <a href="#" 
+               data-id="{{ post.id }}" 
+               data-action="{% if post.user_has_liked %}un{% endif %}like"
+               class="like-button">
+                <span class="like-icon">{% if post.user_has_liked %}❤️{% else %}🤍{% endif %}</span>
                 <span class="likes-count">{{ post.total_likes }}</span> likes
-            </form>
+            </a>
         {% endif %}
         
         {% if user.is_authenticated %}
