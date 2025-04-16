@@ -21,62 +21,72 @@
 }
 
 .post {
-    background-color: #f7f7f7;
+    background-color: var(--blog-card-bg);
     padding: 1rem;
     margin-bottom: 0.5rem;
+    border: 1px solid var(--blog-border);
+    box-shadow: 0 2px 4px var(--blog-card-shadow);
+    border-radius: 4px;
 }
 
 .secondary a {
-    color: inherit;
+    color: var(--blog-link);
     text-decoration: underline;
 }
 
 .secondary a:hover {
-    text-decoration: None;
+    color: var(--blog-link-hover);
+    text-decoration: none;
 }
 
 #sidebar {
     flex: 1;
     max-width: 300px;
     padding: 1rem;
-    background-color: #f9f9f9;
-    border-left: 1px solid var(--accent-primary);
+    background-color: var(--blog-card-bg);
+    border-left: 1px solid var(--blog-border);
     font-size: 0.9rem;
 }
 
 #sidebar h2,
 #sidebar h3 {
-    margin-top: 1vh;;
+    margin-top: 1vh;
+    color: var(--blog-text);
 }
 
 /* Comment form styling */
 #comment-form {
     margin: 2em 0;
     padding: 1em;
-    background: #f9f9f9;
+    background: var(--blog-card-bg);
+    border: 1px solid var(--blog-border);
     border-radius: 4px;
 }
 
 #comment-form p {
     margin-bottom: 1em;
+    color: var(--blog-text);
 }
 
 #comment-form label {
     display: block;
     margin-bottom: 0.5em;
     font-weight: bold;
+    color: var(--blog-text);
 }
 
 #comment-form input[type="text"],
 #comment-form textarea {
     width: 100%;
     padding: 0.5em;
-    border: 1px solid #ddd;
+    border: 1px solid var(--blog-border);
     border-radius: 4px;
+    background-color: var(--background-primary);
+    color: var(--blog-text);
 }
 
 #comment-form .errorlist {
-    color: #cc0000;
+    color: var(--accent-secondary);
     font-size: 0.9em;
     margin: 0.25em 0;
     padding-left: 0;
@@ -86,22 +96,25 @@
 .comment-login-prompt {
     margin: 2rem 0;
     padding: 1rem;
-    background: #f5f5f5;
-    border: 1px solid #ddd;
+    background: var(--blog-card-bg);
+    border: 1px solid var(--blog-border);
     border-radius: 4px;
     text-align: center;
+    color: var(--blog-text);
 }
 
 .comment-login-prompt a {
-    color: #2962ff;
+    color: var(--blog-link);
     text-decoration: none;
     font-weight: 500;
 }
 
 .comment-login-prompt a:hover {
+    color: var(--blog-link-hover);
     text-decoration: underline;
 }
 
+/* Other styles remain the same but using variables */
 .form-field {
     margin-bottom: 1.5em;
 }
@@ -110,22 +123,24 @@
     display: block;
     margin-bottom: 0.5em;
     font-weight: bold;
-    color: #333;
+    color: var(--blog-text);
 }
 
 .form-field input[type="text"],
 .form-field textarea {
     width: 100%;
     padding: 0.75em;
-    border: 1px solid #ddd;
+    border: 1px solid var(--blog-border);
     border-radius: 4px;
     font-size: 1em;
+    background-color: var(--background-primary);
+    color: var(--blog-text);
 }
 
 .form-field .help-text {
     display: block;
     margin-top: 0.25em;
-    color: #666;
+    color: var(--blog-meta);
     font-size: 0.9em;
 }
 
@@ -175,6 +190,7 @@
     margin-top: 1.5em;
 }
 
+/* Like button styling */
 .like-button {
     background: none;
     border: none;
@@ -182,7 +198,7 @@
     font-size: 1.2em;
     padding: 0 5px;
     transition: transform 0.2s;
-    color: inherit;
+    color: var(--blog-text);
     text-decoration: none;
     display: flex;
     align-items: center;
@@ -200,6 +216,7 @@
 
 .likes-count {
     font-size: 0.9em;
+    color: var(--blog-text);
 }
 
 .post-actions {
@@ -216,7 +233,7 @@
 
     #sidebar {
         border-left: none;
-        border-top: 1px solid #ddd;
+        border-top: 1px solid var(--blog-border);
         margin-top: 2rem;
     }
 }

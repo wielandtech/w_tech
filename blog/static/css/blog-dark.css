@@ -203,8 +203,9 @@ a:hover {
         transition: border-color 0.2s ease;
     }
 
-    #comment-form textarea:focus,
-    #comment-form input[type="text"]:focus {
+    #comment-form input[type="text"]:focus,
+    .form-field input[type="text"]:focus,
+    .form-field textarea:focus {
         border-color: var(--blog-link);
         outline: none;
         box-shadow: 0 0 0 2px var(--shadow-color);
@@ -282,6 +283,32 @@ a:hover {
     }
 }
 
+/* Dark theme specific overrides if needed */
+[data-theme="dark"] {
+    .post {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    #comment-form input[type="text"]:focus,
+    #comment-form textarea:focus,
+    .form-field input[type="text"]:focus,
+    .form-field textarea:focus {
+        box-shadow: 0 0 0 2px var(--shadow-color);
+    }
+
+    .alert-success {
+        background: #1a472a;
+        color: #4ade80;
+        border: 1px solid #22543d;
+    }
+
+    .alert-error {
+        background: #471a1a;
+        color: #f87171;
+        border: 1px solid #542222;
+    }
+}
+
 /* System dark mode preference */
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
@@ -300,5 +327,7 @@ a:hover {
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
+
+        /* Add any specific system dark mode overrides here if needed */
     }
 }
