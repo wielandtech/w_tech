@@ -26,8 +26,8 @@ def post_list(request, tag_slug=None):
     # Add user likes data
     if request.user.is_authenticated:
         for post in post_list:
-            # Convert likes to a list of user IDs as strings
-            post.user_has_liked = [str(user.id) for user in post.users_like.all()]
+            # Check likes in Redis
+            post.user_has_liked = [str(request.user.id)] if post.user_has_liked(request.user.id) else []
     
     tag = None
 
@@ -55,9 +55,9 @@ def post_detail(request, year, month, day, post):
                             publish__month=month,
                             publish__day=day)
     
-    # Add user likes data
+    # Add user likes data using Redis
     if request.user.is_authenticated:
-        post.user_has_liked = [str(user.id) for user in post.users_like.all()]
+        post.user_has_liked = [str(request.user.id)] if post.user_has_liked(request.user.id) else []
     
     comments = post.comments.filter(active=True)
     
