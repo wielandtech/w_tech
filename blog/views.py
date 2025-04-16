@@ -26,12 +26,6 @@ class PostListView(ListView):
 def post_list(request, tag_slug=None):
     post_list = Post.published.all()
     
-    # Add user likes data
-    if request.user.is_authenticated:
-        for post in post_list:
-            # Check likes in Redis
-            post.user_has_liked = [str(request.user.id)] if post.user_has_liked(request.user.id) else []
-    
     tag = None
 
     if tag_slug:
