@@ -1,7 +1,7 @@
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
+from django.core.cache.backends import redis
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.mail import send_mail
-from django.db.models import Count
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.http import require_POST
 from django.views.generic import ListView
@@ -14,6 +14,9 @@ from common.decorators import ajax_required
 from .forms import CommentForm, EmailPostForm, SearchForm
 from .models import Post
 from core.redis_client import get_redis
+
+from logging import getLogger
+logger = getLogger(__name__)
 
 
 class PostListView(ListView):
@@ -67,6 +70,12 @@ def post_detail(request, year, month, day, post):
             return redirect(post.get_absolute_url())
     else:
         comment_form = CommentForm()
+        r = get_redis()
+        if r is not None:
+            try:
+                total_views = r.incr(f'image:{post.id}:views')
+            except redis.RedisError as e:
+                logger.error(f"Redis error in image_detail: {e}")
     
     return render(request,
                  'blog/post/detail.html',
