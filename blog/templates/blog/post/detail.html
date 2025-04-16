@@ -116,3 +116,32 @@
     </div>
 {% endif %}
 {% endblock %}
+
+{% block domready %}
+    $('a.like-button').click(function(e){
+        e.preventDefault();
+        $.post('{% url "blog:like" %}',
+        {
+            id: $(this).data('id'),
+            action: $(this).data('action')
+        },
+        function(data){
+            if (data['status'] === 'ok')
+            {
+                var previous_action = $('a.like-button').data('action');
+                
+                // toggle data-action
+                $('a.like-button').data('action', 
+                    previous_action === 'like' ? 'unlike' : 'like');
+                
+                // toggle heart icon
+                $('.like-icon').text(
+                    previous_action === 'like' ? '❤️' : '🤍');
+                
+                // update total likes
+                $('.likes-count').text(data.likes);
+            }
+        }
+    );
+});
+{% endblock %}
