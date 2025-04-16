@@ -71,7 +71,7 @@
         // Disable button temporarily to prevent double-clicks
         $button.prop('disabled', true);
 
-        $.post('{% url "blog:post_like" %}', {
+        $.post('{% url "blog:like_post" %}', {
             id: $button.data('id'),
             action: action
         })
