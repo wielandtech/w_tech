@@ -1,33 +1,37 @@
 #!/bin/bash
 #deploy/scripts/deploy.sh
-echo "Redeploying the WielandTech Django App, plus stack..."
+start_time=$(date +%s)
+
+echo "[$( date '+%H:%M:%S' )] Redeploying the WielandTech Django App, plus stack..."
 
 set -e  # Exit on error
 
 cd /opt/w_tech
 
-echo "Pulling latest code..."
+echo "[$( date '+%H:%M:%S' )] Pulling latest code..."
 git pull origin development
 
-echo "Stopping old containers..."
+echo "[$( date '+%H:%M:%S' )] Stopping old containers..."
 docker compose -f docker-compose.yml down --remove-orphans
 
-echo "Building new images..."
+echo "[$( date '+%H:%M:%S' )] Building new images..."
 docker compose -f docker-compose.yml build
 
-echo "Starting containers..."
+echo "[$( date '+%H:%M:%S' )] Starting containers..."
 docker compose -f docker-compose.yml up -d
 
 # Wait for build to complete
 wait $BUILD_PID
 
 # Optimized health check with timeout
-echo "Waiting for web container to become healthy..."
+echo "[$( date '+%H:%M:%S' )] Waiting for web container to become healthy..."
 timeout 60 bash -c 'until [ "$(docker inspect -f "{{.State.Health.Status}}" $(docker compose ps -q web))" == "healthy" ]; do sleep 2; done'
 
-echo "Running Django management commands..."
+echo "[$( date '+%H:%M:%S' )] Running Django management commands..."
 docker compose -f docker-compose.yml exec web python manage.py makemigrations --noinput
 docker compose -f docker-compose.yml exec web python manage.py migrate --noinput
 docker compose -f docker-compose.yml exec web python manage.py collectstatic --noinput
 
-echo "Deployment complete."
+end_time=$(date +%s)
+duration=$((end_time - start_time))
+echo "[$( date '+%H:%M:%S' )] Deployment complete. Total duration: ${duration} seconds"
