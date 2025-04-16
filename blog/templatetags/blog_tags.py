@@ -1,12 +1,19 @@
 import markdown
+import redis
 
 from django import template
 from django.db.models import Count
 from django.utils.safestring import mark_safe
+from django.conf import settings
 
 from ..models import Post
 
 register = template.Library()
+redis_instance = redis.Redis(
+    host=settings.REDIS_IP,
+    port=settings.REDIS_PORT,
+    db=settings.REDIS_DB
+)
 
 
 @register.filter(name='markdown')
@@ -28,3 +35,15 @@ def show_latest_posts(count=5):
 @register.simple_tag
 def total_posts():
     return Post.published.count()
+
+
+@register.filter
+def user_has_liked(post, user):
+    """Check if user has liked a post using Redis"""
+    return redis_instance.sismember(f'blog:like:{post.id}', user.id)
+
+
+@register.filter
+def get_likes_count(post):
+    """Get the number of likes for a post from Redis"""
+    return redis_instance.scard(f'blog:like:{post.id}') or 0

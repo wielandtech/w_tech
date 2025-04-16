@@ -37,12 +37,12 @@
             {% if request.user.is_authenticated %}
                 <button class="like-button" 
                         data-id="{{ post.id }}" 
-                        data-action="{% if request.user.id|stringformat:'i' in post.user_has_liked %}unlike{% else %}like{% endif %}"
-                        data-initial-state="{% if request.user.id|stringformat:'i' in post.user_has_liked %}true{% else %}false{% endif %}">
-                    {% if request.user.id|stringformat:'i' in post.user_has_liked %}❤️{% else %}🤍{% endif %}
+                        data-action="{% if post|user_has_liked:request.user %}unlike{% else %}like{% endif %}"
+                        data-initial-state="{% if post|user_has_liked:request.user %}true{% else %}false{% endif %}">
+                    {% if post|user_has_liked:request.user %}❤️{% else %}🤍{% endif %}
                 </button>
             {% endif %}
-            <span id="likes-count-{{ post.id }}">{{ post.get_likes }}</span> likes
+            <span id="likes-count-{{ post.id }}">{{ post|get_likes_count }}</span> likes
         </div>
     </div>
     {% empty %}
