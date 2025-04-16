@@ -31,6 +31,10 @@ class Post(models.Model):
     objects = models.Manager()  # The default manager.
     published = PublishedManager()  # Our custom manager.
     tags = TaggableManager()
+    users_like = models.ManyToManyField(settings.AUTH_USER_MODEL, 
+                                      related_name='blog_posts_liked',
+                                      blank=True)
+    total_likes = models.PositiveIntegerField(db_index=True, default=0)
 
     class Meta:
         ordering = ('-publish',)
@@ -42,24 +46,17 @@ class Post(models.Model):
         return reverse('blog:post_detail', args=[self.publish.year, self.publish.month, self.publish.day, self.slug])
 
     def get_likes(self):
-        """Get the total number of likes from Redis"""
-        r = get_redis()
-        return r.scard(f'blog:post:{self.id}:likes') or 0
+        return self.total_likes
 
-    def user_has_liked(self, user_id):
-        """Check if a user has liked this post"""
-        r = get_redis()
-        return r.sismember(f'blog:post:{self.id}:likes', str(user_id))
+    def user_has_liked(self, user):
+        return user in self.users_like.all()
     
     def toggle_like(self, user):
-        """Toggle like status for a user"""
-        r = get_redis()
-        key = f'blog:post:{self.id}:likes'
-        if self.user_has_liked(user.id):
-            r.srem(key, str(user.id))
+        if self.user_has_liked(user):
+            self.users_like.remove(user)
             return False
         else:
-            r.sadd(key, str(user.id))
+            self.users_like.add(user)
             return True
 
 
