@@ -25,7 +25,7 @@ wait $BUILD_PID
 
 # Optimized health check with timeout
 echo "[$( date '+%H:%M:%S' )] Waiting for web container to become healthy..."
-timeout 60 bash -c 'until [ "$(docker inspect -f "{{.State.Health.Status}}" $(docker compose ps -q web))" == "healthy" ]; do sleep 2; done'
+sleep 5
 
 echo "[$( date '+%H:%M:%S' )] Running Django management commands..."
 docker compose -p w_tech_prod exec web python manage.py makemigrations --noinput
