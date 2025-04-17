@@ -1,20 +1,12 @@
 import markdown
-import redis
 
 from django import template
 from django.db.models import Count
 from django.utils.safestring import mark_safe
-from django.conf import settings
 
 from ..models import Post
 
 register = template.Library()
-redis_instance = redis.Redis(
-    host=settings.REDIS_HOST,
-    port=settings.REDIS_PORT,
-    db=settings.REDIS_DB
-)
-
 
 @register.filter(name='markdown')
 def markdown_format(text):

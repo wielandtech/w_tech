@@ -9,6 +9,19 @@
         {% include "images/image/list_ajax.html" %}
     </div>
 
+    <div class="most-viewed-posts">
+    <p>Most Viewed Images</p>
+        <ol>
+            {% for image in most_viewed %}
+                <li>
+                    <a href="{{ image.get_absolute_url }}">
+                        {{ image.title }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ol>
+    </div>
+
     <div class="upload-button-wrapper">
         <a href="{% url 'images:upload' %}" class="upload-button button">Upload Image</a>
     </div>

@@ -79,28 +79,41 @@ def image_like(request):
 
 @login_required
 def image_list(request):
-    images = Image.objects.order_by('-total_likes')
-    paginator = Paginator(images, 9)
+    most_likes = Image.objects.order_by('-total_likes')
+    paginator = Paginator(most_likes, 9)
     page = request.GET.get('page')
     try:
-        images = paginator.page(page)
+        most_likes = paginator.page(page)
     except PageNotAnInteger:
         # If page is not an integer deliver the first page
-        images = paginator.page(1)
+        most_likes = paginator.page(1)
     except EmptyPage:
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             # If the request is AJAX and the page is out of range
             # return an empty page
             return HttpResponse('')
         # If page is out of range deliver last page of results
-        images = paginator.page(paginator.num_pages)
+        most_likes = paginator.page(paginator.num_pages)
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         return render(request,
                       'images/image/list_ajax.html',
-                      {'section': 'images', 'images': images})
+                      {'section': 'images', 'images': most_likes})
+    # get image ranking dictionary
+    r = get_redis()
+    image_ranking = r.zrange('image_ranking', 0, -1,
+                             desc=True)[:5]
+    image_ranking_ids = [int(id) for id in image_ranking]
+    # get most viewed images
+    most_viewed = list(Image.objects.filter(
+        id__in=image_ranking_ids))
+    most_viewed.sort(key=lambda x: image_ranking_ids.index(x.id))
     return render(request,
                   'images/image/list.html',
-                  {'section': 'images', 'images': images})
+                  {
+                      'section': 'images',
+                      'most_liked': most_likes,
+                      'most_viewed': most_viewed}
+                  )
 
 @login_required
 def image_ranking(request):
