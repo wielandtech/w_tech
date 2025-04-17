@@ -19,6 +19,7 @@ DEBUG = os.getenv("DEBUG", "False") == "True"
 ALLOWED_HOSTS = [
     "wielandtech.com",
     "www.wielandtech.com",
+    "dev.wielandtech.com",
     "127.0.0.1",
     "localhost",
 ]
