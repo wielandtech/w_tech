@@ -12,7 +12,7 @@ echo "[$( date '+%H:%M:%S' )] Pulling latest code..."
 git pull origin development
 
 echo "[$( date '+%H:%M:%S' )] Stopping old containers..."
-docker compose -p w_tech_prod -f docker-compose.yml down --remove-orphans
+docker compose -p w_tech_prod down --remove-orphans
 
 echo "[$( date '+%H:%M:%S' )] Building new images..."
 docker compose -p w_tech_prod -f docker-compose.yml build

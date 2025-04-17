@@ -18,7 +18,7 @@ echo "[$( date '+%H:%M:%S' )] Building new images..."
 docker compose -p w_tech_dev -f docker-compose-dev.yml build
 
 echo "[$( date '+%H:%M:%S' )] Starting containers..."
-docker compose -p w_tech_dev up -d
+docker compose -p w_tech_dev -f docker-compose-dev.yml up -d
 
 # Wait for build to complete
 wait $BUILD_PID
