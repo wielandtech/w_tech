@@ -9,7 +9,7 @@ set -e  # Exit on error
 cd /opt/w_tech
 
 echo "[$( date '+%H:%M:%S' )] Pulling latest code..."
-git pull origin main
+git pull origin development
 
 echo "[$( date '+%H:%M:%S' )] Stopping old containers..."
 docker compose -p w_tech_prod -f docker-compose.yml down --remove-orphans
