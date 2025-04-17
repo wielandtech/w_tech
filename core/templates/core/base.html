@@ -15,9 +15,6 @@
     <script defer src="{% static 'js/theme.js' %}"></script>
     {% block extra_css %}{% endblock %}
     {% block extra_head %}{% endblock %}
-    {% if user.is_authenticated %}
-    <meta name="user-authenticated" content="true">
-    {% endif %}
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-B3T2X5116N"></script>
