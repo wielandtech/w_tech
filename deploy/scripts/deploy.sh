@@ -9,7 +9,10 @@ set -e  # Exit on error
 cd /opt/w_tech
 
 echo "[$( date '+%H:%M:%S' )] Pulling latest code..."
-git pull origin development
+git pull origin main
+
+echo "[$( date '+%H:%M:%S' )] Backing up PostgreSQL database..."
+docker compose -p w_tech_prod run --rm backup
 
 echo "[$( date '+%H:%M:%S' )] Stopping old containers..."
 docker compose -p w_tech_prod down --remove-orphans

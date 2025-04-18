@@ -36,6 +36,7 @@ help:
 deploy-prod:
 	cd $(PROD_DIR) && \
 	git pull origin main && \
+	docker compose -p $(PROD_PROJECT) run --rm backup
 	docker compose -p $(PROD_PROJECT) -f docker-compose.yml down --remove-orphans && \
 	docker compose -p $(PROD_PROJECT) -f docker-compose.yml build && \
 	docker compose -p $(PROD_PROJECT) -f docker-compose.yml up -d
@@ -70,7 +71,7 @@ shell-prod:
 
 backup-prod:
 	cd $(PROD_DIR) && \
-	docker compose -p $(PROD_PROJECT) exec db pg_dump -U $(DATABASE_USER) $(DATABASE_NAME) > backup_prod_$$(date +%Y%m%d_%H%M%S).sql
+	docker compose -p $(PROD_PROJECT) run --rm backup
 
 # === Development Targets ===
 deploy-dev:
