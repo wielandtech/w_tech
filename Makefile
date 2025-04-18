@@ -117,9 +117,11 @@ install-dev:
 
 # === Code Quality ===
 lint:
-	flake8 .
-	black --check .
-	isort --check-only .
+	# Run flake8
+	docker compose exec web flake8 .
+	# Run other linters
+	docker compose exec web black --check .
+	docker compose exec web isort --check-only .
 
 # === Cleanup ===
 clean:

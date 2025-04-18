@@ -1,5 +1,4 @@
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
-import redis
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.mail import send_mail
 from django.shortcuts import render, get_object_or_404, redirect
@@ -13,7 +12,6 @@ from actions.utils import create_action
 from common.decorators import ajax_required
 from .forms import CommentForm, EmailPostForm, SearchForm
 from .models import Post
-from core.redis_client import get_redis
 
 from logging import getLogger
 logger = getLogger(__name__)
@@ -28,7 +26,7 @@ class PostListView(ListView):
 
 def post_list(request, tag_slug=None):
     post_list = Post.published.all()
-    
+
     tag = None
 
     if tag_slug:
@@ -49,15 +47,14 @@ def post_list(request, tag_slug=None):
 
 def post_detail(request, year, month, day, post):
     post = get_object_or_404(Post,
-                            status=Post.Status.PUBLISHED,
-                            slug=post,
-                            publish__year=year,
-                            publish__month=month,
-                            publish__day=day)
+                             status=Post.Status.PUBLISHED,
+                             slug=post,
+                             publish__year=year,
+                             publish__month=month,
+                             publish__day=day)
 
-    
     comments = post.comments.filter(active=True)
-    
+
     if request.method == 'POST':
         comment_form = CommentForm(data=request.POST)
         if comment_form.is_valid():
@@ -70,18 +67,12 @@ def post_detail(request, year, month, day, post):
             return redirect(post.get_absolute_url())
     else:
         comment_form = CommentForm()
-        r = get_redis()
-        if r is not None:
-            try:
-                total_views = r.incr(f'post:{post.id}:views')
-            except redis.RedisError as e:
-                logger.error(f"Redis error in post_detail: {e}")
-    
+
     return render(request,
-                 'blog/post/detail.html',
-                 {'post': post,
-                  'comments': comments,
-                  'comment_form': comment_form})
+                  'blog/post/detail.html',
+                  {'post': post,
+                   'comments': comments,
+                   'comment_form': comment_form})
 
 
 def post_search(request):
@@ -106,6 +97,7 @@ def post_search(request):
         'blog/post/search.html',
         {'form': form, 'query': query, 'results': results}
     )
+
 
 @login_required
 def post_share(request, post_id):
@@ -143,7 +135,7 @@ def post_like(request):
                 create_action(request.user, 'likes', post)
             else:
                 post.users_like.remove(request.user)
-            return JsonResponse({'status':'ok'})
+            return JsonResponse({'status': 'ok'})
         except Post.DoesNotExist:
             pass
     return JsonResponse({'status': 'error'})

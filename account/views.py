@@ -32,6 +32,7 @@ def user_detail(request, username):
                   {'section': 'people',
                    'user': user})
 
+
 def user_login(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
@@ -43,8 +44,7 @@ def user_login(request):
             if user is not None:
                 if user.is_active:
                     login(request, user)
-                    return HttpResponse('Authenticated ' \
-                                        'successfully')
+                    return HttpResponse('Authenticated successfully')
                 else:
                     return HttpResponse('Disabled account')
             else:
@@ -52,6 +52,7 @@ def user_login(request):
     else:
         form = LoginForm()
     return render(request, 'account/login.html', {'form': form})
+
 
 def register(request):
     if request.method == 'POST':
@@ -76,6 +77,7 @@ def register(request):
     return render(request,
                   'account/register.html',
                   {'user_form': user_form})
+
 
 @login_required
 def edit(request):
@@ -131,10 +133,10 @@ def user_follow(request):
                     user_from=request.user,
                     user_to=user)
                 create_action(request.user, 'is following', user)
-                return JsonResponse({'status':'ok'})
+                return JsonResponse({'status': 'ok'})
             else:
                 Contact.objects.filter(user_from=request.user, user_to=user).delete()
-                return JsonResponse({'status':'ok'})
+                return JsonResponse({'status': 'ok'})
         except User.DoesNotExist:
-            return JsonResponse({'status':'error'})
-    return JsonResponse({'status':'error'})
+            return JsonResponse({'status': 'error'})
+    return JsonResponse({'status': 'error'})

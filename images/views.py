@@ -2,19 +2,18 @@ import redis
 from actions.utils import create_action
 from common.decorators import ajax_required
 from django.shortcuts import get_object_or_404, render, redirect
-from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_POST
-from django.core.files.uploadhandler import TemporaryFileUploadHandler
 from .forms import ImageCreateForm, ImageUploadForm
 from .models import Image
 from core.redis_client import get_redis
 import logging
 
 logger = logging.getLogger(__name__)
+
 
 @login_required
 def image_create(request):
@@ -40,6 +39,7 @@ def image_create(request):
                   {'section': 'images',
                    'form': form})
 
+
 def image_detail(request, id, slug):
     image = get_object_or_404(Image, id=id, slug=slug)
     # increment total image views by 1
@@ -53,10 +53,11 @@ def image_detail(request, id, slug):
         except redis.RedisError as e:
             logger.error(f"Redis error in image_detail: {e}")
     return render(request,
-              'images/image/detail.html',
-              {'section': 'images',
-               'image': image,
-               'total_views': total_views})
+                  'images/image/detail.html',
+                  {'section': 'images',
+                   'image': image,
+                   'total_views': total_views})
+
 
 @ajax_required
 @login_required
@@ -72,10 +73,11 @@ def image_like(request):
                 create_action(request.user, 'likes', image)
             else:
                 image.users_like.remove(request.user)
-            return JsonResponse({'status':'ok'})
+            return JsonResponse({'status': 'ok'})
         except:
             pass
     return JsonResponse({'status': 'error'})
+
 
 @login_required
 def image_list(request):
@@ -115,6 +117,7 @@ def image_list(request):
                       'most_viewed': most_viewed}
                   )
 
+
 @login_required
 def image_ranking(request):
     # get image ranking dictionary
@@ -130,6 +133,7 @@ def image_ranking(request):
                   'images/image/ranking.html',
                   {'section': 'images',
                    'most_viewed': most_viewed})
+
 
 @login_required
 def image_upload(request):

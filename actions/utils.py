@@ -3,6 +3,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
 from .models import Action
 
+
 def create_action(user, verb, target=None):
     # check for any similar action made in the last minute
     now = timezone.now()

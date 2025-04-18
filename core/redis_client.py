@@ -1,6 +1,7 @@
 from django.conf import settings
 from redis import Redis
 
+
 class RedisClient:
     _instance = None
 
@@ -14,6 +15,7 @@ class RedisClient:
                 decode_responses=True
             )
         return cls._instance
+
 
 def get_redis():
     return RedisClient.get_instance()
