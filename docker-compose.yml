@@ -43,6 +43,9 @@ services:
     depends_on:
       - db
     environment:
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       # these are read by pg_dump/psql at runtime:
       PGPASSWORD: ${DATABASE_PASSWORD}
       PGUSER: ${DATABASE_USER}
@@ -50,18 +53,17 @@ services:
     volumes:
       - ./db_backups:/backups
     restart: "no"
-    entrypoint: >
-      sh -c "
-        # timestamp
-        TS=\$(date +'%Y%m%d_%H%M%S') &&
-        # single-line pg_dump invocation
+    entrypoint:
+      - sh
+      - -c
+      - >
+        TS=$(date +'%Y%m%d_%H%M%S') &&
         pg_dump \
           -h db \
-          -U \"\$PGUSER\" \
-          -d \"\$PGDATABASE\" \
+          -U "$PGUSER" \
+          -d "$PGDATABASE" \
           --format=custom \
-          -f /backups/\"\$PGDATABASE\"_\"\$TS\".dump
-      "
+          -f "/backups/${PGDATABASE}_${TS}.dump"
   redis:
     image: redis:alpine
     ports:
