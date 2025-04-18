@@ -1,0 +1,175 @@
+/* Account dark theme styles */
+[data-theme="dark"] {
+    /* User cards */
+    .user {
+        background-color: var(--blog-card-bg);
+        box-shadow: 0 2px 4px var(--blog-card-shadow);
+    }
+
+    .user:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .user .title {
+        color: var(--blog-text);
+    }
+
+    /* Profile info section */
+    .profile-info {
+        background-color: var(--blog-card-bg);
+        box-shadow: 0 2px 4px var(--blog-card-shadow);
+    }
+
+    .profile-info h1 {
+        color: var(--accent-primary);
+        border-color: var(--blog-border);
+    }
+
+    .profile-info .count {
+        color: var(--blog-meta);
+    }
+
+    /* Action list */
+    #action-list .action {
+        background-color: var(--blog-card-bg);
+        box-shadow: 0 2px 4px var(--blog-card-shadow);
+    }
+
+    #action-list .action:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    #action-list .action .info {
+        color: var(--blog-text);
+    }
+
+    #action-list .action .info time {
+        color: var(--blog-meta);
+    }
+
+    /* Image container */
+    .image-container {
+        background-color: var(--blog-card-bg);
+        box-shadow: 0 2px 4px var(--blog-card-shadow);
+    }
+
+    /* Form elements */
+    input, textarea {
+        background-color: var(--blog-card-bg);
+        color: var(--blog-text);
+        border: 1px solid var(--blog-border);
+    }
+
+    input:focus, textarea:focus {
+        border-color: var(--blog-link);
+        outline: none;
+    }
+
+    /* Image detail page elements */
+    .image-info {
+        background-color: var(--blog-card-bg);
+        box-shadow: 0 2px 4px var(--blog-card-shadow);
+        border: 1px solid var(--blog-border);
+        color: var(--blog-text);
+    }
+
+    .image-likes {
+        background-color: var(--blog-card-bg);
+        box-shadow: 0 2px 4px var(--blog-card-shadow);
+        border: 1px solid var(--blog-border);
+        color: var(--blog-text);
+    }
+
+    /* Image list page elements */
+    .image-card {
+        background-color: var(--blog-card-bg);
+        box-shadow: 0 2px 4px var(--blog-card-shadow);
+        border: 1px solid var(--blog-border);
+    }
+
+    .image-card:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .image-card .title {
+        color: var(--blog-text);
+    }
+
+    .image-card .meta {
+        color: var(--blog-meta);
+    }
+}
+
+/* System dark mode preference */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        /* User cards */
+        .user {
+            background-color: var(--blog-card-bg);
+            box-shadow: 0 2px 4px var(--blog-card-shadow);
+        }
+
+        .user .title {
+            color: var(--blog-text);
+        }
+
+        /* Profile info section */
+        .profile-info {
+            background-color: var(--blog-card-bg);
+            box-shadow: 0 2px 4px var(--blog-card-shadow);
+        }
+
+        /* Action list */
+        #action-list .action {
+            background-color: var(--blog-card-bg);
+            box-shadow: 0 2px 4px var(--blog-card-shadow);
+        }
+
+        #action-list .action .info {
+            color: var(--blog-text);
+        }
+
+        /* Image container */
+        .image-container {
+            background-color: var(--blog-card-bg);
+            box-shadow: 0 2px 4px var(--blog-card-shadow);
+        }
+
+        /* Form elements */
+        input, textarea {
+            background-color: var(--blog-card-bg);
+            color: var(--blog-text);
+            border: 1px solid var(--blog-border);
+        }
+
+        /* Image detail page elements */
+        .image-info {
+            background-color: var(--blog-card-bg);
+            box-shadow: 0 2px 4px var(--blog-card-shadow);
+            border: 1px solid var(--blog-border);
+            color: var(--blog-text);
+        }
+
+        .image-likes {
+            background-color: var(--blog-card-bg);
+            box-shadow: 0 2px 4px var(--blog-card-shadow);
+            border: 1px solid var(--blog-border);
+            color: var(--blog-text);
+        }
+
+        /* Image list page elements */
+        .image-card {
+            background-color: var(--blog-card-bg);
+            box-shadow: 0 2px 4px var(--blog-card-shadow);
+            border: 1px solid var(--blog-border);
+        }
+
+        .image-card .title {
+            color: var(--blog-text);
+        }
+
+        .image-card .meta {
+            color: var(--blog-meta);
+        }
+    }
+}

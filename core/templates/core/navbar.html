@@ -1,0 +1,25 @@
+{% if request.user.is_authenticated %}
+<nav class="account-navbar">
+    <div class="nav-section">
+        <!-- Empty left section for flex spacing -->
+    </div>
+    <ul class="menu">
+        <li {% if section == "dashboard" %}class="selected"{% endif %}>
+            <a href="{% url "account:dashboard" %}">My Dashboard</a>
+        </li>
+        <li {% if section == "images" %}class="selected"{% endif %}>
+            <a href="{% url "images:list" %}">Images</a>
+        </li>
+        <li {% if section == "people" %}class="selected"{% endif %}>
+            <a href="{% url "account:user_list" %}">People</a>
+        </li>
+    </ul>
+    <div class="user-controls">
+        <span class="user-greeting">Hello {{ request.user.first_name }}</span>
+        <form action="{% url 'logout' %}" method="post" class="logout-form">
+            {% csrf_token %}
+            <button type="submit" class="logout-button">Logout</button>
+        </form>
+    </div>
+</nav>
+{% endif %}

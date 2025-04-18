@@ -1,0 +1,38 @@
+{% extends "account/base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block account_content %}
+    <h1>Dashboard</h1>
+    {% with total_images_created=request.user.images_created.count %}
+        <p>
+            Welcome to your dashboard.<br>You have shared {{ total_images_created }} image{{ total_images_created|pluralize }}.
+        </p>
+    {% endwith %}
+    <p>
+        Share an image with the community.
+    </p>
+    <br>
+    <a href="{% url "images:upload" %}" class="button">Upload Now!</a>
+    <p>
+        You can also <a href="{% url "account:edit" %}">edit your profile</a>
+        or <a href="{% url "password_change" %}">change your password</a>.
+    </p>
+    <h2>What's happening</h2>
+    <div id="action-list">
+        {% for action in actions %}
+            {% include "actions/action/detail.html" %}
+        {% endfor %}
+    </div>
+    <div id="image-list" class="image-grid">
+        {% with images=user.images_created.all %}
+            {% if images %}
+                {% include "images/image/list_ajax.html" with images=images %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="icon">📷</div>
+                    <p>You haven't uploaded any images yet</p>
+                    <a href="{% url 'images:create' %}" class="action-link">Share your first image</a>
+                </div>
+            {% endif %}
+        {% endwith %}
+    </div>
+{% endblock %}

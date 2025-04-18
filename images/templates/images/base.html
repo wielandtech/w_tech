@@ -1,0 +1,31 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% block extra_css %}
+    <link href="{% static 'css/account.css' %}" rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'css/account-dark.css' %}">
+    <link href="{% static 'css/images.css' %}" rel="stylesheet" />
+{% endblock %}
+
+{% block title %}WielandTech Image Board{% endblock %}
+
+{% block content %}
+    <div class="app">
+        {% include "core/navbar.html" %}
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li class="{{ message.tags }}">
+                        {{ message|safe }}
+                        <a href="#" class="close">x</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <div class="content">
+            <div class="images">
+                {% block images_content %}
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

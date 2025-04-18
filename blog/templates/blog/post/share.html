@@ -1,0 +1,28 @@
+{% extends "blog/base.html" %}
+
+{% block title %}Share a post{% endblock %}
+
+{% block blog_content %}
+<div class="post-detail">
+    {% if sent %}
+    <div class="post-card">
+        <h1 class="post-title">E-mail successfully sent</h1>
+        <p class="post-body">
+            "{{ post.title }}" was successfully sent to {{ form.cleaned_data.to }}.
+        </p>
+        <div class="tags">
+            <a href="{% url 'blog:post_list' %}" class="tag">Return to blog</a>
+        </div>
+    </div>
+    {% else %}
+    <div class="post-card">
+        <h2 class="secondary">Share "{{ post.title }}" by e-mail</h2>
+        <form method="post" class="email-form">
+            {{ form.as_p }}
+            {% csrf_token %}
+            <input type="submit" value="Send e-mail">
+        </form>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

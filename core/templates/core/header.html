@@ -1,0 +1,18 @@
+{% load static %}
+<div class="navbar">
+    <a href="/#homepage" class="logo-link" data-link="homepage">
+        <img src="{% static 'img/logo.png' %}" alt="WielandTech Logo" class="logo-img">
+    </a>
+    <a href="/#about" data-link="about">About</a>
+    <a href="/#resume" data-link="resume">Resume</a>
+    <a href="/#education" data-link="education">Education</a>
+    <a href="/#projects" data-link="projects">Projects</a>
+    <a href="{% url 'images:list' %}">Photography</a>
+    <a href="{% url 'blog:post_list' %}" {% if section == 'blog' %}class="active"{% endif %}>Blog</a>
+    <div class="theme-switch-wrapper">
+        <label class="theme-switch" for="theme-toggle">
+            <input type="checkbox" id="theme-toggle" />
+            <div class="slider round"></div>
+        </label>
+    </div>
+</div>

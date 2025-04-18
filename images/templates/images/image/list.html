@@ -1,0 +1,51 @@
+{% extends "images/base.html" %}
+{% block title %}Images shared{% endblock %}
+{% block images_content %}
+    <div class="image-list-header">
+        <h1>Shared Images</h1>
+    </div>
+
+    <div id="image-list" class="image-grid">
+        {% include "images/image/list_ajax.html" %}
+    </div>
+
+    <div class="most-viewed-posts">
+    <p>Most Viewed Images</p>
+        <ol>
+            {% for image in most_viewed %}
+                <li>
+                    <a href="{{ image.get_absolute_url }}">
+                        {{ image.title }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ol>
+    </div>
+
+    <div class="upload-button-wrapper">
+        <a href="{% url 'images:upload' %}" class="upload-button button">Upload Image</a>
+    </div>
+{% endblock %}
+
+{% block domready %}
+    var page = 1;
+    var empty_page = false;
+    var block_request = false;
+    $(window).scroll(function() {
+        var margin = $(document).height() - $(window).height() - 200;
+        if($(window).scrollTop() > margin && empty_page == false &&
+        block_request == false) {
+            block_request = true;
+            page += 1;
+            $.get('?page=' + page, function(data) {
+                if(data == '') {
+                    empty_page = true;
+                }
+                else {
+                    block_request = false;
+                    $('#image-list').append(data);
+                }
+            });
+        }
+    });
+{% endblock %}
