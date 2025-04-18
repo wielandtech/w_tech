@@ -218,22 +218,14 @@ docker compose up --build -d
 docker compose exec web python manage.py migrate
 ```
 
-Alternatively, if you want to keep the database but fix specific app migrations:
+### Restoring Database Backups
+
+To restore a database backup from the host machine:
 
 ```bash
-# Access container shell
-docker compose exec web bash
-
-# Reset specific app migrations (e.g., for blog app)
-python manage.py migrate blog zero
-
-# Remove old migration files
-rm blog/migrations/0*.py
-touch blog/migrations/__init__.py
-
-# Create and apply fresh migrations
-python manage.py makemigrations blog
-python manage.py migrate blog
+# Restore from gzipped SQL backup
+zcat db_backups/your_db_name_20250418_020000.sql.gz | \
+  docker exec -i w_tech_dev-db-1 psql -U your_db_user -d your_db_name
 ```
 
 ### Creating a Superuser
