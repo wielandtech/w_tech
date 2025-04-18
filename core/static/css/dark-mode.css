@@ -2,7 +2,7 @@
 :root {
   --text-primary: #011627;
   --text-secondary: #2a2a2a;
-  --background-primary: #FDFFFC;
+  --background-primary: pink;
   --background-secondary: #f5f5f5;
   /* Navbar stays dark in light mode */
   --nav-background: #011627;
