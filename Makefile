@@ -43,13 +43,13 @@ makemigrations-prod:
 deploy-dev:
 	cd $(DEV_DIR) && \
 	git pull origin development && \
-	docker compose -p $(DEV_PROJECT) -f docker-compose.yml down --remove-orphans && \
-	docker compose -p $(DEV_PROJECT) -f docker-compose.yml build && \
-	docker compose -p $(DEV_PROJECT) -f docker-compose.yml up -d
+	docker compose -p $(DEV_PROJECT) -f docker-compose-dev.yml down --remove-orphans && \
+	docker compose -p $(DEV_PROJECT) -f docker-compose-dev.yml build && \
+	docker compose -p $(DEV_PROJECT) -f docker-compose-dev.yml up -d
 
 down-dev:
 	cd $(DEV_DIR) && \
-	docker compose -p $(DEV_PROJECT) -f docker-compose.yml down --remove-orphans
+	docker compose -p $(DEV_PROJECT) -f docker-compose-dev.yml down --remove-orphans
 
 migrate-dev:
 	cd $(DEV_DIR) && \
