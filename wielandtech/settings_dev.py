@@ -14,7 +14,7 @@ SECURE_HSTS_PRELOAD = False
 # Update CSRF trusted origins to include HTTP
 CSRF_TRUSTED_ORIGINS = [
     "http://dev.wielandtech.com:8080",
-    "http://dev.wielandtech.com:8443",
+    "https://dev.wielandtech.com:8443",
     "http://localhost:8080",
 ]
 
