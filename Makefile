@@ -34,99 +34,99 @@ help:
 
 # === Production Targets ===
 deploy-prod:
-    cd $(PROD_DIR) && \
-    git pull origin main && \
-    docker compose -p $(PROD_PROJECT) -f docker-compose.yml down --remove-orphans && \
-    docker compose -p $(PROD_PROJECT) -f docker-compose.yml build && \
-    docker compose -p $(PROD_PROJECT) -f docker-compose.yml up -d
+	cd $(PROD_DIR) && \
+	git pull origin main && \
+	docker compose -p $(PROD_PROJECT) -f docker-compose.yml down --remove-orphans && \
+	docker compose -p $(PROD_PROJECT) -f docker-compose.yml build && \
+	docker compose -p $(PROD_PROJECT) -f docker-compose.yml up -d
 
 down-prod:
-    cd $(PROD_DIR) && \
-    docker compose -p $(PROD_PROJECT) -f docker-compose.yml down --remove-orphans
+	cd $(PROD_DIR) && \
+	docker compose -p $(PROD_PROJECT) -f docker-compose.yml down --remove-orphans
 
 migrate-prod:
-    cd $(PROD_DIR) && \
-    docker compose -p $(PROD_PROJECT) exec web python manage.py migrate --noinput
+	cd $(PROD_DIR) && \
+	docker compose -p $(PROD_PROJECT) exec web python manage.py migrate --noinput
 
 makemigrations-prod:
-    cd $(PROD_DIR) && \
-    docker compose -p $(PROD_PROJECT) exec web python manage.py makemigrations
+	cd $(PROD_DIR) && \
+	docker compose -p $(PROD_PROJECT) exec web python manage.py makemigrations
 
 collectstatic-prod:
-    cd $(PROD_DIR) && \
-    docker compose -p $(PROD_PROJECT) exec web python manage.py collectstatic --noinput
+	cd $(PROD_DIR) && \
+	docker compose -p $(PROD_PROJECT) exec web python manage.py collectstatic --noinput
 
 test-prod:
-    cd $(PROD_DIR) && \
-    docker compose -p $(PROD_PROJECT) exec web python manage.py test --noinput
+	cd $(PROD_DIR) && \
+	docker compose -p $(PROD_PROJECT) exec web python manage.py test --noinput
 
 logs-prod:
-    cd $(PROD_DIR) && \
-    docker compose -p $(PROD_PROJECT) logs -f
+	cd $(PROD_DIR) && \
+	docker compose -p $(PROD_PROJECT) logs -f
 
 shell-prod:
-    cd $(PROD_DIR) && \
-    docker compose -p $(PROD_PROJECT) exec web python manage.py shell
+	cd $(PROD_DIR) && \
+	docker compose -p $(PROD_PROJECT) exec web python manage.py shell
 
 backup-prod:
-    cd $(PROD_DIR) && \
-    docker compose -p $(PROD_PROJECT) exec db pg_dump -U $(DATABASE_USER) $(DATABASE_NAME) > backup_prod_$$(date +%Y%m%d_%H%M%S).sql
+	cd $(PROD_DIR) && \
+	docker compose -p $(PROD_PROJECT) exec db pg_dump -U $(DATABASE_USER) $(DATABASE_NAME) > backup_prod_$$(date +%Y%m%d_%H%M%S).sql
 
 # === Development Targets ===
 deploy-dev:
-    cd $(DEV_DIR) && \
-    git pull origin development && \
-    docker compose -p $(DEV_PROJECT) -f docker-compose-dev.yml down --remove-orphans && \
-    docker compose -p $(DEV_PROJECT) -f docker-compose-dev.yml build && \
-    docker compose -p $(DEV_PROJECT) -f docker-compose-dev.yml up -d
+	cd $(DEV_DIR) && \
+	git pull origin development && \
+	docker compose -p $(DEV_PROJECT) -f docker-compose-dev.yml down --remove-orphans && \
+	docker compose -p $(DEV_PROJECT) -f docker-compose-dev.yml build && \
+	docker compose -p $(DEV_PROJECT) -f docker-compose-dev.yml up -d
 
 down-dev:
-    cd $(DEV_DIR) && \
-    docker compose -p $(DEV_PROJECT) -f docker-compose-dev.yml down --remove-orphans
+	cd $(DEV_DIR) && \
+	docker compose -p $(DEV_PROJECT) -f docker-compose-dev.yml down --remove-orphans
 
 migrate-dev:
-    cd $(DEV_DIR) && \
-    docker compose -p $(DEV_PROJECT) exec web python manage.py migrate --noinput
+	cd $(DEV_DIR) && \
+	docker compose -p $(DEV_PROJECT) exec web python manage.py migrate --noinput
 
 makemigrations-dev:
-    cd $(DEV_DIR) && \
-    docker compose -p $(DEV_PROJECT) exec web python manage.py makemigrations
+	cd $(DEV_DIR) && \
+	docker compose -p $(DEV_PROJECT) exec web python manage.py makemigrations
 
 collectstatic-dev:
-    cd $(DEV_DIR) && \
-    docker compose -p $(DEV_PROJECT) exec web python manage.py collectstatic --noinput
+	cd $(DEV_DIR) && \
+	docker compose -p $(DEV_PROJECT) exec web python manage.py collectstatic --noinput
 
 test-dev:
-    cd $(DEV_DIR) && \
-    docker compose -p $(DEV_PROJECT) exec web python manage.py test --noinput
+	cd $(DEV_DIR) && \
+	docker compose -p $(DEV_PROJECT) exec web python manage.py test --noinput
 
 logs-dev:
-    cd $(DEV_DIR) && \
-    docker compose -p $(DEV_PROJECT) logs -f
+	cd $(DEV_DIR) && \
+	docker compose -p $(DEV_PROJECT) logs -f
 
 shell-dev:
-    cd $(DEV_DIR) && \
-    docker compose -p $(DEV_PROJECT) exec web python manage.py shell
+	cd $(DEV_DIR) && \
+	docker compose -p $(DEV_PROJECT) exec web python manage.py shell
 
 backup-dev:
-    cd $(DEV_DIR) && \
-    docker compose -p $(DEV_PROJECT) exec db pg_dump -U $(DATABASE_USER) $(DATABASE_NAME) > backup_dev_$$(date +%Y%m%d_%H%M%S).sql
+	cd $(DEV_DIR) && \
+	docker compose -p $(DEV_PROJECT) exec db pg_dump -U $(DATABASE_USER) $(DATABASE_NAME) > backup_dev_$$(date +%Y%m%d_%H%M%S).sql
 
 install-dev:
-    pip install -r requirements-dev.txt
+	pip install -r requirements-dev.txt
 
 # === Code Quality ===
 lint:
-    flake8 .
-    black --check .
-    isort --check-only .
+	flake8 .
+	black --check .
+	isort --check-only .
 
 # === Cleanup ===
 clean:
-    find . -type d -name "__pycache__" -exec rm -r {} +
-    find . -type f -name "*.pyc" -delete
-    find . -type f -name "*.pyo" -delete
-    find . -type f -name "*.pyd" -delete
-    find . -type f -name ".coverage" -delete
-    find . -type d -name "*.egg-info" -exec rm -r {} +
-    find . -type d -name "*.egg" -exec rm -r {} +
+	find . -type d -name "__pycache__" -exec rm -r {} +
+	find . -type f -name "*.pyc" -delete
+	find . -type f -name "*.pyo" -delete
+	find . -type f -name "*.pyd" -delete
+	find . -type f -name ".coverage" -delete
+	find . -type d -name "*.egg-info" -exec rm -r {} +
+	find . -type d -name "*.egg" -exec rm -r {} +
