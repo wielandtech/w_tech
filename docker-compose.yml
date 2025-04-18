@@ -42,26 +42,26 @@ services:
     image: postgres:16-alpine
     depends_on:
       - db
-    entrypoint: >
-      sh -c "
-        TIMESTAMP=$(date +'%Y%m%d_%H%M%S');
-        export PGPASSWORD=\$${DATABASE_PASSWORD};
-        pg_dump -h db \
-                -U \$${DATABASE_USER} \
-                -d \$${DATABASE_NAME} \
-                --format=custom \
-          > /backups/\$${DATABASE_NAME}_\$${TIMESTAMP}.dump
-      "
     environment:
-      # for pg_dump/psql at runtime:
+      # these are read by pg_dump/psql at runtime:
       PGPASSWORD: ${DATABASE_PASSWORD}
-      # optional, makes the CLI flags shorter:
       PGUSER: ${DATABASE_USER}
       PGDATABASE: ${DATABASE_NAME}
     volumes:
       - ./db_backups:/backups
     restart: "no"
-
+    entrypoint: >
+      sh -c "
+        # timestamp
+        TS=\$(date +'%Y%m%d_%H%M%S') &&
+        # single-line pg_dump invocation
+        pg_dump \
+          -h db \
+          -U \"\$PGUSER\" \
+          -d \"\$PGDATABASE\" \
+          --format=custom \
+          -f /backups/\"\$PGDATABASE\"_\"\$TS\".dump
+      "
   redis:
     image: redis:alpine
     ports:
