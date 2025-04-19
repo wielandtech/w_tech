@@ -44,8 +44,8 @@ class Post(models.Model):
         return reverse('blog:post_detail', args=[self.publish.year, self.publish.month, self.publish.day, self.slug])
 
     def save(self, *args, **kwargs):
-        create_action(self.author, 'blogged', self)
         super().save(*args, **kwargs)
+        create_action(self.author, 'blogged', self)
 
 
 class Comment(models.Model):
@@ -71,8 +71,8 @@ class Comment(models.Model):
             self.name = self.user.get_full_name() or self.user.username
         if not self.email and self.user:
             self.email = self.user.email
-        create_action(self.user, 'wrote a comment on', self.post)
         super().save(*args, **kwargs)
+        create_action(self.user, 'wrote a comment on', self.post)
 
     def __str__(self):
         return f'Comment by {self.name} on {self.post}'
