@@ -20,10 +20,10 @@ class StaticViewSitemapTests(SimpleTestCase):
         self.sitemap = StaticViewSitemap()
 
     def test_items(self):
-        self.assertEqual(self.sitemap.items(), ['core:homepage'])
+        self.assertEqual(self.sitemap.items(), ['core:core_home'])
 
     def test_location(self):
-        self.assertEqual(self.sitemap.location('core:homepage'), '/')
+        self.assertEqual(self.sitemap.location('core:core_home'), '/')
 
 
 class RedisClientTests(TestCase):
