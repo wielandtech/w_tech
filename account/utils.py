@@ -1,8 +1,6 @@
 import os
 import random
-from django.conf import settings
-from django.core.files import File
-from django.core.files.storage import default_storage
+
 
 def get_random_lego_image_file():
     static_lego_dir = '/app/static/img/lego-icons/'
