@@ -5,7 +5,7 @@ from django.core.files import File
 from django.core.files.storage import default_storage
 
 def get_random_lego_image_file():
-    static_lego_dir = os.path.join(settings.BASE_DIR, 'static/img/lego-icons/')
+    static_lego_dir = '/app/static/img/lego-icons/'
     available_images = [
         f for f in os.listdir(static_lego_dir)
         if os.path.isfile(os.path.join(static_lego_dir, f)) and f.lower().endswith(('.png', '.jpg', '.jpeg'))
