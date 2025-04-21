@@ -14,7 +14,7 @@ class Profile(models.Model):
     def save(self, *args, **kwargs):
         if not self.photo:
             # Get path to lego-icons directory
-            lego_icons_dir = os.path.join(settings.MEDIA_ROOT, 'lego-icons')
+            lego_icons_dir = os.path.join(settings.MEDIA_ROOT, 'img/lego-icons')
             
             # Get list of all files in the directory
             if os.path.exists(lego_icons_dir):
@@ -25,7 +25,7 @@ class Profile(models.Model):
                     # Randomly select one icon
                     random_icon = random.choice(icon_files)
                     # Set relative path from MEDIA_ROOT
-                    self.photo = os.path.join('lego-icons', random_icon)
+                    self.photo = os.path.join('img/lego-icons', random_icon)
 
         super().save(*args, **kwargs)
 
