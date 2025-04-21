@@ -1,12 +1,33 @@
 from django.db import models
 from django.conf import settings
 from django.contrib.auth import get_user_model
+import random
+import os
 
 
 class Profile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     date_of_birth = models.DateField(blank=True, null=True)
-    photo = models.ImageField(upload_to='users/%Y/%m/%d/', blank=True)
+    photo = models.ImageField(upload_to='users/%Y/%m/%d/', 
+                              blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.photo:
+            # Get path to lego-icons directory
+            lego_icons_dir = os.path.join(settings.MEDIA_ROOT, 'lego-icons')
+            
+            # Get list of all files in the directory
+            if os.path.exists(lego_icons_dir):
+                icon_files = [f for f in os.listdir(lego_icons_dir) 
+                              if os.path.isfile(os.path.join(lego_icons_dir, f))]
+                
+                if icon_files:
+                    # Randomly select one icon
+                    random_icon = random.choice(icon_files)
+                    # Set relative path from MEDIA_ROOT
+                    self.photo = os.path.join('lego-icons', random_icon)
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f'Profile for user {self.user.username}'
