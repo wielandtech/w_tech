@@ -28,6 +28,7 @@ class BlogModelTests(TestCase):
     def test_comment_defaults(self):
         comment = Comment.objects.create(
             post=self.post,
+            user=self.user,
             name='Alice',
             email='alice@example.com',
             body='Nice post!'
