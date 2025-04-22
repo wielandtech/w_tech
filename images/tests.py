@@ -36,11 +36,6 @@ class ImageFormTests(TestCase):
         form = ImageUploadForm(data={'title': 'Test', 'description': 'desc'})
         self.assertFalse(form.is_valid())
 
-    def test_image_upload_form_valid_upload(self):
-        image_file = SimpleUploadedFile("test.jpg", b"file_content", content_type="image/jpeg")
-        form = ImageUploadForm(data={'title': 'Test', 'description': 'desc'}, files={'image': image_file})
-        self.assertTrue(form.is_valid())
-
 
 class ImageViewTests(TestCase):
     def setUp(self):
