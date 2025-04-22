@@ -1,3 +1,5 @@
+import os
+
 from actions.models import Action
 from actions.utils import create_action
 from common.decorators import ajax_required
@@ -7,10 +9,12 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.core.files import File
 from django.views.decorators.http import require_POST
 
 from .forms import LoginForm, ProfileEditForm, UserEditForm, UserRegistrationForm
 from .models import Contact, Profile
+from .utils import get_random_lego_image_file
 
 
 @login_required
@@ -66,7 +70,15 @@ def register(request):
             # Save the User object
             new_user.save()
             # Create the user profile
-            Profile.objects.create(user=new_user)
+            profile = Profile(user=new_user)
+
+            # Assign random default profile image
+            lego_img_path = get_random_lego_image_file()
+            if lego_img_path:
+                with open(lego_img_path, 'rb') as f:
+                    profile.photo.save(os.path.basename(lego_img_path), File(f), save=False)
+
+            profile.save()
             create_action(new_user, 'has created an account')
 
             return render(request,

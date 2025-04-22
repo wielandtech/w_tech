@@ -21,6 +21,8 @@ ALLOWED_HOSTS = [
     "www.wielandtech.com",
     "dev.wielandtech.com",
     "127.0.0.1",
+    "174.138.92.200",
+    "159.89.246.9",
     "localhost",
 ]
 
@@ -131,7 +133,7 @@ EMAIL_HOST = os.getenv("EMAIL_HOST", "mail.wielandtech.com")
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "no-reply@wielandtech.com")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_PASSWORD")
 EMAIL_PORT = int(os.getenv("EMAIL_PORT", "465"))
-EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "True") == "True"
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_SSL", "True") == "True"
 
 # Auth and URLs
 LOGIN_REDIRECT_URL = '/account/'

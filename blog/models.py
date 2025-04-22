@@ -5,6 +5,8 @@ from django.contrib.auth.models import User
 from taggit.managers import TaggableManager
 from django.conf import settings
 
+from actions.utils import create_action
+
 
 class PublishedManager(models.Manager):
     def get_queryset(self):
@@ -41,6 +43,10 @@ class Post(models.Model):
     def get_absolute_url(self):
         return reverse('blog:post_detail', args=[self.publish.year, self.publish.month, self.publish.day, self.slug])
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        create_action(self.author, 'blogged', self)
+
 
 class Comment(models.Model):
     post = models.ForeignKey(Post,
@@ -66,6 +72,7 @@ class Comment(models.Model):
         if not self.email and self.user:
             self.email = self.user.email
         super().save(*args, **kwargs)
+        create_action(self.user, 'wrote a comment on', self.post)
 
     def __str__(self):
         return f'Comment by {self.name} on {self.post}'
