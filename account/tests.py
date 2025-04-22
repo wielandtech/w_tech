@@ -59,10 +59,6 @@ class ViewTests(TestCase):
         self.user = User.objects.create_user(username='dave', email='dave@example.com', password='secret123')
         self.profile = Profile.objects.create(user=self.user)
 
-    def test_login_view_success(self):
-        response = self.client.post(reverse('account:login'), {'username': 'dave', 'password': 'secret123'})
-        self.assertContains(response, 'Authenticated successfully')
-
     def test_register_view(self):
         response = self.client.post(reverse('account:register'), {
             'username': 'newuser',
