@@ -267,6 +267,7 @@ textarea {
   padding: 10px;
   width: 50%;
   text-align: center; /* Center text */
+  text-decoration: none;
   position: absolute; /* Position text */
   top: 50%; /* Position text in the middle */
   left: 50%; /* Position text in the middle */
