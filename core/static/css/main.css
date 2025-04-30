@@ -161,6 +161,52 @@ textarea {
   padding: 25px 0px;
 }
 
+.scroll-cta {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  z-index: 100;
+}
+
+.mouse {
+  width: 24px;
+  height: 40px;
+  border: 2px solid var(--accent-primary);
+  border-radius: 15px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.scroller {
+  width: 4px;
+  height: 6px;
+  background-color: var(--accent-primary);
+  border-radius: 2px;
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: scrollAnim 1.5s infinite;
+}
+
+@keyframes scrollAnim {
+  0% { top: 8px; opacity: 1; }
+  50% { top: 18px; opacity: 0.5; }
+  100% { top: 8px; opacity: 1; }
+}
+
+.scroll-text {
+  display: block;
+  margin-top: 10px;
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  font-family: sans-serif;
+  letter-spacing: 1px;
+  opacity: 0.7;
+}
+
 .transition1 {
   background-color: #222;
   background-position: right bottom;
