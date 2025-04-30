@@ -167,6 +167,7 @@ textarea {
   left: 50%;
   transform: translateX(-50%);
   text-align: center;
+  text-decoration: none;
   z-index: 100;
 }
 
@@ -201,10 +202,18 @@ textarea {
   display: block;
   margin-top: 10px;
   font-size: 0.8rem;
-  color: var(--accent-primary);
+  color: #FDFFFC;
   font-family: sans-serif;
   letter-spacing: 1px;
-  opacity: 0.7;
+  text-decoration: none;
+}
+
+.scroll-cta:link,
+.scroll-cta:visited,
+.scroll-cta:hover,
+.scroll-cta:active {
+  text-decoration: none;
+  color: inherit; /* ensure text uses the correct theme-aware color */
 }
 
 .transition1 {
