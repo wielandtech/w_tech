@@ -131,9 +131,6 @@ MEDIA_ROOT = '/app/media/'
 # WhiteNoise configuration for static files
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# WhiteNoise configuration for media files
-WHITENOISE_USE_FINDERS = True
-
 # Default primary key field
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

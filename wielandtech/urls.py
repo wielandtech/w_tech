@@ -37,5 +37,10 @@ urlpatterns = [
     path('social-auth/', include('social_django.urls', namespace='social')),
 ]
 
+# Serve static and media files
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# Serve media files in production (for development/testing)
+if not settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
