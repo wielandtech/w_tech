@@ -161,6 +161,62 @@ textarea {
   padding: 25px 0px;
 }
 
+.scroll-cta {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  text-decoration: none;
+  z-index: 100;
+}
+
+.mouse {
+  width: 24px;
+  height: 40px;
+  border: 2px solid #FDFFFC;
+  border-radius: 15px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.scroller {
+  width: 4px;
+  height: 6px;
+  background-color: var(--accent-primary);
+  border-radius: 2px;
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: scrollAnim 1.5s infinite;
+}
+
+@keyframes scrollAnim {
+  0% { top: 8px; opacity: 1; }
+  50% { top: 18px; opacity: 0.5; }
+  100% { top: 8px; opacity: 1; }
+}
+
+.scroll-text {
+  display: block;
+  margin-top: 10px;
+  font-size: 0.8rem;
+  color: #FDFFFC;
+  font-family: sans-serif;
+  letter-spacing: 1px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.scroll-cta:link,
+.scroll-cta:visited,
+.scroll-cta:hover,
+.scroll-cta:active {
+  text-decoration: none;
+  color: inherit; /* ensure text uses the correct theme-aware color */
+}
+
 .transition1 {
   background-color: #222;
   background-position: right bottom;
@@ -212,6 +268,7 @@ textarea {
   padding: 10px;
   width: 50%;
   text-align: center; /* Center text */
+  text-decoration: none;
   position: absolute; /* Position text */
   top: 50%; /* Position text in the middle */
   left: 50%; /* Position text in the middle */
