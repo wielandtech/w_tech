@@ -22,7 +22,8 @@ COPY . .
 # Make entrypoint script executable
 RUN chmod +x deploy/scripts/docker-entrypoint.sh
 
-# Collect static files
+# Create migrations and collect static files
+RUN python manage.py makemigrations --noinput
 RUN python manage.py collectstatic --noinput
 
 # Expose port
