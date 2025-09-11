@@ -20,6 +20,7 @@ ALLOWED_HOSTS = [
     "wielandtech.com",
     "www.wielandtech.com",
     "dev.wielandtech.com",
+    "wielandtech.k8s.local",
     "127.0.0.1",
     "174.138.92.200",
     "159.89.246.9",
@@ -29,6 +30,7 @@ ALLOWED_HOSTS = [
 CSRF_TRUSTED_ORIGINS = [
     "https://www.wielandtech.com",
     "https://wielandtech.com",
+    "https://wielandtech.k8s.local",
 ]
 
 SITE_ID = 1

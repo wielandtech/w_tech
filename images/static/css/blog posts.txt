@@ -1,0 +1,30 @@
+Photo Gallery
+Tags: Python, Django, Photography
+
+After hosting an open text box on the internet for the past couple of weeks, I've decided to lock [/blog](https://wielandtech.com/blog/) like, share, and comment functionality befind authorization.
+To access any of these features, please [create an account](https://wielandtech.com/account/register/) or [sign-in using an existing Facebook or Google account.](https://wielandtech.com/account/login/)
+
+Once you do so, check out the new [/images Photography Gallery.](https://wielandtech.com/images/) Right now it's mostly just pictures of my dog, but feel free to upload a photo of your own.
+
+
+Dynamic Programming
+Tags: Dynamic Programming , Interviews
+
+Published April 10, 2025, 4:32 p.m. by wielandtech
+
+A rainforest recruiter recently reached out to me, and I began the mad scramble to learn Dynamic Programming. I find recursion and memorization quite natural to how I think, but dynamic programming quite the opposite. Where we somehow already have the answer, but now have to work backwards to where we started?
+
+The OA was exactly what I had expected to encounter: Two dynamic programming questions; one medium; one hard. Never-the-less, I couldn't plop out two answers in the 90 minute time-frame. I'm curious how much time I should dedicate to this very specific interview skill?
+
+I guess rainforest is saying memory is cheap, wrap it in a cache. Try again in 6 months? [GL to Project Kuiper.](https://www.aboutamazon.com/what-we-do/devices-services/project-kuiper)
+
+Hello World
+Tags: Django , Python
+
+Published March 25, 2025, 3:28 a.m. by wielandtech
+
+Welcome to the Django rewrite of WielandTech.
+
+One of the new features is this blog. Content is organized by tag and it features full-text search backed by a PostgreSQL database. The [source code can be found here.](https://github.com/wielandtech/w_tech/tree/main/blog)
+
+Please stay tuned for more blog posts related to my software development journey.
