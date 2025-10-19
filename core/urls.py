@@ -6,4 +6,5 @@ app_name = 'core'
 urlpatterns = [
     path('', views.homepage, name='core_home'),  # The route for core/index.html
     path('api/metrics/', views.get_netdata_metrics, name='netdata_metrics'),
+    path('api/metrics/debug/', views.debug_netdata, name='netdata_debug'),
 ]

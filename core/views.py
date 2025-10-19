@@ -12,6 +12,54 @@ def homepage(request):
     return render(request, 'core/index.html')
 
 
+def debug_netdata(request):
+    """
+    Debug endpoint to test Netdata connectivity and available charts.
+    """
+    netdata_url = settings.NETDATA_URL
+    debug_info = {
+        'netdata_url': netdata_url,
+        'connectivity': 'unknown',
+        'available_charts': [],
+        'sample_data': {}
+    }
+    
+    try:
+        # Test basic connectivity
+        response = requests.get(f"{netdata_url}/api/v1/info", timeout=3)
+        if response.status_code == 200:
+            debug_info['connectivity'] = 'success'
+            debug_info['netdata_info'] = response.json()
+        else:
+            debug_info['connectivity'] = f'failed (status {response.status_code})'
+            
+        # Try to get available charts
+        charts_response = requests.get(f"{netdata_url}/api/v1/charts", timeout=3)
+        if charts_response.status_code == 200:
+            charts_data = charts_response.json()
+            debug_info['available_charts'] = list(charts_data.get('charts', {}).keys())[:20]  # First 20
+            
+        # Try fetching sample metrics
+        for chart_name in ['system.cpu', 'system.ram', 'system.net', 'system.io']:
+            try:
+                chart_response = requests.get(
+                    f"{netdata_url}/api/v1/data",
+                    params={'chart': chart_name, 'points': 1},
+                    timeout=3
+                )
+                if chart_response.status_code == 200:
+                    debug_info['sample_data'][chart_name] = chart_response.json()
+                else:
+                    debug_info['sample_data'][chart_name] = f'Error: {chart_response.status_code}'
+            except Exception as e:
+                debug_info['sample_data'][chart_name] = f'Exception: {str(e)}'
+                
+    except Exception as e:
+        debug_info['connectivity'] = f'failed: {str(e)}'
+        
+    return JsonResponse(debug_info, json_dumps_params={'indent': 2})
+
+
 def get_netdata_metrics(request):
     """
     Fetch system metrics from Netdata API and return as JSON.
@@ -20,6 +68,7 @@ def get_netdata_metrics(request):
     # Try to get cached metrics first
     cached_metrics = cache.get('netdata_metrics')
     if cached_metrics:
+        cached_metrics['cache_hit'] = True
         return JsonResponse(cached_metrics)
     
     try:
@@ -31,7 +80,9 @@ def get_netdata_metrics(request):
             'ram': None,
             'network': None,
             'disk': None,
-            'status': 'ok'
+            'status': 'ok',
+            'cache_hit': False,
+            'errors': []
         }
         
         # Fetch CPU usage
@@ -61,7 +112,9 @@ def get_netdata_metrics(request):
                         cpu_usage = sum([v for v in latest[1:] if isinstance(v, (int, float))])
                     metrics['cpu'] = round(cpu_usage, 1)
         except Exception as e:
-            logger.warning(f"Failed to fetch CPU metrics: {e}")
+            error_msg = f"Failed to fetch CPU metrics: {e}"
+            logger.warning(error_msg)
+            metrics['errors'].append(error_msg)
         
         # Fetch RAM usage
         try:
@@ -96,7 +149,9 @@ def get_netdata_metrics(request):
                         'total_gb': round(total_ram / 1024, 2)
                     }
         except Exception as e:
-            logger.warning(f"Failed to fetch RAM metrics: {e}")
+            error_msg = f"Failed to fetch RAM metrics: {e}"
+            logger.warning(error_msg)
+            metrics['errors'].append(error_msg)
         
         # Fetch Network I/O
         try:
@@ -130,7 +185,9 @@ def get_netdata_metrics(request):
                         'sent_mbps': round(sent / 1024, 2)
                     }
         except Exception as e:
-            logger.warning(f"Failed to fetch network metrics: {e}")
+            error_msg = f"Failed to fetch network metrics: {e}"
+            logger.warning(error_msg)
+            metrics['errors'].append(error_msg)
         
         # Fetch Disk I/O
         try:
@@ -164,7 +221,9 @@ def get_netdata_metrics(request):
                         'write_kbps': round(write_ops / 1024, 2)
                     }
         except Exception as e:
-            logger.warning(f"Failed to fetch disk metrics: {e}")
+            error_msg = f"Failed to fetch disk metrics: {e}"
+            logger.warning(error_msg)
+            metrics['errors'].append(error_msg)
         
         # Cache the metrics for 30 seconds
         cache.set('netdata_metrics', metrics, 30)

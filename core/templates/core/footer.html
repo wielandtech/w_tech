@@ -14,9 +14,18 @@ function fetchMetrics() {
     fetch('/api/metrics/')
         .then(response => response.json())
         .then(data => {
+            console.log('Metrics response:', data);  // Debug logging
+            
             if (data.status === 'unavailable' || data.status === 'error') {
+                let errorMsg = 'Metrics temporarily unavailable';
+                if (data.error) {
+                    errorMsg += ': ' + data.error;
+                }
+                if (data.errors && data.errors.length > 0) {
+                    errorMsg += ' (' + data.errors.join(', ') + ')';
+                }
                 document.getElementById('metrics-content').innerHTML = 
-                    '<div class="metrics-error">Metrics temporarily unavailable</div>';
+                    '<div class="metrics-error">' + errorMsg + '</div>';
                 return;
             }
             
@@ -76,8 +85,11 @@ function fetchMetrics() {
             html += '</div>';
             
             // Add status indicator
-            if (data.status === 'cached') {
-                html += '<div class="metrics-status">Using cached data</div>';
+            if (data.cache_hit) {
+                html += '<div class="metrics-status">Cached</div>';
+            }
+            if (data.errors && data.errors.length > 0) {
+                html += '<div class="metrics-status">Warnings: ' + data.errors.length + '</div>';
             }
             
             document.getElementById('metrics-content').innerHTML = html;

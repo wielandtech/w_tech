@@ -188,6 +188,18 @@ REDIS_HOST = os.environ.get('REDIS_IP', 'redis')
 REDIS_PORT = int(os.environ.get('REDIS_PORT', 6379))
 REDIS_DB = int(os.environ.get('REDIS_DB', 0))
 
+# Django Cache configuration using Redis
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}',
+        'OPTIONS': {
+            'socket_connect_timeout': 5,
+            'socket_timeout': 5,
+        }
+    }
+}
+
 # Netdata monitoring configuration
 NETDATA_URL = os.environ.get('NETDATA_URL', 'http://netdata.netdata.svc.cluster.local:19999')
 
