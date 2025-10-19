@@ -6,16 +6,6 @@
     border-radius: 8px;
 }
 
-.metrics-title {
-    font-size: 0.9rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 1rem;
-    text-align: center;
-    color: #FDFFFC;
-}
-
 .metrics-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
