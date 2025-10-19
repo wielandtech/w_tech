@@ -53,7 +53,7 @@ function fetchMetrics() {
                            <div class="metric-card">
                                <div class="metric-label">${data.ram.description}</div>
                                <div class="metric-value">${data.ram.cluster_total_gb} GB</div>
-                               <div class="metric-detail">~${data.ram.cluster_estimated_used_gb} GB used</div>
+                               <div class="metric-detail">~${data.ram.cluster_estimated_used_gb} GB used (${data.ram.ram_per_node_gb} GB per node)</div>
                                <div class="metric-bar">
                                    <div class="metric-bar-fill ${ramClass}" style="width: ${Math.min(data.ram.cluster_estimated_percentage, 100)}%"></div>
                                </div>

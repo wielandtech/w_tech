@@ -181,14 +181,23 @@ def get_netdata_metrics(request):
             info_response = requests.get(f"{netdata_url}/api/v1/info", timeout=timeout)
             if info_response.status_code == 200:
                 info_data = info_response.json()
-                cluster_cores = int(info_data.get('cores_total', 0))
-                cluster_ram_bytes = int(info_data.get('ram_total', 0))
-                cluster_ram_gb = round(cluster_ram_bytes / (1024**3), 1)
+                # These values are per node, so multiply by number of nodes
+                cores_per_node = int(info_data.get('cores_total', 0))
+                ram_bytes_per_node = int(info_data.get('ram_total', 0))
+                ram_gb_per_node = round(ram_bytes_per_node / (1024**3), 1)
+                
+                # Calculate total cluster resources
+                total_nodes = len(netdata_hosts)
+                cluster_cores = cores_per_node * total_nodes
+                cluster_ram_gb = ram_gb_per_node * total_nodes
+                cluster_ram_mb = round(cluster_ram_gb * 1024, 0)
                 
                 metrics['cluster_info'] = {
                     'total_cores': cluster_cores,
                     'total_ram_gb': cluster_ram_gb,
-                    'total_ram_mb': round(cluster_ram_bytes / (1024**2), 0)
+                    'total_ram_mb': round(cluster_ram_gb * 1024, 0),
+                    'cores_per_node': cores_per_node,
+                    'ram_gb_per_node': ram_gb_per_node
                 }
         except Exception as e:
             logger.warning(f"Failed to fetch cluster info: {e}")
@@ -219,8 +228,8 @@ def get_netdata_metrics(request):
                     cpu_data = cpu_response.json()
                     if 'data' in cpu_data and len(cpu_data['data']) > 0:
                         latest = cpu_data['data'][0]
-                        # Get the first CPU usage value (usually total CPU percentage)
-                        cpu_usage = latest[1] if len(latest) > 1 and isinstance(latest[1], (int, float)) else 0
+                        # Sum user + system CPU usage (skip timestamp at index 0)
+                        cpu_usage = sum([v for v in latest[1:] if isinstance(v, (int, float))])
                         cpu_values.append(cpu_usage)
                         node_metrics['cpu'] = round(cpu_usage, 1)
                         node_metrics['reachable'] = True
@@ -312,22 +321,23 @@ def get_netdata_metrics(request):
             metrics['cpu'] = {
                 'percentage': round(sum(cpu_values) / len(cpu_values), 1),
                 'total_cores': metrics['cluster_info'].get('total_cores', 0),
-                'description': 'Monitoring CPU usage'
+                'description': 'System CPU Usage'
             }
         
         if ram_data['total'] > 0:
             # Show cluster memory with estimated usage
-            cluster_ram_mb = metrics['cluster_info'].get('total_ram_mb', 0)
             cluster_ram_gb = metrics['cluster_info'].get('total_ram_gb', 0)
+            ram_gb_per_node = metrics['cluster_info'].get('ram_gb_per_node', 0)
             
-            # Estimate cluster usage based on monitoring overhead (assume 5-10% of total)
-            estimated_usage_percent = 8  # 8% estimated cluster usage
+            # Estimate cluster usage (assume 15-25% of total cluster memory is used)
+            estimated_usage_percent = 20  # 20% estimated cluster usage
             cluster_used_gb = round(cluster_ram_gb * estimated_usage_percent / 100, 1)
             
             metrics['ram'] = {
                 'cluster_total_gb': cluster_ram_gb,
                 'cluster_estimated_used_gb': cluster_used_gb,
                 'cluster_estimated_percentage': estimated_usage_percent,
+                'ram_per_node_gb': ram_gb_per_node,
                 'monitoring_used_mb': round(ram_data['used'], 1),
                 'description': 'Cluster Memory'
             }
