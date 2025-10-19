@@ -169,12 +169,13 @@ def get_netdata_metrics(request):
             'status': 'ok',
             'cache_hit': False,
             'errors': [],
-            'nodes': [],
             'nodes_count': len(netdata_hosts),
-            'cluster_info': {}
+            'reachable_nodes': 0
         }
         
         # Get cluster total resources from parent node info
+        cluster_cores = 0
+        cluster_ram_gb = 0
         try:
             info_response = requests.get(f"{netdata_url}/api/v1/info", timeout=timeout)
             if info_response.status_code == 200:
@@ -187,16 +188,10 @@ def get_netdata_metrics(request):
                 total_nodes = len(netdata_hosts)
                 cluster_cores = cores_per_node * total_nodes
                 cluster_ram_gb = ram_gb_per_node * total_nodes
-                
-                metrics['cluster_info'] = {
-                    'total_cores': cluster_cores,
-                    'total_ram_gb': cluster_ram_gb,
-                    'cores_per_node': cores_per_node,
-                    'ram_gb_per_node': ram_gb_per_node
-                }
         except Exception as e:
             logger.warning(f"Failed to fetch cluster info: {e}")
-            metrics['errors'].append(f"Failed to fetch cluster info: {e}")
+            if len(metrics['errors']) < 3:
+                metrics['errors'].append(f"Cluster info failed")
 
         # Aggregate data from all nodes
         cpu_values = []
@@ -205,8 +200,8 @@ def get_netdata_metrics(request):
         total_requests = 0
         
         # Fetch metrics from each node
+        reachable_nodes = 0
         for host in netdata_hosts:
-            node_metrics = {'hostname': host, 'reachable': False}
             
             # Fetch CPU usage for this node (use only user CPU as proxy for system load)
             try:
@@ -227,12 +222,11 @@ def get_netdata_metrics(request):
                         system_cpu = latest[2] if len(latest) > 2 and isinstance(latest[2], (int, float)) else 0
                         cpu_usage = system_cpu
                         cpu_values.append(cpu_usage)
-                        node_metrics['cpu'] = round(cpu_usage, 1)
-                        node_metrics['reachable'] = True
+                        reachable_nodes += 1
             except Exception as e:
-                error_msg = f"Failed to fetch CPU for {host}: {e}"
-                logger.warning(error_msg)
-                metrics['errors'].append(error_msg)
+                logger.warning(f"Failed to fetch CPU for {host}: {e}")
+                if len(metrics['errors']) < 3:  # Limit error messages
+                    metrics['errors'].append(f"CPU fetch failed")
         
             # Fetch memory usage for this node
             try:
@@ -252,11 +246,10 @@ def get_netdata_metrics(request):
                         memory_bytes = latest[1] if len(latest) > 1 and isinstance(latest[1], (int, float)) else 0
                         memory_mb = memory_bytes / (1024 * 1024)  # Convert bytes to MB
                         memory_values.append(memory_mb)
-                        node_metrics['memory_mb'] = round(memory_mb, 1)
             except Exception as e:
-                error_msg = f"Failed to fetch memory for {host}: {e}"
-                logger.warning(error_msg)
-                metrics['errors'].append(error_msg)
+                logger.warning(f"Failed to fetch memory for {host}: {e}")
+                if len(metrics['errors']) < 3:
+                    metrics['errors'].append(f"Memory fetch failed")
         
             # Fetch active connections for this node
             try:
@@ -275,11 +268,10 @@ def get_netdata_metrics(request):
                         latest = clients_data['data'][0]
                         clients = latest[1] if len(latest) > 1 and isinstance(latest[1], (int, float)) else 0
                         total_clients += clients
-                        node_metrics['clients'] = int(clients)
             except Exception as e:
-                error_msg = f"Failed to fetch clients for {host}: {e}"
-                logger.warning(error_msg)
-                metrics['errors'].append(error_msg)
+                logger.warning(f"Failed to fetch clients for {host}: {e}")
+                if len(metrics['errors']) < 3:
+                    metrics['errors'].append(f"Network fetch failed")
         
             # Fetch API requests for this node
             try:
@@ -298,26 +290,22 @@ def get_netdata_metrics(request):
                         latest = requests_data['data'][0]
                         requests_ps = latest[1] if len(latest) > 1 and isinstance(latest[1], (int, float)) else 0
                         total_requests += requests_ps
-                        node_metrics['requests_ps'] = round(requests_ps, 1)
             except Exception as e:
-                error_msg = f"Failed to fetch requests for {host}: {e}"
-                logger.warning(error_msg)
-                metrics['errors'].append(error_msg)
-            
-            metrics['nodes'].append(node_metrics)
+                logger.warning(f"Failed to fetch requests for {host}: {e}")
+                if len(metrics['errors']) < 3:
+                    metrics['errors'].append(f"API fetch failed")
         
         # Calculate cluster-wide metrics
         if cpu_values:
             avg_cpu = sum(cpu_values) / len(cpu_values)
             metrics['cpu'] = {
                 'percentage': round(avg_cpu, 1),
-                'total_cores': metrics['cluster_info'].get('total_cores', 0),
+                'total_cores': cluster_cores,
                 'description': 'Cluster CPU Usage'
             }
         
         if memory_values:
             total_memory_mb = sum(memory_values)
-            cluster_ram_gb = metrics['cluster_info'].get('total_ram_gb', 0)
             cluster_ram_mb = cluster_ram_gb * 1024
             
             # Estimate actual cluster memory usage (scale monitoring memory to represent cluster usage)
@@ -349,6 +337,9 @@ def get_netdata_metrics(request):
             'api_requests_ps': round(total_requests, 1),
             'description': 'Network Activity'
         }
+        
+        # Set reachable nodes count
+        metrics['reachable_nodes'] = reachable_nodes
         
         # Cache the metrics for 10 seconds
         cache.set('netdata_metrics', metrics, 10)

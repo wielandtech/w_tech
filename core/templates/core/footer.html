@@ -88,7 +88,7 @@ function fetchMetrics() {
             // Add status indicator
             let statusParts = [];
             if (data.nodes_count) {
-                const reachable = data.nodes ? data.nodes.filter(n => n.reachable).length : 0;
+                const reachable = data.reachable_nodes || 0;
                 statusParts.push(reachable + '/' + data.nodes_count + ' nodes');
             }
             if (data.cache_hit) {
