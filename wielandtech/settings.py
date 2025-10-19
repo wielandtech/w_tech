@@ -188,6 +188,9 @@ REDIS_HOST = os.environ.get('REDIS_IP', 'redis')
 REDIS_PORT = int(os.environ.get('REDIS_PORT', 6379))
 REDIS_DB = int(os.environ.get('REDIS_DB', 0))
 
+# Netdata monitoring configuration
+NETDATA_URL = os.environ.get('NETDATA_URL', 'http://netdata.netdata.svc.cluster.local:19999')
+
 # Security settings for production
 # These are enabled when DEBUG=False
 if not DEBUG:

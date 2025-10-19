@@ -1,3 +1,97 @@
 <div class="footer">
+    <div class="metrics-container" id="metrics-container">
+        <div class="metrics-title">System Metrics</div>
+        <div id="metrics-content">
+            <div class="metrics-loading">Loading metrics...</div>
+        </div>
+    </div>
     <h3>VLAN Technology Services LLC 2025</h3>
 </div>
+
+<script>
+// Fetch and display Netdata metrics
+function fetchMetrics() {
+    fetch('/api/metrics/')
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'unavailable' || data.status === 'error') {
+                document.getElementById('metrics-content').innerHTML = 
+                    '<div class="metrics-error">Metrics temporarily unavailable</div>';
+                return;
+            }
+            
+            let html = '<div class="metrics-grid">';
+            
+            // CPU Card
+            if (data.cpu !== null) {
+                const cpuClass = data.cpu > 80 ? 'critical' : (data.cpu > 60 ? 'warning' : '');
+                html += `
+                    <div class="metric-card">
+                        <div class="metric-label">CPU Usage</div>
+                        <div class="metric-value">${data.cpu}%</div>
+                        <div class="metric-bar">
+                            <div class="metric-bar-fill ${cpuClass}" style="width: ${data.cpu}%"></div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // RAM Card
+            if (data.ram !== null) {
+                const ramClass = data.ram.percentage > 85 ? 'critical' : (data.ram.percentage > 70 ? 'warning' : '');
+                html += `
+                    <div class="metric-card">
+                        <div class="metric-label">Memory Usage</div>
+                        <div class="metric-value">${data.ram.percentage}%</div>
+                        <div class="metric-detail">${data.ram.used_gb} / ${data.ram.total_gb} GB</div>
+                        <div class="metric-bar">
+                            <div class="metric-bar-fill ${ramClass}" style="width: ${data.ram.percentage}%"></div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Network Card
+            if (data.network !== null) {
+                html += `
+                    <div class="metric-card">
+                        <div class="metric-label">Network I/O</div>
+                        <div class="metric-value">↓${data.network.received_mbps} Mbps</div>
+                        <div class="metric-detail">↑${data.network.sent_mbps} Mbps</div>
+                    </div>
+                `;
+            }
+            
+            // Disk Card
+            if (data.disk !== null) {
+                html += `
+                    <div class="metric-card">
+                        <div class="metric-label">Disk I/O</div>
+                        <div class="metric-value">R: ${data.disk.read_kbps} KB/s</div>
+                        <div class="metric-detail">W: ${data.disk.write_kbps} KB/s</div>
+                    </div>
+                `;
+            }
+            
+            html += '</div>';
+            
+            // Add status indicator
+            if (data.status === 'cached') {
+                html += '<div class="metrics-status">Using cached data</div>';
+            }
+            
+            document.getElementById('metrics-content').innerHTML = html;
+        })
+        .catch(error => {
+            console.error('Error fetching metrics:', error);
+            document.getElementById('metrics-content').innerHTML = 
+                '<div class="metrics-error">Unable to load metrics</div>';
+        });
+}
+
+// Initial fetch
+fetchMetrics();
+
+// Refresh every 30 seconds
+setInterval(fetchMetrics, 30000);
+</script>
