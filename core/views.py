@@ -39,25 +39,74 @@ def debug_netdata(request):
             charts_data = charts_response.json()
             debug_info['available_charts'] = list(charts_data.get('charts', {}).keys())[:20]  # First 20
             
-        # Try fetching sample metrics from different hosts
+        # Try fetching charts list for each host to see available metrics
         test_hosts = ['wtech7062', 'wtech7061', 'wtech7063']
-        debug_info['sample_data'] = {}
+        debug_info['host_charts'] = {}
+        debug_info['sample_queries'] = {}
         
         for host in test_hosts:
-            debug_info['sample_data'][host] = {}
+            debug_info['host_charts'][host] = {}
+            debug_info['sample_queries'][host] = {}
+            
+            # Try to get charts for this specific host
+            try:
+                host_charts_response = requests.get(
+                    f"{netdata_url}/api/v1/charts",
+                    params={'host': host},
+                    timeout=3
+                )
+                if host_charts_response.status_code == 200:
+                    host_charts_data = host_charts_response.json()
+                    charts_list = list(host_charts_data.get('charts', {}).keys())
+                    # Look for system charts
+                    system_charts = [c for c in charts_list if c.startswith('system.')]
+                    debug_info['host_charts'][host] = {
+                        'status': 'OK',
+                        'total_charts': len(charts_list),
+                        'system_charts': system_charts[:10]  # First 10 system charts
+                    }
+                else:
+                    debug_info['host_charts'][host] = {'status': f'Error {host_charts_response.status_code}'}
+            except Exception as e:
+                debug_info['host_charts'][host] = {'status': f'Exception: {str(e)}'}
+            
+            # Try different query methods
             for chart_name in ['system.cpu', 'system.ram']:
+                debug_info['sample_queries'][host][chart_name] = {}
+                
+                # Method 1: host parameter
                 try:
-                    chart_response = requests.get(
+                    resp = requests.get(
                         f"{netdata_url}/api/v1/data",
                         params={'chart': chart_name, 'points': 1, 'host': host},
                         timeout=3
                     )
-                    if chart_response.status_code == 200:
-                        debug_info['sample_data'][host][chart_name] = 'OK'
-                    else:
-                        debug_info['sample_data'][host][chart_name] = f'Error: {chart_response.status_code}'
+                    debug_info['sample_queries'][host][chart_name]['host_param'] = resp.status_code
                 except Exception as e:
-                    debug_info['sample_data'][host][chart_name] = f'Exception: {str(e)}'
+                    debug_info['sample_queries'][host][chart_name]['host_param'] = str(e)
+                
+                # Method 2: node parameter
+                try:
+                    resp = requests.get(
+                        f"{netdata_url}/api/v1/data",
+                        params={'chart': chart_name, 'points': 1, 'node': host},
+                        timeout=3
+                    )
+                    debug_info['sample_queries'][host][chart_name]['node_param'] = resp.status_code
+                except Exception as e:
+                    debug_info['sample_queries'][host][chart_name]['node_param'] = str(e)
+                
+                # Method 3: Try with hostname prefix in chart name
+                try:
+                    prefixed_chart = f"{host}.{chart_name}"
+                    resp = requests.get(
+                        f"{netdata_url}/api/v1/data",
+                        params={'chart': prefixed_chart, 'points': 1},
+                        timeout=3
+                    )
+                    debug_info['sample_queries'][host][chart_name]['prefixed_chart'] = resp.status_code
+                except Exception as e:
+                    debug_info['sample_queries'][host][chart_name]['prefixed_chart'] = str(e)
                 
     except Exception as e:
         debug_info['connectivity'] = f'failed: {str(e)}'
