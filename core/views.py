@@ -350,8 +350,8 @@ def get_netdata_metrics(request):
             'description': 'Network Activity'
         }
         
-        # Cache the metrics for 30 seconds
-        cache.set('netdata_metrics', metrics, 30)
+        # Cache the metrics for 1 second (real-time updates)
+        cache.set('netdata_metrics', metrics, 1)
         
         return JsonResponse(metrics)
         
