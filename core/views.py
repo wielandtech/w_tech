@@ -325,6 +325,10 @@ def get_netdata_metrics(request):
             estimated_cluster_usage_gb = round(estimated_cluster_usage_mb / 1024, 1)
             usage_percentage = round((estimated_cluster_usage_mb / cluster_ram_mb) * 100, 1)
             
+            # Ensure we have a meaningful decimal value (at least 0.1 GB)
+            if estimated_cluster_usage_gb < 0.1:
+                estimated_cluster_usage_gb = 0.1
+            
             metrics['memory'] = {
                 'total_gb': cluster_ram_gb,
                 'used_gb': estimated_cluster_usage_gb,
