@@ -58,12 +58,23 @@ def debug_netdata(request):
                 if host_charts_response.status_code == 200:
                     host_charts_data = host_charts_response.json()
                     charts_list = list(host_charts_data.get('charts', {}).keys())
-                    # Look for system charts
+                    
+                    # Categorize charts by prefix
                     system_charts = [c for c in charts_list if c.startswith('system.')]
+                    cpu_charts = [c for c in charts_list if 'cpu' in c.lower()]
+                    mem_charts = [c for c in charts_list if 'mem' in c.lower() or 'ram' in c.lower()]
+                    net_charts = [c for c in charts_list if 'net' in c.lower()]
+                    disk_charts = [c for c in charts_list if 'disk' in c.lower() or 'io' in c.lower()]
+                    
                     debug_info['host_charts'][host] = {
                         'status': 'OK',
                         'total_charts': len(charts_list),
-                        'system_charts': system_charts[:10]  # First 10 system charts
+                        'system_charts': system_charts,
+                        'cpu_related': cpu_charts[:15],
+                        'memory_related': mem_charts[:15],
+                        'network_related': net_charts[:15],
+                        'disk_related': disk_charts[:15],
+                        'all_charts_sample': charts_list[:30]  # First 30 of all charts
                     }
                 else:
                     debug_info['host_charts'][host] = {'status': f'Error {host_charts_response.status_code}'}
