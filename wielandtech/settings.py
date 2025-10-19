@@ -202,6 +202,8 @@ CACHES = {
 
 # Netdata monitoring configuration
 NETDATA_URL = os.environ.get('NETDATA_URL', 'http://netdata.netdata.svc.cluster.local:19999')
+# For parent-child Netdata setups, specify which hosts to monitor (comma-separated)
+NETDATA_HOSTS = os.environ.get('NETDATA_HOSTS', 'wtech7062,wtech7061,wtech7063').split(',')
 
 # Security settings for production
 # These are enabled when DEBUG=False

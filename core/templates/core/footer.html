@@ -85,11 +85,19 @@ function fetchMetrics() {
             html += '</div>';
             
             // Add status indicator
+            let statusParts = [];
+            if (data.nodes_count) {
+                const reachable = data.nodes ? data.nodes.filter(n => n.reachable).length : 0;
+                statusParts.push(reachable + '/' + data.nodes_count + ' nodes');
+            }
             if (data.cache_hit) {
-                html += '<div class="metrics-status">Cached</div>';
+                statusParts.push('cached');
             }
             if (data.errors && data.errors.length > 0) {
-                html += '<div class="metrics-status">Warnings: ' + data.errors.length + '</div>';
+                statusParts.push(data.errors.length + ' warnings');
+            }
+            if (statusParts.length > 0) {
+                html += '<div class="metrics-status">' + statusParts.join(' • ') + '</div>';
             }
             
             document.getElementById('metrics-content').innerHTML = html;

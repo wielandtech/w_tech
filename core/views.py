@@ -39,20 +39,25 @@ def debug_netdata(request):
             charts_data = charts_response.json()
             debug_info['available_charts'] = list(charts_data.get('charts', {}).keys())[:20]  # First 20
             
-        # Try fetching sample metrics
-        for chart_name in ['system.cpu', 'system.ram', 'system.net', 'system.io']:
-            try:
-                chart_response = requests.get(
-                    f"{netdata_url}/api/v1/data",
-                    params={'chart': chart_name, 'points': 1},
-                    timeout=3
-                )
-                if chart_response.status_code == 200:
-                    debug_info['sample_data'][chart_name] = chart_response.json()
-                else:
-                    debug_info['sample_data'][chart_name] = f'Error: {chart_response.status_code}'
-            except Exception as e:
-                debug_info['sample_data'][chart_name] = f'Exception: {str(e)}'
+        # Try fetching sample metrics from different hosts
+        test_hosts = ['wtech7062', 'wtech7061', 'wtech7063']
+        debug_info['sample_data'] = {}
+        
+        for host in test_hosts:
+            debug_info['sample_data'][host] = {}
+            for chart_name in ['system.cpu', 'system.ram']:
+                try:
+                    chart_response = requests.get(
+                        f"{netdata_url}/api/v1/data",
+                        params={'chart': chart_name, 'points': 1, 'host': host},
+                        timeout=3
+                    )
+                    if chart_response.status_code == 200:
+                        debug_info['sample_data'][host][chart_name] = 'OK'
+                    else:
+                        debug_info['sample_data'][host][chart_name] = f'Error: {chart_response.status_code}'
+                except Exception as e:
+                    debug_info['sample_data'][host][chart_name] = f'Exception: {str(e)}'
                 
     except Exception as e:
         debug_info['connectivity'] = f'failed: {str(e)}'
@@ -63,6 +68,7 @@ def debug_netdata(request):
 def get_netdata_metrics(request):
     """
     Fetch system metrics from Netdata API and return as JSON.
+    Aggregates metrics from all physical nodes in the cluster.
     Implements caching to reduce API calls.
     """
     # Try to get cached metrics first
@@ -75,6 +81,11 @@ def get_netdata_metrics(request):
         netdata_url = settings.NETDATA_URL
         timeout = 3  # 3 second timeout
         
+        # Monitor all physical nodes
+        netdata_hosts = getattr(settings, 'NETDATA_HOSTS', ['wtech7062', 'wtech7061', 'wtech7063'])
+        if isinstance(netdata_hosts, str):
+            netdata_hosts = [h.strip() for h in netdata_hosts.split(',')]
+        
         metrics = {
             'cpu': None,
             'ram': None,
@@ -82,148 +93,172 @@ def get_netdata_metrics(request):
             'disk': None,
             'status': 'ok',
             'cache_hit': False,
-            'errors': []
+            'errors': [],
+            'nodes': [],
+            'nodes_count': len(netdata_hosts)
         }
         
-        # Fetch CPU usage
-        try:
-            cpu_response = requests.get(
-                f"{netdata_url}/api/v1/data",
-                params={
-                    'chart': 'system.cpu',
-                    'points': 1,
-                    'options': 'percentage'
-                },
-                timeout=timeout
-            )
-            if cpu_response.status_code == 200:
-                cpu_data = cpu_response.json()
-                # Calculate total CPU usage (sum of all states except idle)
-                if 'data' in cpu_data and len(cpu_data['data']) > 0:
-                    latest = cpu_data['data'][0]
-                    # Find idle index in labels
-                    labels = cpu_data.get('labels', [])
-                    if 'idle' in labels:
-                        idle_idx = labels.index('idle')
-                        idle_value = latest[idle_idx + 1] if len(latest) > idle_idx + 1 else 0
-                        cpu_usage = 100 - idle_value
-                    else:
-                        # If no idle, sum all other values
-                        cpu_usage = sum([v for v in latest[1:] if isinstance(v, (int, float))])
-                    metrics['cpu'] = round(cpu_usage, 1)
-        except Exception as e:
-            error_msg = f"Failed to fetch CPU metrics: {e}"
-            logger.warning(error_msg)
-            metrics['errors'].append(error_msg)
+        # Aggregate data from all nodes
+        cpu_values = []
+        ram_data = {'used': 0, 'total': 0}
+        network_data = {'received': 0, 'sent': 0}
+        disk_data = {'read': 0, 'write': 0}
         
-        # Fetch RAM usage
-        try:
-            ram_response = requests.get(
-                f"{netdata_url}/api/v1/data",
-                params={
-                    'chart': 'system.ram',
-                    'points': 1,
-                },
-                timeout=timeout
-            )
-            if ram_response.status_code == 200:
-                ram_data = ram_response.json()
-                if 'data' in ram_data and len(ram_data['data']) > 0:
-                    latest = ram_data['data'][0]
-                    labels = ram_data.get('labels', [])
-                    
-                    # Calculate used RAM (excluding free and cached)
-                    total_ram = sum([v for v in latest[1:] if isinstance(v, (int, float))])
-                    free_ram = 0
-                    
-                    if 'free' in labels:
-                        free_idx = labels.index('free')
-                        free_ram = latest[free_idx + 1] if len(latest) > free_idx + 1 else 0
-                    
-                    used_ram = total_ram - free_ram
-                    ram_percentage = (used_ram / total_ram * 100) if total_ram > 0 else 0
-                    
-                    metrics['ram'] = {
-                        'percentage': round(ram_percentage, 1),
-                        'used_gb': round(used_ram / 1024, 2),  # Convert MB to GB
-                        'total_gb': round(total_ram / 1024, 2)
-                    }
-        except Exception as e:
-            error_msg = f"Failed to fetch RAM metrics: {e}"
-            logger.warning(error_msg)
-            metrics['errors'].append(error_msg)
+        # Fetch metrics from each node
+        for host in netdata_hosts:
+            node_metrics = {'hostname': host, 'reachable': False}
+            
+            # Fetch CPU usage for this node
+            try:
+                cpu_response = requests.get(
+                    f"{netdata_url}/api/v1/data",
+                    params={
+                        'chart': 'system.cpu',
+                        'points': 1,
+                        'options': 'percentage',
+                        'host': host
+                    },
+                    timeout=timeout
+                )
+                if cpu_response.status_code == 200:
+                    cpu_data = cpu_response.json()
+                    if 'data' in cpu_data and len(cpu_data['data']) > 0:
+                        latest = cpu_data['data'][0]
+                        labels = cpu_data.get('labels', [])
+                        if 'idle' in labels:
+                            idle_idx = labels.index('idle')
+                            idle_value = latest[idle_idx + 1] if len(latest) > idle_idx + 1 else 0
+                            cpu_usage = 100 - idle_value
+                        else:
+                            cpu_usage = sum([v for v in latest[1:] if isinstance(v, (int, float))])
+                        cpu_values.append(cpu_usage)
+                        node_metrics['cpu'] = round(cpu_usage, 1)
+                        node_metrics['reachable'] = True
+            except Exception as e:
+                error_msg = f"Failed to fetch CPU for {host}: {e}"
+                logger.warning(error_msg)
+                metrics['errors'].append(error_msg)
         
-        # Fetch Network I/O
-        try:
-            net_response = requests.get(
-                f"{netdata_url}/api/v1/data",
-                params={
-                    'chart': 'system.net',
-                    'points': 1,
-                },
-                timeout=timeout
-            )
-            if net_response.status_code == 200:
-                net_data = net_response.json()
-                if 'data' in net_data and len(net_data['data']) > 0:
-                    latest = net_data['data'][0]
-                    labels = net_data.get('labels', [])
-                    
-                    received = 0
-                    sent = 0
-                    
-                    if 'received' in labels:
-                        recv_idx = labels.index('received')
-                        received = abs(latest[recv_idx + 1]) if len(latest) > recv_idx + 1 else 0
-                    
-                    if 'sent' in labels:
-                        sent_idx = labels.index('sent')
-                        sent = abs(latest[sent_idx + 1]) if len(latest) > sent_idx + 1 else 0
-                    
-                    metrics['network'] = {
-                        'received_mbps': round(received / 1024, 2),  # Convert to Mbps
-                        'sent_mbps': round(sent / 1024, 2)
-                    }
-        except Exception as e:
-            error_msg = f"Failed to fetch network metrics: {e}"
-            logger.warning(error_msg)
-            metrics['errors'].append(error_msg)
+            # Fetch RAM usage for this node
+            try:
+                ram_response = requests.get(
+                    f"{netdata_url}/api/v1/data",
+                    params={
+                        'chart': 'system.ram',
+                        'points': 1,
+                        'host': host
+                    },
+                    timeout=timeout
+                )
+                if ram_response.status_code == 200:
+                    ram_response_data = ram_response.json()
+                    if 'data' in ram_response_data and len(ram_response_data['data']) > 0:
+                        latest = ram_response_data['data'][0]
+                        labels = ram_response_data.get('labels', [])
+                        
+                        total_ram = sum([v for v in latest[1:] if isinstance(v, (int, float))])
+                        free_ram = 0
+                        
+                        if 'free' in labels:
+                            free_idx = labels.index('free')
+                            free_ram = latest[free_idx + 1] if len(latest) > free_idx + 1 else 0
+                        
+                        used_ram = total_ram - free_ram
+                        ram_data['used'] += used_ram
+                        ram_data['total'] += total_ram
+                        node_metrics['ram_gb'] = round(total_ram / 1024, 2)
+            except Exception as e:
+                error_msg = f"Failed to fetch RAM for {host}: {e}"
+                logger.warning(error_msg)
+                metrics['errors'].append(error_msg)
         
-        # Fetch Disk I/O
-        try:
-            disk_response = requests.get(
-                f"{netdata_url}/api/v1/data",
-                params={
-                    'chart': 'system.io',
-                    'points': 1,
-                },
-                timeout=timeout
-            )
-            if disk_response.status_code == 200:
-                disk_data = disk_response.json()
-                if 'data' in disk_data and len(disk_data['data']) > 0:
-                    latest = disk_data['data'][0]
-                    labels = disk_data.get('labels', [])
-                    
-                    read_ops = 0
-                    write_ops = 0
-                    
-                    if 'in' in labels:
-                        read_idx = labels.index('in')
-                        read_ops = abs(latest[read_idx + 1]) if len(latest) > read_idx + 1 else 0
-                    
-                    if 'out' in labels:
-                        write_idx = labels.index('out')
-                        write_ops = abs(latest[write_idx + 1]) if len(latest) > write_idx + 1 else 0
-                    
-                    metrics['disk'] = {
-                        'read_kbps': round(read_ops / 1024, 2),
-                        'write_kbps': round(write_ops / 1024, 2)
-                    }
-        except Exception as e:
-            error_msg = f"Failed to fetch disk metrics: {e}"
-            logger.warning(error_msg)
-            metrics['errors'].append(error_msg)
+            # Fetch Network I/O for this node
+            try:
+                net_response = requests.get(
+                    f"{netdata_url}/api/v1/data",
+                    params={
+                        'chart': 'system.net',
+                        'points': 1,
+                        'host': host
+                    },
+                    timeout=timeout
+                )
+                if net_response.status_code == 200:
+                    net_data = net_response.json()
+                    if 'data' in net_data and len(net_data['data']) > 0:
+                        latest = net_data['data'][0]
+                        labels = net_data.get('labels', [])
+                        
+                        if 'received' in labels:
+                            recv_idx = labels.index('received')
+                            received = abs(latest[recv_idx + 1]) if len(latest) > recv_idx + 1 else 0
+                            network_data['received'] += received
+                        
+                        if 'sent' in labels:
+                            sent_idx = labels.index('sent')
+                            sent = abs(latest[sent_idx + 1]) if len(latest) > sent_idx + 1 else 0
+                            network_data['sent'] += sent
+            except Exception as e:
+                error_msg = f"Failed to fetch network for {host}: {e}"
+                logger.warning(error_msg)
+                metrics['errors'].append(error_msg)
+        
+            # Fetch Disk I/O for this node
+            try:
+                disk_response = requests.get(
+                    f"{netdata_url}/api/v1/data",
+                    params={
+                        'chart': 'system.io',
+                        'points': 1,
+                        'host': host
+                    },
+                    timeout=timeout
+                )
+                if disk_response.status_code == 200:
+                    disk_response_data = disk_response.json()
+                    if 'data' in disk_response_data and len(disk_response_data['data']) > 0:
+                        latest = disk_response_data['data'][0]
+                        labels = disk_response_data.get('labels', [])
+                        
+                        if 'in' in labels:
+                            read_idx = labels.index('in')
+                            read_ops = abs(latest[read_idx + 1]) if len(latest) > read_idx + 1 else 0
+                            disk_data['read'] += read_ops
+                        
+                        if 'out' in labels:
+                            write_idx = labels.index('out')
+                            write_ops = abs(latest[write_idx + 1]) if len(latest) > write_idx + 1 else 0
+                            disk_data['write'] += write_ops
+            except Exception as e:
+                error_msg = f"Failed to fetch disk for {host}: {e}"
+                logger.warning(error_msg)
+                metrics['errors'].append(error_msg)
+            
+            metrics['nodes'].append(node_metrics)
+        
+        # Calculate aggregated metrics
+        if cpu_values:
+            metrics['cpu'] = round(sum(cpu_values) / len(cpu_values), 1)  # Average CPU
+        
+        if ram_data['total'] > 0:
+            ram_percentage = (ram_data['used'] / ram_data['total'] * 100)
+            metrics['ram'] = {
+                'percentage': round(ram_percentage, 1),
+                'used_gb': round(ram_data['used'] / 1024, 2),  # Convert MB to GB
+                'total_gb': round(ram_data['total'] / 1024, 2)
+            }
+        
+        if network_data['received'] > 0 or network_data['sent'] > 0:
+            metrics['network'] = {
+                'received_mbps': round(network_data['received'] / 1024, 2),  # Convert to Mbps
+                'sent_mbps': round(network_data['sent'] / 1024, 2)
+            }
+        
+        if disk_data['read'] > 0 or disk_data['write'] > 0:
+            metrics['disk'] = {
+                'read_kbps': round(disk_data['read'] / 1024, 2),
+                'write_kbps': round(disk_data['write'] / 1024, 2)
+            }
         
         # Cache the metrics for 30 seconds
         cache.set('netdata_metrics', metrics, 30)
