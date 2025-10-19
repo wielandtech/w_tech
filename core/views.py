@@ -194,10 +194,52 @@ def get_netdata_metrics(request):
                 'description': 'Memory Usage'
             }
         
-        # Estimate pod count based on monitoring activity
-        estimated_pods = max(20, int(total_clients * 0.5))  # Estimate pods based on connections
+        # Get actual pod count from Kubernetes state
+        pod_count = 0
+        try:
+            # Try to get pod usage from k8s_state
+            k8s_response = requests.get(
+                f"{netdata_url}/api/v1/data",
+                params={
+                    'chart': 'k8s_state.node_allocatable_pods_usage',
+                    'points': 1
+                },
+                timeout=timeout
+            )
+            if k8s_response.status_code == 200:
+                k8s_data = k8s_response.json()
+                if 'data' in k8s_data and len(k8s_data['data']) > 0:
+                    latest = k8s_data['data'][0]
+                    pod_count = latest[1] if len(latest) > 1 and isinstance(latest[1], (int, float)) else 0
+        except Exception as e:
+            logger.warning(f"Failed to fetch pod count from k8s_state: {e}")
+            if len(metrics['errors']) < 3:
+                metrics['errors'].append(f"Pod count failed")
+        
+        # Fallback: try to get from all nodes
+        if pod_count == 0:
+            for host in netdata_hosts:
+                try:
+                    host_pods_response = requests.get(
+                        f"{netdata_url}/api/v1/data",
+                        params={
+                            'chart': 'k8s_state.node_allocatable_pods_usage',
+                            'points': 1,
+                            'host': host
+                        },
+                        timeout=timeout
+                    )
+                    if host_pods_response.status_code == 200:
+                        host_pods_data = host_pods_response.json()
+                        if 'data' in host_pods_data and len(host_pods_data['data']) > 0:
+                            latest = host_pods_data['data'][0]
+                            host_pods = latest[1] if len(latest) > 1 and isinstance(latest[1], (int, float)) else 0
+                            pod_count += host_pods
+                except Exception as e:
+                    logger.warning(f"Failed to fetch pod count for {host}: {e}")
+        
         metrics['pods'] = {
-            'count': estimated_pods,
+            'count': int(pod_count),
             'description': 'Number of Pods'
         }
         
