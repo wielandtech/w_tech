@@ -40,9 +40,10 @@ def debug_netdata(request):
             debug_info['available_charts'] = list(charts_data.get('charts', {}).keys())[:20]  # First 20
             
         # Try fetching charts list for each host to see available metrics
-        test_hosts = ['wtech7062', 'wtech7061', 'wtech7063']
+        test_hosts = ['netdata-parent', 'wtech7062', 'wtech7061', 'wtech7063']
         debug_info['host_charts'] = {}
         debug_info['sample_queries'] = {}
+        debug_info['parent_test'] = {}
         
         for host in test_hosts:
             debug_info['host_charts'][host] = {}
@@ -118,6 +119,22 @@ def debug_netdata(request):
                     debug_info['sample_queries'][host][chart_name]['prefixed_chart'] = resp.status_code
                 except Exception as e:
                     debug_info['sample_queries'][host][chart_name]['prefixed_chart'] = str(e)
+        
+        # Test if we can get data without host parameter (should query parent/default)
+        debug_info['parent_test']['charts_query'] = {}
+        for chart in ['system.cpu', 'system.ram', 'system.net', 'system.io']:
+            try:
+                resp = requests.get(
+                    f"{netdata_url}/api/v1/data",
+                    params={'chart': chart, 'points': 1},
+                    timeout=3
+                )
+                debug_info['parent_test']['charts_query'][chart] = {
+                    'status': resp.status_code,
+                    'has_data': len(resp.json().get('data', [])) > 0 if resp.status_code == 200 else False
+                }
+            except Exception as e:
+                debug_info['parent_test']['charts_query'][chart] = {'error': str(e)}
                 
     except Exception as e:
         debug_info['connectivity'] = f'failed: {str(e)}'
