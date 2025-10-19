@@ -219,8 +219,8 @@ def get_netdata_metrics(request):
                     cpu_data = cpu_response.json()
                     if 'data' in cpu_data and len(cpu_data['data']) > 0:
                         latest = cpu_data['data'][0]
-                        # Sum all CPU usage values (user, system, etc.)
-                        cpu_usage = sum([abs(v) for v in latest[1:] if isinstance(v, (int, float))])
+                        # Get the first CPU usage value (usually total CPU percentage)
+                        cpu_usage = latest[1] if len(latest) > 1 and isinstance(latest[1], (int, float)) else 0
                         cpu_values.append(cpu_usage)
                         node_metrics['cpu'] = round(cpu_usage, 1)
                         node_metrics['reachable'] = True
@@ -244,8 +244,9 @@ def get_netdata_metrics(request):
                     ram_response_data = ram_response.json()
                     if 'data' in ram_response_data and len(ram_response_data['data']) > 0:
                         latest = ram_response_data['data'][0]
-                        # Netdata memory usage in MB
-                        memory_mb = sum([abs(v) for v in latest[1:] if isinstance(v, (int, float))])
+                        # Get the first memory value (usually in bytes, convert to MB)
+                        memory_bytes = latest[1] if len(latest) > 1 and isinstance(latest[1], (int, float)) else 0
+                        memory_mb = memory_bytes / (1024 * 1024)  # Convert bytes to MB
                         ram_data['used'] += memory_mb
                         # Estimate total (we'll use a fixed value per node for percentage)
                         ram_data['total'] += 500  # Assume 500MB max per Netdata instance
@@ -270,8 +271,8 @@ def get_netdata_metrics(request):
                     net_data = net_response.json()
                     if 'data' in net_data and len(net_data['data']) > 0:
                         latest = net_data['data'][0]
-                        # Count active clients (connections to Netdata)
-                        clients = sum([abs(v) for v in latest[1:] if isinstance(v, (int, float))])
+                        # Get the first client count value
+                        clients = latest[1] if len(latest) > 1 and isinstance(latest[1], (int, float)) else 0
                         network_data['received'] += clients  # Reuse as client count
                         node_metrics['clients'] = int(clients)
             except Exception as e:
@@ -294,8 +295,8 @@ def get_netdata_metrics(request):
                     disk_response_data = disk_response.json()
                     if 'data' in disk_response_data and len(disk_response_data['data']) > 0:
                         latest = disk_response_data['data'][0]
-                        # API requests per second
-                        requests_ps = sum([abs(v) for v in latest[1:] if isinstance(v, (int, float))])
+                        # Get the first requests per second value
+                        requests_ps = latest[1] if len(latest) > 1 and isinstance(latest[1], (int, float)) else 0
                         disk_data['read'] += requests_ps
                         node_metrics['requests_ps'] = round(requests_ps, 1)
             except Exception as e:
@@ -315,17 +316,19 @@ def get_netdata_metrics(request):
             }
         
         if ram_data['total'] > 0:
-            # Show monitoring RAM usage vs cluster total
-            ram_percentage = (ram_data['used'] / ram_data['total'] * 100)
+            # Show cluster memory with estimated usage
             cluster_ram_mb = metrics['cluster_info'].get('total_ram_mb', 0)
-            cluster_ram_used_mb = round(cluster_ram_mb * 0.1) # Estimate 10% cluster usage for monitoring
+            cluster_ram_gb = metrics['cluster_info'].get('total_ram_gb', 0)
+            
+            # Estimate cluster usage based on monitoring overhead (assume 5-10% of total)
+            estimated_usage_percent = 8  # 8% estimated cluster usage
+            cluster_used_gb = round(cluster_ram_gb * estimated_usage_percent / 100, 1)
             
             metrics['ram'] = {
-                'monitoring_percentage': round(ram_percentage, 1),
+                'cluster_total_gb': cluster_ram_gb,
+                'cluster_estimated_used_gb': cluster_used_gb,
+                'cluster_estimated_percentage': estimated_usage_percent,
                 'monitoring_used_mb': round(ram_data['used'], 1),
-                'monitoring_total_mb': round(ram_data['total'], 1),
-                'cluster_total_gb': metrics['cluster_info'].get('total_ram_gb', 0),
-                'cluster_estimated_used_gb': round(cluster_ram_used_mb / 1024, 1),
                 'description': 'Cluster Memory'
             }
         

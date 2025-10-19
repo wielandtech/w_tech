@@ -48,14 +48,14 @@ function fetchMetrics() {
             
                    // RAM Card (Cluster Memory)
                    if (data.ram !== null) {
-                       const ramClass = data.ram.monitoring_percentage > 85 ? 'critical' : (data.ram.monitoring_percentage > 70 ? 'warning' : '');
+                       const ramClass = data.ram.cluster_estimated_percentage > 85 ? 'critical' : (data.ram.cluster_estimated_percentage > 70 ? 'warning' : '');
                        html += `
                            <div class="metric-card">
                                <div class="metric-label">${data.ram.description}</div>
                                <div class="metric-value">${data.ram.cluster_total_gb} GB</div>
                                <div class="metric-detail">~${data.ram.cluster_estimated_used_gb} GB used</div>
                                <div class="metric-bar">
-                                   <div class="metric-bar-fill ${ramClass}" style="width: ${Math.min(data.ram.monitoring_percentage, 100)}%"></div>
+                                   <div class="metric-bar-fill ${ramClass}" style="width: ${Math.min(data.ram.cluster_estimated_percentage, 100)}%"></div>
                                </div>
                            </div>
                        `;
