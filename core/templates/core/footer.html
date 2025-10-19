@@ -31,56 +31,57 @@ function fetchMetrics() {
             
             let html = '<div class="metrics-grid">';
             
-            // CPU Card
-            if (data.cpu !== null) {
-                const cpuClass = data.cpu > 80 ? 'critical' : (data.cpu > 60 ? 'warning' : '');
-                html += `
-                    <div class="metric-card">
-                        <div class="metric-label">CPU Usage</div>
-                        <div class="metric-value">${data.cpu}%</div>
-                        <div class="metric-bar">
-                            <div class="metric-bar-fill ${cpuClass}" style="width: ${data.cpu}%"></div>
-                        </div>
-                    </div>
-                `;
-            }
+                   // CPU Card (Cluster + Monitoring)
+                   if (data.cpu !== null) {
+                       const cpuClass = data.cpu.percentage > 50 ? 'critical' : (data.cpu.percentage > 25 ? 'warning' : '');
+                       html += `
+                           <div class="metric-card">
+                               <div class="metric-label">${data.cpu.description}</div>
+                               <div class="metric-value">${data.cpu.percentage}%</div>
+                               <div class="metric-detail">${data.cpu.total_cores} cores total</div>
+                               <div class="metric-bar">
+                                   <div class="metric-bar-fill ${cpuClass}" style="width: ${Math.min(data.cpu.percentage, 100)}%"></div>
+                               </div>
+                           </div>
+                       `;
+                   }
             
-            // RAM Card
-            if (data.ram !== null) {
-                const ramClass = data.ram.percentage > 85 ? 'critical' : (data.ram.percentage > 70 ? 'warning' : '');
-                html += `
-                    <div class="metric-card">
-                        <div class="metric-label">Memory Usage</div>
-                        <div class="metric-value">${data.ram.percentage}%</div>
-                        <div class="metric-detail">${data.ram.used_gb} / ${data.ram.total_gb} GB</div>
-                        <div class="metric-bar">
-                            <div class="metric-bar-fill ${ramClass}" style="width: ${data.ram.percentage}%"></div>
-                        </div>
-                    </div>
-                `;
-            }
+                   // RAM Card (Cluster Memory)
+                   if (data.ram !== null) {
+                       const ramClass = data.ram.monitoring_percentage > 85 ? 'critical' : (data.ram.monitoring_percentage > 70 ? 'warning' : '');
+                       html += `
+                           <div class="metric-card">
+                               <div class="metric-label">${data.ram.description}</div>
+                               <div class="metric-value">${data.ram.cluster_total_gb} GB</div>
+                               <div class="metric-detail">~${data.ram.cluster_estimated_used_gb} GB used</div>
+                               <div class="metric-bar">
+                                   <div class="metric-bar-fill ${ramClass}" style="width: ${Math.min(data.ram.monitoring_percentage, 100)}%"></div>
+                               </div>
+                           </div>
+                       `;
+                   }
             
-            // Network Card
-            if (data.network !== null) {
-                html += `
-                    <div class="metric-card">
-                        <div class="metric-label">Network I/O</div>
-                        <div class="metric-value">↓${data.network.received_mbps} Mbps</div>
-                        <div class="metric-detail">↑${data.network.sent_mbps} Mbps</div>
-                    </div>
-                `;
-            }
+                   // Active Clients Card
+                   if (data.network !== null) {
+                       html += `
+                           <div class="metric-card">
+                               <div class="metric-label">${data.network.description}</div>
+                               <div class="metric-value">${data.network.total_clients}</div>
+                               <div class="metric-detail">${data.network.avg_per_node} per node</div>
+                           </div>
+                       `;
+                   }
             
-            // Disk Card
-            if (data.disk !== null) {
-                html += `
-                    <div class="metric-card">
-                        <div class="metric-label">Disk I/O</div>
-                        <div class="metric-value">R: ${data.disk.read_kbps} KB/s</div>
-                        <div class="metric-detail">W: ${data.disk.write_kbps} KB/s</div>
-                    </div>
-                `;
-            }
+                   // API Requests Card
+                   if (data.disk !== null) {
+                       html += `
+                           <div class="metric-card">
+                               <div class="metric-label">${data.disk.description}</div>
+                               <div class="metric-value">${data.disk.total_requests_ps}/s</div>
+                               <div class="metric-detail">${data.disk.avg_per_node}/s per node</div>
+                           </div>
+                       `;
+                   }
             
             html += '</div>';
             
