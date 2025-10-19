@@ -171,7 +171,7 @@ def get_netdata_metrics(request):
             metrics['cpu'] = {
                 'percentage': round(avg_cpu, 1),
                 'total_cores': cluster_cores,
-                'description': 'Cluster CPU Usage'
+                'description': 'CPU Usage'
             }
         
         if memory_values:
@@ -191,14 +191,14 @@ def get_netdata_metrics(request):
                 'total_gb': cluster_ram_gb,
                 'used_gb': estimated_cluster_usage_gb,
                 'percentage': usage_percentage,
-                'description': 'Cluster Memory'
+                'description': 'Memory Usage'
             }
         
         # Estimate pod count based on monitoring activity
         estimated_pods = max(20, int(total_clients * 0.5))  # Estimate pods based on connections
         metrics['pods'] = {
             'count': estimated_pods,
-            'description': 'Running Pods'
+            'description': 'Number of Pods'
         }
         
         # Network activity

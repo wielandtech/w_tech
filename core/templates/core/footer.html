@@ -53,7 +53,7 @@ function fetchMetrics() {
                            <div class="metric-card">
                                <div class="metric-label">${data.memory.description}</div>
                                <div class="metric-value">${data.memory.used_gb} / ${data.memory.total_gb} GB</div>
-                               <div class="metric-detail">${data.memory.percentage}% used</div>
+                               <div class="metric-detail">${data.memory.percentage}%</div>
                                <div class="metric-bar">
                                    <div class="metric-bar-fill ${memoryClass}" style="width: ${Math.min(data.memory.percentage, 100)}%"></div>
                                </div>
@@ -67,7 +67,7 @@ function fetchMetrics() {
                            <div class="metric-card">
                                <div class="metric-label">${data.pods.description}</div>
                                <div class="metric-value">${data.pods.count}</div>
-                               <div class="metric-detail">across cluster</div>
+                               <div class="metric-detail">running on cluster</div>
                            </div>
                        `;
                    }
@@ -77,8 +77,8 @@ function fetchMetrics() {
                 html += `
                     <div class="metric-card">
                         <div class="metric-label">${data.network.description}</div>
-                        <div class="metric-value">${data.network.active_connections}</div>
-                        <div class="metric-detail">${data.network.api_requests_ps}/s API calls</div>
+                        <div class="metric-value">${data.network.active_connections} connections</div>
+                        <div class="metric-detail">${data.network.api_requests_ps} API calls per second</div>
                     </div>
                 `;
             }
