@@ -14,8 +14,8 @@ def homepage(request):
 
 def get_netdata_metrics(request):
     """
-    Fetch comprehensive cluster metrics from Netdata API and return as JSON.
-    Shows total cluster resources, CPU utilization, memory usage, and pod counts.
+    Fetch comprehensive cluster metrics from Netdata k8s_state collector and return as JSON.
+    Shows cluster CPU utilization, memory usage, pod counts, and network activity.
     Implements caching to reduce API calls.
     """
     cached_metrics = cache.get('netdata_metrics')
@@ -25,6 +25,7 @@ def get_netdata_metrics(request):
 
     try:
         netdata_url = settings.NETDATA_URL
+        k8s_state_url = f"{netdata_url.replace('netdata-parent', 'netdata-k8s-state')}"
         timeout = 3
 
         netdata_hosts = getattr(settings, 'NETDATA_HOSTS', ['wtech7062', 'wtech7061', 'wtech7063'])
@@ -63,24 +64,22 @@ def get_netdata_metrics(request):
             if len(metrics['errors']) < 3:
                 metrics['errors'].append(f"Cluster info failed")
 
-        # Aggregate data from all nodes
-        cpu_values = []
-        memory_values = []
+        # Aggregate k8s_state metrics from all nodes
+        cpu_utilization_values = []
+        memory_utilization_values = []
+        pod_counts = []
         total_clients = 0
         total_requests = 0
-        
-        # Fetch metrics from each node
         reachable_nodes = 0
+        
         for host in netdata_hosts:
-            
-            # Fetch CPU usage for this node (use only user CPU as proxy for system load)
             try:
+                # Fetch CPU utilization from k8s_state
                 cpu_response = requests.get(
-                    f"{netdata_url}/api/v1/data",
+                    f"{k8s_state_url}/api/v1/data",
                     params={
-                        'chart': 'netdata.server_cpu',
-                        'points': 1,
-                        'host': host
+                        'chart': f'k8s_state_k8s-metrics_node_{host}.allocatable_cpu_requests_utilization',
+                        'points': 1
                     },
                     timeout=timeout
                 )
@@ -88,41 +87,44 @@ def get_netdata_metrics(request):
                     cpu_data = cpu_response.json()
                     if 'data' in cpu_data and len(cpu_data['data']) > 0:
                         latest = cpu_data['data'][0]
-                        # Use system CPU directly
-                        system_cpu = latest[2] if len(latest) > 2 and isinstance(latest[2], (int, float)) else 0
-                        cpu_usage = system_cpu
-                        cpu_values.append(cpu_usage)
+                        cpu_util = latest[1] if len(latest) > 1 and isinstance(latest[1], (int, float)) else 0
+                        cpu_utilization_values.append(cpu_util)
                         reachable_nodes += 1
-            except Exception as e:
-                logger.warning(f"Failed to fetch CPU for {host}: {e}")
-                if len(metrics['errors']) < 3:  # Limit error messages
-                    metrics['errors'].append(f"CPU fetch failed")
-        
-            # Fetch memory usage for this node
-            try:
-                ram_response = requests.get(
-                    f"{netdata_url}/api/v1/data",
+                
+                # Fetch memory utilization from k8s_state
+                memory_response = requests.get(
+                    f"{k8s_state_url}/api/v1/data",
                     params={
-                        'chart': 'netdata.memory',
-                        'points': 1,
-                        'host': host
+                        'chart': f'k8s_state_k8s-metrics_node_{host}.allocatable_mem_requests_utilization',
+                        'points': 1
                     },
                     timeout=timeout
                 )
-                if ram_response.status_code == 200:
-                    ram_data = ram_response.json()
-                    if 'data' in ram_data and len(ram_data['data']) > 0:
-                        latest = ram_data['data'][0]
-                        memory_bytes = latest[1] if len(latest) > 1 and isinstance(latest[1], (int, float)) else 0
-                        memory_mb = memory_bytes / (1024 * 1024)  # Convert bytes to MB
-                        memory_values.append(memory_mb)
-            except Exception as e:
-                logger.warning(f"Failed to fetch memory for {host}: {e}")
-                if len(metrics['errors']) < 3:
-                    metrics['errors'].append(f"Memory fetch failed")
-        
-            # Fetch active connections for this node
-            try:
+                if memory_response.status_code == 200:
+                    memory_data = memory_response.json()
+                    if 'data' in memory_data and len(memory_data['data']) > 0:
+                        latest = memory_data['data'][0]
+                        memory_util = latest[1] if len(latest) > 1 and isinstance(latest[1], (int, float)) else 0
+                        memory_utilization_values.append(memory_util)
+                
+                # Fetch pod count from k8s_state
+                pods_response = requests.get(
+                    f"{k8s_state_url}/api/v1/data",
+                    params={
+                        'chart': f'k8s_state_k8s-metrics_node_{host}.allocated_pods_usage',
+                        'points': 1
+                    },
+                    timeout=timeout
+                )
+                if pods_response.status_code == 200:
+                    pods_data = pods_response.json()
+                    if 'data' in pods_data and len(pods_data['data']) > 0:
+                        latest = pods_data['data'][0]
+                        # latest[2] is the 'allocated' pods count
+                        host_pods = latest[2] if len(latest) > 2 and isinstance(latest[2], (int, float)) else 0
+                        pod_counts.append(host_pods)
+                
+                # Fetch network activity from netdata (fallback to netdata metrics for network)
                 clients_response = requests.get(
                     f"{netdata_url}/api/v1/data",
                     params={
@@ -138,13 +140,7 @@ def get_netdata_metrics(request):
                         latest = clients_data['data'][0]
                         clients = latest[1] if len(latest) > 1 and isinstance(latest[1], (int, float)) else 0
                         total_clients += clients
-            except Exception as e:
-                logger.warning(f"Failed to fetch clients for {host}: {e}")
-                if len(metrics['errors']) < 3:
-                    metrics['errors'].append(f"Network fetch failed")
-        
-            # Fetch API requests for this node
-            try:
+                
                 requests_response = requests.get(
                     f"{netdata_url}/api/v1/data",
                     params={
@@ -160,90 +156,46 @@ def get_netdata_metrics(request):
                         latest = requests_data['data'][0]
                         requests_ps = latest[1] if len(latest) > 1 and isinstance(latest[1], (int, float)) else 0
                         total_requests += requests_ps
+                        
             except Exception as e:
-                logger.warning(f"Failed to fetch requests for {host}: {e}")
+                logger.warning(f"Failed to fetch metrics for {host}: {e}")
                 if len(metrics['errors']) < 3:
-                    metrics['errors'].append(f"API fetch failed")
+                    metrics['errors'].append(f"Metrics fetch failed for {host}")
         
-        # Calculate cluster-wide metrics
-        if cpu_values:
-            avg_cpu = sum(cpu_values) / len(cpu_values)
+        # Calculate cluster-wide CPU metrics
+        if cpu_utilization_values:
+            avg_cpu_util = sum(cpu_utilization_values) / len(cpu_utilization_values)
             metrics['cpu'] = {
-                'percentage': round(avg_cpu, 1),
+                'percentage': round(avg_cpu_util, 1),
                 'total_cores': cluster_cores,
                 'description': 'CPU Usage'
             }
         
-        if memory_values:
-            total_memory_mb = sum(memory_values)
-            cluster_ram_mb = cluster_ram_gb * 1024
-            
-            # Estimate actual cluster memory usage (scale monitoring memory to represent cluster usage)
-            estimated_cluster_usage_mb = total_memory_mb * 10  # Scale factor for cluster vs monitoring
-            estimated_cluster_usage_gb = round(estimated_cluster_usage_mb / 1024, 1)
-            usage_percentage = round((estimated_cluster_usage_mb / cluster_ram_mb) * 100, 1)
+        # Calculate cluster-wide memory metrics
+        if memory_utilization_values and cluster_ram_gb > 0:
+            avg_memory_util = sum(memory_utilization_values) / len(memory_utilization_values)
+            # Convert percentage to actual GB usage
+            estimated_cluster_usage_gb = round((avg_memory_util / 100) * cluster_ram_gb, 1)
             
             # Ensure we have a meaningful decimal value (at least 0.1 GB)
-            if estimated_cluster_usage_gb < 0.1:
+            if estimated_cluster_usage_gb < 0.1 and avg_memory_util > 0:
                 estimated_cluster_usage_gb = 0.1
             
             metrics['memory'] = {
                 'total_gb': cluster_ram_gb,
                 'used_gb': estimated_cluster_usage_gb,
-                'percentage': usage_percentage,
+                'percentage': round(avg_memory_util, 1),
                 'description': 'Memory Usage'
             }
         
-        # Get actual pod count from Kubernetes state
-        pod_count = 0
-        try:
-            # Try to get pod usage from k8s_state
-            k8s_response = requests.get(
-                f"{netdata_url}/api/v1/data",
-                params={
-                    'chart': 'k8s_state.node_allocatable_pods_usage',
-                    'points': 1
-                },
-                timeout=timeout
-            )
-            if k8s_response.status_code == 200:
-                k8s_data = k8s_response.json()
-                if 'data' in k8s_data and len(k8s_data['data']) > 0:
-                    latest = k8s_data['data'][0]
-                    pod_count = latest[1] if len(latest) > 1 and isinstance(latest[1], (int, float)) else 0
-        except Exception as e:
-            logger.warning(f"Failed to fetch pod count from k8s_state: {e}")
-            if len(metrics['errors']) < 3:
-                metrics['errors'].append(f"Pod count failed")
-        
-        # Fallback: try to get from all nodes
-        if pod_count == 0:
-            for host in netdata_hosts:
-                try:
-                    host_pods_response = requests.get(
-                        f"{netdata_url}/api/v1/data",
-                        params={
-                            'chart': 'k8s_state.node_allocatable_pods_usage',
-                            'points': 1,
-                            'host': host
-                        },
-                        timeout=timeout
-                    )
-                    if host_pods_response.status_code == 200:
-                        host_pods_data = host_pods_response.json()
-                        if 'data' in host_pods_data and len(host_pods_data['data']) > 0:
-                            latest = host_pods_data['data'][0]
-                            host_pods = latest[1] if len(latest) > 1 and isinstance(latest[1], (int, float)) else 0
-                            pod_count += host_pods
-                except Exception as e:
-                    logger.warning(f"Failed to fetch pod count for {host}: {e}")
-        
+        # Calculate total pod count
+        total_pods = sum(pod_counts) if pod_counts else 0
         metrics['pods'] = {
-            'count': int(pod_count),
+            'count': int(total_pods),
             'description': 'Number of Pods'
         }
         
-        # Network activity
+        # Network activity (using netdata metrics)
         metrics['network'] = {
             'active_connections': int(total_clients),
             'api_requests_ps': round(total_requests, 1),
