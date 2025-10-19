@@ -208,7 +208,7 @@ def get_netdata_metrics(request):
         for host in netdata_hosts:
             node_metrics = {'hostname': host, 'reachable': False}
             
-            # Fetch CPU usage for this node
+            # Fetch CPU usage for this node (use only user CPU as proxy for system load)
             try:
                 cpu_response = requests.get(
                     f"{netdata_url}/api/v1/data",
@@ -223,7 +223,9 @@ def get_netdata_metrics(request):
                     cpu_data = cpu_response.json()
                     if 'data' in cpu_data and len(cpu_data['data']) > 0:
                         latest = cpu_data['data'][0]
-                        cpu_usage = sum([v for v in latest[1:] if isinstance(v, (int, float))])
+                        # Use system CPU directly
+                        system_cpu = latest[2] if len(latest) > 2 and isinstance(latest[2], (int, float)) else 0
+                        cpu_usage = system_cpu
                         cpu_values.append(cpu_usage)
                         node_metrics['cpu'] = round(cpu_usage, 1)
                         node_metrics['reachable'] = True
