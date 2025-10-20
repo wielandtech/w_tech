@@ -141,8 +141,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 EMAIL_HOST = os.getenv("EMAIL_HOST", "mail.wielandtech.com")
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "no-reply@wielandtech.com")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_PASSWORD")
-EMAIL_PORT = int(os.getenv("EMAIL_PORT", "2525"))
-EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "False") == "True"
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", "465"))
+EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "True") == "True"
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "False") == "True"
 EMAIL_TIMEOUT = 30  # 30 seconds timeout for email sending
 DEFAULT_FROM_EMAIL = os.getenv("EMAIL_HOST_USER", "no-reply@wielandtech.com")
