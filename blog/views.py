@@ -136,8 +136,7 @@ def post_share(request, post_id):
                         message, 
                         settings.DEFAULT_FROM_EMAIL, 
                         [cd['to']],
-                        fail_silently=False,
-                        timeout=getattr(settings, 'EMAIL_TIMEOUT', 30)
+                        fail_silently=False
                     )
                     sent = True
                     logger.info(f"Email sent successfully to {cd['to']} for post {post.id}")
