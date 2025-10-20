@@ -17,6 +17,15 @@
     {% else %}
     <div class="post-card">
         <h2 class="secondary">Share "{{ post.title }}" by e-mail</h2>
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        
         <form method="post" class="email-form">
             {{ form.as_p }}
             {% csrf_token %}

@@ -25,6 +25,12 @@ services:
       REDIS_PORT: ${REDIS_PORT}
       REDIS_DB: 0
       DJANGO_SETTINGS_MODULE: wielandtech.settings_dev
+      EMAIL_HOST: ${EMAIL_HOST}
+      EMAIL_HOST_USER: ${EMAIL_HOST_USER}
+      EMAIL_PASSWORD: ${EMAIL_PASSWORD}
+      EMAIL_PORT: ${EMAIL_PORT}
+      EMAIL_USE_SSL: ${EMAIL_USE_SSL}
+      EMAIL_USE_TLS: ${EMAIL_USE_TLS}
     healthcheck:
       test: ["CMD", "python", "-c", "import socket; s=socket.socket(); s.connect(('localhost', 8000))" ]
       interval: 10s

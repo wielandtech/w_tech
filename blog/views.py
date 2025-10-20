@@ -1,6 +1,8 @@
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.mail import send_mail
+from django.conf import settings
+from django.contrib import messages
 from django.db.models import Count
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.http import require_POST
@@ -121,8 +123,27 @@ def post_share(request, post_id):
             post_url = request.build_absolute_uri(post.get_absolute_url())
             subject = f"{cd['name']} recommends you read {post.title}"
             message = f"Read {post.title} at {post_url}\n\n {cd['name']}\'s comments: {cd['comments']}"
-            send_mail(subject, message, 'no-reply@wielandtech.com', [cd['to']])
-            sent = True
+            
+            try:
+                # Check if email configuration is available
+                if not settings.EMAIL_HOST_PASSWORD:
+                    messages.error(request, 'Email service is not configured. Please contact the administrator.')
+                    logger.error("Email configuration missing: EMAIL_HOST_PASSWORD not set")
+                else:
+                    # Send email with timeout
+                    send_mail(
+                        subject, 
+                        message, 
+                        settings.DEFAULT_FROM_EMAIL, 
+                        [cd['to']],
+                        fail_silently=False,
+                        timeout=getattr(settings, 'EMAIL_TIMEOUT', 30)
+                    )
+                    sent = True
+                    logger.info(f"Email sent successfully to {cd['to']} for post {post.id}")
+            except Exception as e:
+                logger.error(f"Failed to send email: {str(e)}")
+                messages.error(request, f'Failed to send email: {str(e)}')
     else:
         form = EmailPostForm()
     return render(request, 'blog/post/share.html', {'post': post, 'form': form, 'sent': sent})
