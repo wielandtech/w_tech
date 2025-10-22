@@ -18,7 +18,7 @@ def markdown_format(text):
 @register.simple_tag
 def truncate_with_read_more(text, word_count, post_url):
     """
-    Truncate HTML text and add 'Read More' link only if truncation occurred.
+    Truncate text and add 'Read More' link only if truncation occurred.
     """
     from django.template.defaultfilters import truncatewords_html
     from django.utils.html import strip_tags
@@ -43,7 +43,9 @@ def truncate_with_read_more(text, word_count, post_url):
         post_url
     )
     
-    return mark_safe(read_more_link)
+    return read_more_link
+
+
 
 
 
