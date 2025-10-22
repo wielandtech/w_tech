@@ -3,6 +3,7 @@ import markdown
 from django import template
 from django.db.models import Count
 from django.utils.safestring import mark_safe
+from django.utils.html import format_html
 
 from ..models import Post
 
@@ -12,6 +13,32 @@ register = template.Library()
 @register.filter(name='markdown')
 def markdown_format(text):
     return mark_safe(markdown.markdown(text))
+
+
+@register.filter(name='truncate_with_read_more')
+def truncate_with_read_more(text, word_count, post_url):
+    """
+    Truncate HTML text to specified word count and add a 'Read More' link.
+    Uses Django's truncatewords_html as base and adds the Read More link.
+    """
+    from django.template.defaultfilters import truncatewords_html
+    
+    # First truncate the HTML content
+    truncated_html = truncatewords_html(text, word_count)
+    
+    # Check if truncation actually occurred by comparing lengths
+    # If the truncated version is the same as original, no truncation happened
+    if len(truncated_html) >= len(text):
+        return text
+    
+    # Add the Read More link
+    read_more_link = format_html(
+        '{} <a href="{}" class="read-more-link">Read More</a>',
+        truncated_html,
+        post_url
+    )
+    
+    return mark_safe(read_more_link)
 
 
 @register.simple_tag
