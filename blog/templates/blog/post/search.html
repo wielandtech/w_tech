@@ -13,7 +13,7 @@
         {% for post in results %}
         <div class="post-search-result">
             <h4 class="secondary"><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h4>
-            {{ post.body|markdown|truncate_with_read_more:5:post.get_absolute_url }}
+            {% truncate_with_read_more post.body 5 post.get_absolute_url %}
         </div>
         {% empty %}
         <p>There are no results for your query.</p>

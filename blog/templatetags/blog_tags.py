@@ -15,7 +15,7 @@ def markdown_format(text):
     return mark_safe(markdown.markdown(text))
 
 
-@register.filter(name='truncate_with_read_more')
+@register.simple_tag
 def truncate_with_read_more(text, word_count, post_url):
     """
     Truncate HTML text to specified word count and add a 'Read More' link.
@@ -23,13 +23,16 @@ def truncate_with_read_more(text, word_count, post_url):
     """
     from django.template.defaultfilters import truncatewords_html
     
-    # First truncate the HTML content
-    truncated_html = truncatewords_html(text, word_count)
+    # Process markdown first
+    processed_text = markdown.markdown(text)
+    
+    # Then truncate the HTML content
+    truncated_html = truncatewords_html(processed_text, word_count)
     
     # Check if truncation actually occurred by comparing lengths
     # If the truncated version is the same as original, no truncation happened
-    if len(truncated_html) >= len(text):
-        return text
+    if len(truncated_html) >= len(processed_text):
+        return mark_safe(processed_text)
     
     # Add the Read More link
     read_more_link = format_html(
