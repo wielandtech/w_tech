@@ -27,8 +27,7 @@
         <p class="date">
             Published {{ post.publish }} by {{ post.author }}
         </p>
-        {{ post.body|markdown|truncatewords_html:140 }}
-        <a href="{{ post.get_absolute_url }}" class="read-more-link">Read More</a>
+        {% truncate_with_read_more post.body 140 post.get_absolute_url %}
         <div class="post-actions">
             <a href="{{ post.get_absolute_url }}">Comment or Share</a>
             {% if request.user.is_authenticated %}
