@@ -27,24 +27,11 @@ document.addEventListener('DOMContentLoaded', () => {
             // Store current scroll position
             const currentScrollY = window.scrollY;
             
-            // Temporarily disable smooth scrolling and transitions during theme change
-            document.documentElement.style.scrollBehavior = 'auto';
-            document.body.style.transition = 'none';
-            
             const theme = e.target.checked ? 'dark' : 'light';
             setTheme(theme);
             
-            // Force a reflow to ensure layout is stable
-            document.body.offsetHeight;
-            
             // Restore scroll position to prevent jumping
             window.scrollTo(0, currentScrollY);
-            
-            // Re-enable smooth scrolling and transitions after a short delay
-            setTimeout(() => {
-                document.documentElement.style.scrollBehavior = 'smooth';
-                document.body.style.transition = '';
-            }, 100);
         });
     }
 
