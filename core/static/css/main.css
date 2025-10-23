@@ -355,7 +355,7 @@ ul {
   text-align: center;
   padding: 14px 20px;
   text-decoration: none;
-  transition: all 0.3s ease;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Change color on hover */
@@ -520,7 +520,7 @@ input:checked + .slider:before {
   padding: 0.5rem 1rem;
   border: 1px solid #2c3e50;
   border-radius: 4px;
-  transition: all 0.3s ease;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .search-again:hover {

@@ -24,8 +24,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // Listen for toggle switch change
     if (toggleSwitch) {
         toggleSwitch.addEventListener('change', (e) => {
+            // Temporarily disable smooth scrolling during theme change
+            document.documentElement.style.scrollBehavior = 'auto';
+            
             const theme = e.target.checked ? 'dark' : 'light';
             setTheme(theme);
+            
+            // Re-enable smooth scrolling after a short delay
+            setTimeout(() => {
+                document.documentElement.style.scrollBehavior = 'smooth';
+            }, 100);
         });
     }
 
