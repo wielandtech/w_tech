@@ -128,9 +128,8 @@ a:hover {
     /* Sidebar styles */
     #sidebar {
         background-color: var(--blog-card-bg);
-        padding: 20px;
         border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 2px 4px var(--blog-card-shadow);
     }
 
     #sidebar h2, #sidebar h3 {
@@ -151,10 +150,8 @@ a:hover {
     /* Post styles */
     .post {
         background-color: var(--blog-card-bg);
-        padding: 25px;
-        margin-bottom: 20px;
         border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 2px 4px var(--blog-card-shadow);
     }
 
     .post-title {
@@ -286,7 +283,7 @@ a:hover {
 /* Dark theme specific overrides if needed */
 [data-theme="dark"] {
     .post {
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 2px 4px var(--blog-card-shadow);
     }
 
     #comment-form input[type="text"]:focus,
@@ -322,10 +319,8 @@ a:hover {
 
         .post {
             background-color: var(--blog-card-bg);
-            padding: 25px;
-            margin-bottom: 20px;
             border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 4px var(--blog-card-shadow);
         }
 
         /* Add any specific system dark mode overrides here if needed */

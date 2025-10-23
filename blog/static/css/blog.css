@@ -22,7 +22,7 @@
 
 .post {
     background-color: var(--blog-card-bg);
-    padding: 1rem;
+    padding: 20px;
     margin-bottom: 0.5rem;
     border: 1px solid var(--blog-border);
     box-shadow: 0 2px 4px var(--blog-card-shadow);
@@ -42,7 +42,7 @@
 #sidebar {
     flex: 1;
     max-width: 300px;
-    padding: 1rem;
+    padding: 20px;
     background-color: var(--blog-card-bg);
     border-left: 1px solid var(--blog-border);
     font-size: 0.9rem;
