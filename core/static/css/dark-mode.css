@@ -91,6 +91,13 @@
 }
 
 /* Apply smooth transitions when theme changes */
-* {
+body,
+.navbar,
+.navbar a,
+.footer,
+.content,
+.slider,
+a,
+.theme-switch-wrapper {
   transition: background-color 0.3s ease, color 0.3s ease;
 }

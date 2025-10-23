@@ -29,7 +29,7 @@
         </p>
         {{ post.body|markdown|truncatewords_html:140 }}
         <div class="post-actions">
-            <a href="{{ post.get_absolute_url }}">Read more, Comment, or Share</a>
+            <a href="{{ post.get_absolute_url }}">Read full post</a>
             {% if request.user.is_authenticated %}
                 {% with total_likes=post.users_like.count users_like=post.users_like.all %}
                 <a href="#" 
