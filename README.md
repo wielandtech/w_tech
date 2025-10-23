@@ -18,7 +18,7 @@ A modern Django-based personal portfolio and blog platform.
 - **Cache**: Redis
 - **Frontend**: HTML5, CSS3, JavaScript
 - **Server**: Nginx, Gunicorn
-- **Container**: Docker
+- **Deployment**: Kubernetes
 - **CI/CD**: GitHub Actions
 
 ## 📁 Project Structure
@@ -68,7 +68,6 @@ w_tech/
 │           ├── base.html
 │           ├── index.html
 │           └── projects.html
-├── deploy/                    # Deployment configs
 ├── images/                    # Image handling
 │   ├── static/
 │   │   └── css/
@@ -76,13 +75,9 @@ w_tech/
 │   └── templates/
 │       └── images/
 │           └── base.html
-├── nginx/                     # Nginx config
-│   └── conf.d/
 ├── static/                    # Static files
 ├── wielandtech/              # Project settings
 ├── .env                      # Environment variables
-├── docker-compose.yml        # Docker setup
-├── Dockerfile                # Docker image
 ├── manage.py                 # Django CLI
 ├── requirements.txt          # Python dependencies
 └── README.md                 # Documentation
@@ -161,7 +156,6 @@ python manage.py runserver
 - Python 3.10+
 - PostgreSQL 14+
 - Redis 6+
-- Docker & Docker Compose
 
 ### Testing
 ```bash
@@ -173,87 +167,9 @@ coverage run manage.py test
 coverage report
 ```
 
-### Docker Development
-```bash
-# Build and start services
-docker compose up --build
+### Deployment
 
-# Run migrations in container
-docker compose exec web python manage.py migrate
-```
-
-### Managing Migrations in Docker
-```bash
-# Drop into a shell in the web container
-docker compose exec web bash
-
-# Reset migrations for a specific app
-python manage.py migrate app_name zero
-
-# Remove migration files
-rm app_name/migrations/0*.py
-
-# Create fresh migration
-python manage.py makemigrations app_name
-
-# Apply new migration
-python manage.py migrate app_name
-```
-
-### Troubleshooting Migrations
-
-If you encounter `relation already exists` errors during migrations:
-
-```bash
-# Stop the containers first
-docker compose down
-
-# Remove the PostgreSQL volume to start fresh
-docker volume rm w_tech_postgres_data
-
-# Rebuild and start the containers
-docker compose up --build -d
-
-# Run migrations again
-docker compose exec web python manage.py migrate
-```
-
-### Restoring Database Backups
-
-To restore a database backup from the host machine:
-
-```bash
-# Restore from gzipped SQL backup
-zcat db_backups/your_db_name_20250418_020000.sql.gz | \
-  docker exec -i w_tech_dev-db-1 psql -U your_db_user -d your_db_name
-```
-
-### Creating a Superuser
-
-To create a superuser account in Docker:
-
-```bash
-# Access the container shell
-docker compose exec web python manage.py createsuperuser
-
-# Follow the prompts:
-# - Enter username
-# - Enter email
-# - Enter password (it won't be visible)
-# - Confirm password
-```
-
-Alternatively, create a superuser non-interactively:
-
-```bash
-# Create superuser with predefined credentials
-docker compose exec web python manage.py createsuperuser --noinput --username admin --email admin@example.com
-```
-
-Note: When using --noinput, set the DJANGO_SUPERUSER_PASSWORD environment variable first:
-```bash
-export DJANGO_SUPERUSER_PASSWORD="your-secure-password"
-```
+This application is deployed using Kubernetes in a homelab environment. The deployment configuration is managed separately from this repository.
 
 ## 📝 License
 
