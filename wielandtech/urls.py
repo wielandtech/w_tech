@@ -18,6 +18,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.sitemaps.views import sitemap
 from django.urls import include, path
+from django.conf.urls import handler404
 
 from blog.sitemaps import PostSitemap
 from wielandtech import settings
@@ -48,3 +49,9 @@ if not settings.DEBUG:
     urlpatterns += [
         re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
     ]
+
+# Custom error handlers
+handler400 = 'core.views.custom_400'
+handler403 = 'core.views.custom_403'
+handler404 = 'core.views.custom_404'
+handler500 = 'core.views.custom_500'

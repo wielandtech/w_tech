@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from django.conf import settings
 from django.core.cache import cache
 import requests
@@ -10,6 +10,62 @@ logger = logging.getLogger(__name__)
 
 def homepage(request):
     return render(request, 'core/index.html')
+
+
+def custom_400(request, exception=None):
+    """
+    Custom 400 error handler that serves a branded error page.
+    This will be used when DEBUG=False and a 400 error occurs.
+    """
+    return render(request, 'core/400.html', status=400)
+
+
+def custom_403(request, exception=None):
+    """
+    Custom 403 error handler that serves a branded error page.
+    This will be used when DEBUG=False and a 403 error occurs.
+    """
+    return render(request, 'core/403.html', status=403)
+
+
+def custom_404(request, exception=None):
+    """
+    Custom 404 error handler that serves a branded error page.
+    This will be used when DEBUG=False and a 404 error occurs.
+    """
+    return render(request, 'core/404.html', status=404)
+
+
+def custom_500(request):
+    """
+    Custom 500 error handler that serves a branded error page.
+    This will be used when DEBUG=False and a 500 error occurs.
+    """
+    return render(request, 'core/500.html', status=500)
+
+
+def custom_502(request, exception=None):
+    """
+    Custom 502 error handler that serves a branded error page.
+    This will be used when DEBUG=False and a 502 error occurs.
+    """
+    return render(request, 'core/502.html', status=502)
+
+
+def custom_503(request, exception=None):
+    """
+    Custom 503 error handler that serves a branded error page.
+    This will be used when DEBUG=False and a 503 error occurs.
+    """
+    return render(request, 'core/503.html', status=503)
+
+
+def maintenance(request):
+    """
+    Maintenance page handler.
+    This can be used to show a maintenance page when needed.
+    """
+    return render(request, 'core/maintenance.html', status=503)
 
 
 def get_netdata_metrics(request):
