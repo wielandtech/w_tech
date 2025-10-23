@@ -45,6 +45,8 @@
     padding: 20px;
     background-color: var(--blog-card-bg);
     border-left: 1px solid var(--blog-border);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px var(--blog-card-shadow);
     font-size: 0.9rem;
 }
 
