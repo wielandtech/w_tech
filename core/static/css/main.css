@@ -299,6 +299,7 @@ textarea {
   color: #35A89C;
   font-size: 1em;
   font-weight: bolder;
+  line-height: 1.2;
 }
 
 .float_right {
@@ -310,6 +311,7 @@ textarea {
   margin: 0 0;
   padding: 5px 0;
   font-weight: bold;
+  line-height: 1.2;
 }
 
 a {
