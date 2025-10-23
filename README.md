@@ -78,6 +78,7 @@ w_tech/
 ├── static/                    # Static files
 ├── wielandtech/              # Project settings
 ├── .env                      # Environment variables
+├── Dockerfile                # Docker image for CI/CD
 ├── manage.py                 # Django CLI
 ├── requirements.txt          # Python dependencies
 └── README.md                 # Documentation
