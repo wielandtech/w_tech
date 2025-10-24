@@ -28,3 +28,4 @@ EXPOSE 8000
 
 # Start Gunicorn server
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "wielandtech.wsgi:application"]
+

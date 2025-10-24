@@ -61,3 +61,4 @@ def test_404_handler():
 if __name__ == '__main__':
     success = test_404_handler()
     sys.exit(0 if success else 1)
+

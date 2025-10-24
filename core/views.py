@@ -131,11 +131,19 @@ def get_netdata_metrics(request):
                                 if len(latest) > 1 and latest[1] == 1:
                                     running_pods += 1
                 
-                # If no pods found via phase charts, try a simpler approach
+                # If no pods found via phase charts, try alternative approaches
                 if running_pods == 0:
-                    # Count all charts that look like pod charts (not system charts)
+                    # Method 1: Count pod-related charts
                     pod_charts = [name for name in charts_data.get('charts', {}) if 'pod_' in name and not name.startswith('k8s_state_k8s-metrics')]
-                    running_pods = len(pod_charts)  # Rough estimate
+                    if pod_charts:
+                        running_pods = len(pod_charts)
+                        logger.info(f"Found {running_pods} pod charts: {pod_charts[:5]}...")  # Log first 5
+                    else:
+                        # Method 2: Count any charts that look like individual resources
+                        resource_charts = [name for name in charts_data.get('charts', {}) if '.' in name and not name.startswith('k8s_state_k8s-metrics')]
+                        # Estimate pods as a fraction of total charts (rough heuristic)
+                        running_pods = max(1, len(resource_charts) // 10)  # Rough estimate
+                        logger.info(f"Estimated {running_pods} pods from {len(resource_charts)} resource charts")
                 
                 metrics['pods'] = {
                     'count': running_pods,
@@ -150,15 +158,19 @@ def get_netdata_metrics(request):
 
         # Try to get system metrics from netdata (if available)
         try:
-            # Get netdata info for cluster resources
-            info_response = requests.get(f"{netdata_url}/api/v1/info", timeout=timeout)
-            if info_response.status_code == 200:
-                info_data = info_response.json()
-                # Use netdata info if available, otherwise use K8s data
-                if 'cores_total' in info_data and info_data['cores_total']:
-                    cluster_cores = int(info_data['cores_total'])
-                if 'ram_total' in info_data and info_data['ram_total']:
-                    cluster_ram_gb = round(int(info_data['ram_total']) / (1024**3), 1)
+                # Get netdata info for cluster resources
+                info_response = requests.get(f"{netdata_url}/api/v1/info", timeout=timeout)
+                if info_response.status_code == 200:
+                    info_data = info_response.json()
+                    # Use netdata info if available, but prefer our hardcoded values for accuracy
+                    # Only use netdata info if it seems reasonable (not single node values)
+                    if 'cores_total' in info_data and info_data['cores_total'] and int(info_data['cores_total']) >= 18:
+                        cluster_cores = int(info_data['cores_total'])
+                    if 'ram_total' in info_data and info_data['ram_total']:
+                        netdata_ram_gb = round(int(info_data['ram_total']) / (1024**3), 1)
+                        # Only use if it's reasonable (not single node values)
+                        if netdata_ram_gb >= 40:
+                            cluster_ram_gb = netdata_ram_gb
         except Exception as e:
             logger.warning(f"Failed to fetch netdata info: {e}")
 
