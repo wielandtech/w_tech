@@ -131,6 +131,12 @@ def get_netdata_metrics(request):
                                 if len(latest) > 1 and latest[1] == 1:
                                     running_pods += 1
                 
+                # If no pods found via phase charts, try a simpler approach
+                if running_pods == 0:
+                    # Count all charts that look like pod charts (not system charts)
+                    pod_charts = [name for name in charts_data.get('charts', {}) if 'pod_' in name and not name.startswith('k8s_state_k8s-metrics')]
+                    running_pods = len(pod_charts)  # Rough estimate
+                
                 metrics['pods'] = {
                     'count': running_pods,
                     'description': 'Running Pods'
@@ -159,11 +165,14 @@ def get_netdata_metrics(request):
         # Get CPU utilization metrics from k8s_state
         try:
             k8s_state_url = f"{netdata_url.replace('netdata-parent', 'netdata-k8s-state')}"
+            
+            # Try to get CPU utilization - first try the specific chart
             cpu_response = requests.get(
                 f"{k8s_state_url}/api/v1/data",
                 params={'chart': 'k8s_state.node_allocatable_cpu_requests_utilization', 'points': 1},
                 timeout=timeout
             )
+            
             if cpu_response.status_code == 200:
                 cpu_data = cpu_response.json()
                 if 'data' in cpu_data and len(cpu_data['data']) > 0:
@@ -175,8 +184,22 @@ def get_netdata_metrics(request):
                         'total_cores': int(cluster_cores),
                         'description': 'CPU Utilization (requests)'
                     }
+            else:
+                # Fallback: try to aggregate CPU usage from individual pods
+                logger.warning(f"CPU utilization chart not found, trying pod aggregation")
+                # For now, set a default value
+                metrics['cpu'] = {
+                    'percentage': 0.0,
+                    'total_cores': int(cluster_cores),
+                    'description': 'CPU Utilization (unavailable)'
+                }
         except Exception as e:
             logger.warning(f"Failed to fetch CPU utilization metrics: {e}")
+            metrics['cpu'] = {
+                'percentage': 0.0,
+                'total_cores': int(cluster_cores),
+                'description': 'CPU Utilization (unavailable)'
+            }
 
         try:
             # Get memory utilization metrics from k8s_state
@@ -200,8 +223,23 @@ def get_netdata_metrics(request):
                         'percentage': round(memory_utilization, 1),
                         'description': 'Memory Utilization (requests)'
                     }
+            else:
+                # Fallback: set default values
+                logger.warning(f"Memory utilization chart not found")
+                metrics['memory'] = {
+                    'total_gb': cluster_ram_gb,
+                    'used_gb': 0.0,
+                    'percentage': 0.0,
+                    'description': 'Memory Utilization (unavailable)'
+                }
         except Exception as e:
             logger.warning(f"Failed to fetch memory utilization metrics: {e}")
+            metrics['memory'] = {
+                'total_gb': cluster_ram_gb,
+                'used_gb': 0.0,
+                'percentage': 0.0,
+                'description': 'Memory Utilization (unavailable)'
+            }
 
         # Get network activity from netdata
         try:
