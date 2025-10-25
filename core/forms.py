@@ -1,6 +1,6 @@
 from django import forms
 from captcha.fields import ReCaptchaField
-from captcha.widgets import ReCaptchaV2Checkbox
+from captcha.widgets import ReCaptchaV3
 
 
 class ContactForm(forms.Form):
@@ -36,9 +36,10 @@ class ContactForm(forms.Form):
         })
     )
     captcha = ReCaptchaField(
-        widget=ReCaptchaV2Checkbox(
+        widget=ReCaptchaV3(
             attrs={
-                'data-theme': 'light',
+                'data-callback': 'onSubmit',
+                'data-action': 'contact_form'
             }
         )
     )

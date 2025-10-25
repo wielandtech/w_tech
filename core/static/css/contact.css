@@ -91,10 +91,7 @@ textarea.form-control {
     margin: 1rem 0;
 }
 
-.captcha-group .g-recaptcha {
-    display: flex;
-    justify-content: center;
-}
+/* reCAPTCHA v3 is invisible, so no special styling needed */
 
 .submit-btn {
     background: var(--accent-color);

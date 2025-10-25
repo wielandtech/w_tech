@@ -258,7 +258,7 @@ MAX_UPLOAD_SIZE = 10485760  # 10MB
 # reCAPTCHA configuration
 RECAPTCHA_PUBLIC_KEY = os.getenv("RECAPTCHA_PUBLIC_KEY")
 RECAPTCHA_PRIVATE_KEY = os.getenv("RECAPTCHA_PRIVATE_KEY")
-RECAPTCHA_REQUIRED_SCORE = 0.85
+RECAPTCHA_REQUIRED_SCORE = 0.5  # Lower threshold for v3 (0.0-1.0, where 1.0 is very likely human)
 
 # Contact form settings
 CONTACT_EMAIL = "raphael@wielandtech.com"
