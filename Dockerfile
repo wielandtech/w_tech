@@ -19,9 +19,7 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 # Copy Django project
 COPY . .
 
-# Create migrations and collect static files
-RUN python manage.py makemigrations --noinput
-RUN python manage.py collectstatic --noinput
+# Static files will be collected at runtime
 
 # Expose port
 EXPOSE 8000
