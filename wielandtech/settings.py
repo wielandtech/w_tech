@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'social_django',
     'images.apps.ImagesConfig',
     'easy_thumbnails',
+    'captcha',
 ]
 
 MIDDLEWARE = [
@@ -253,3 +254,11 @@ else:
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB
 MAX_UPLOAD_SIZE = 10485760  # 10MB
+
+# reCAPTCHA configuration
+RECAPTCHA_PUBLIC_KEY = os.getenv("RECAPTCHA_PUBLIC_KEY")
+RECAPTCHA_PRIVATE_KEY = os.getenv("RECAPTCHA_PRIVATE_KEY")
+RECAPTCHA_REQUIRED_SCORE = 0.85
+
+# Contact form settings
+CONTACT_EMAIL = "raphael@wielandtech.com"

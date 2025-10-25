@@ -2,6 +2,9 @@ from django.shortcuts import render
 from django.http import JsonResponse, Http404
 from django.conf import settings
 from django.core.cache import cache
+from django.core.mail import send_mail
+from django.contrib import messages
+from django.utils.html import format_html
 import requests
 import logging
 # from kubernetes import client, config  # No longer needed - using k8s_state metrics
@@ -11,6 +14,62 @@ logger = logging.getLogger(__name__)
 
 def homepage(request):
     return render(request, 'core/index.html')
+
+
+def contact(request):
+    """Contact page view with form handling and email sending."""
+    from .forms import ContactForm
+    
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            # Get form data
+            cd = form.cleaned_data
+            name = cd['name']
+            email = cd['email']
+            subject = cd['subject']
+            message = cd['message']
+            
+            # Prepare email content
+            email_subject = f"Contact Form: {subject}"
+            email_message = f"""
+New contact form submission from {name} ({email})
+
+Subject: {subject}
+
+Message:
+{message}
+
+---
+This message was sent from the contact form on wielandtech.com
+            """.strip()
+            
+            try:
+                # Check if email configuration is available
+                if not settings.EMAIL_HOST_PASSWORD:
+                    messages.error(request, 'Email service is not configured. Please contact the administrator.')
+                    logger.error("Email configuration missing: EMAIL_HOST_PASSWORD not set")
+                else:
+                    # Send email with timeout
+                    send_mail(
+                        email_subject,
+                        email_message,
+                        settings.DEFAULT_FROM_EMAIL,
+                        [settings.CONTACT_EMAIL],
+                        fail_silently=False
+                    )
+                    messages.success(request, 'Thank you for your message! I will get back to you as soon as possible.')
+                    logger.info(f"Contact form email sent successfully from {email}")
+                    
+                    # Clear the form after successful submission
+                    form = ContactForm()
+            except Exception as e:
+                logger.error(f"Failed to send contact form email: {str(e)}")
+                messages.error(request, f'Failed to send message. Please try again later or contact me directly at {settings.CONTACT_EMAIL}')
+    else:
+        form = ContactForm()
+    
+    return render(request, 'core/contact.html', {'form': form})
 
 
 def custom_400(request, exception=None):
