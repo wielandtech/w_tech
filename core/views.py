@@ -160,54 +160,45 @@ def get_netdata_metrics(request):
         cluster_ram_gb = 48  # 3 nodes * 16GB per node
         metrics['nodes_count'] = 3
         
-        # Get pod count from k8s_state by counting running pods
+        # Get pod count from k8s_state aggregate charts
         try:
             k8s_state_url = f"{netdata_url.replace('netdata-parent', 'netdata-k8s-state')}"
-            
-            # Get all pod phase charts and count running pods
-            charts_response = requests.get(
-                f"{k8s_state_url}/api/v1/charts",
+
+            # Try to get running pods directly from aggregate chart
+            running_pods_response = requests.get(
+                f"{k8s_state_url}/api/v1/data",
+                params={'chart': 'k8s_state.pod_status.running', 'points': 1},
                 timeout=timeout
             )
-            if charts_response.status_code == 200:
-                charts_data = charts_response.json()
-                running_pods = 0
-                
-                # Count pods with phase=running
-                for chart_name in charts_data.get('charts', {}):
-                    if chart_name.endswith('.phase'):
-                        # Get the phase data for this pod
-                        phase_response = requests.get(
-                            f"{k8s_state_url}/api/v1/data",
-                            params={'chart': chart_name, 'points': 1},
-                            timeout=timeout
-                        )
-                        if phase_response.status_code == 200:
-                            phase_data = phase_response.json()
-                            if 'data' in phase_data and len(phase_data['data']) > 0:
-                                latest = phase_data['data'][0]
-                                # Check if this pod is running (phase=1 typically means running)
-                                if len(latest) > 1 and latest[1] == 1:
-                                    running_pods += 1
-                
-                # If no pods found via phase charts, try alternative approaches
-                if running_pods == 0:
-                    # Method 1: Count pod-related charts
-                    pod_charts = [name for name in charts_data.get('charts', {}) if 'pod_' in name and not name.startswith('k8s_state_k8s-metrics')]
-                    if pod_charts:
-                        running_pods = len(pod_charts)
-                        logger.info(f"Found {running_pods} pod charts: {pod_charts[:5]}...")  # Log first 5
+
+            if running_pods_response.status_code == 200:
+                running_pods_data = running_pods_response.json()
+                if 'data' in running_pods_data and len(running_pods_data['data']) > 0:
+                    latest = running_pods_data['data'][0]
+                    running_pods = int(latest[1]) if len(latest) > 1 and isinstance(latest[1], (int, float)) else 0
+                else:
+                    running_pods = 0
+            else:
+                # Fallback: try total pods chart
+                total_pods_response = requests.get(
+                    f"{k8s_state_url}/api/v1/data",
+                    params={'chart': 'k8s_state.pods', 'points': 1},
+                    timeout=timeout
+                )
+                if total_pods_response.status_code == 200:
+                    total_pods_data = total_pods_response.json()
+                    if 'data' in total_pods_data and len(total_pods_data['data']) > 0:
+                        latest = total_pods_data['data'][0]
+                        running_pods = int(latest[1]) if len(latest) > 1 and isinstance(latest[1], (int, float)) else 0
                     else:
-                        # Method 2: Count any charts that look like individual resources
-                        resource_charts = [name for name in charts_data.get('charts', {}) if '.' in name and not name.startswith('k8s_state_k8s-metrics')]
-                        # Estimate pods as a fraction of total charts (rough heuristic)
-                        running_pods = max(1, len(resource_charts) // 10)  # Rough estimate
-                        logger.info(f"Estimated {running_pods} pods from {len(resource_charts)} resource charts")
-                
-                metrics['pods'] = {
-                    'count': running_pods,
-                    'description': 'Running Pods'
-                }
+                        running_pods = 0
+                else:
+                    running_pods = 0
+
+            metrics['pods'] = {
+                'count': running_pods,
+                'description': 'Running Pods'
+            }
         except Exception as e:
             logger.warning(f"Failed to fetch pod counts from k8s_state: {e}")
             metrics['pods'] = {
@@ -233,115 +224,115 @@ def get_netdata_metrics(request):
         except Exception as e:
             logger.warning(f"Failed to fetch netdata info: {e}")
 
-               # Get CPU utilization metrics from system.cpu (aggregated from child nodes)
-               try:
-                   cpu_response = requests.get(
-                       f"{netdata_url}/api/v1/data",
-                       params={'chart': 'system.cpu', 'points': 1, 'format': 'json'},
-                       timeout=timeout
-                   )
+        # Get CPU utilization metrics from system.cpu (aggregated from child nodes)
+        try:
+            cpu_response = requests.get(
+                f"{netdata_url}/api/v1/data",
+                params={'chart': 'system.cpu', 'points': 1, 'format': 'json'},
+                timeout=timeout
+            )
 
-                   if cpu_response.status_code == 200:
-                       cpu_data = cpu_response.json()
-                       if 'data' in cpu_data and len(cpu_data['data']) > 0:
-                           latest = cpu_data['data'][0]
-                           # system.cpu typically has: [timestamp, percentage]
-                           # CPU utilization percentage (already in percentage format)
-                           if len(latest) >= 2:  # Ensure we have timestamp and value
-                               cpu_percentage = latest[1] if isinstance(latest[1], (int, float)) else 0
-                               # Ensure percentage is within valid range
-                               cpu_percentage = min(100.0, max(0.0, cpu_percentage))
+            if cpu_response.status_code == 200:
+                cpu_data = cpu_response.json()
+                if 'data' in cpu_data and len(cpu_data['data']) > 0:
+                    latest = cpu_data['data'][0]
+                    # system.cpu typically has: [timestamp, percentage]
+                    # CPU utilization percentage (already in percentage format)
+                    if len(latest) >= 2:  # Ensure we have timestamp and value
+                        cpu_percentage = latest[1] if isinstance(latest[1], (int, float)) else 0
+                        # Ensure percentage is within valid range
+                        cpu_percentage = min(100.0, max(0.0, cpu_percentage))
 
-                               metrics['cpu'] = {
-                                   'percentage': round(cpu_percentage, 1),
-                                   'total_cores': int(cluster_cores),
-                                   'description': 'CPU Utilization (netdata)'
-                               }
-                           else:
-                               # Fallback if data structure is different
-                               cpu_percentage = latest[1] if len(latest) > 1 and isinstance(latest[1], (int, float)) else 0
-                               cpu_percentage = min(100.0, max(0.0, cpu_percentage))
-                               metrics['cpu'] = {
-                                   'percentage': round(cpu_percentage, 1),
-                                   'total_cores': int(cluster_cores),
-                                   'description': 'CPU Utilization (netdata)'
-                               }
-                   else:
-                       logger.warning(f"system.cpu chart not found (status: {cpu_response.status_code})")
-                       metrics['cpu'] = {
-                           'percentage': 0.0,
-                           'total_cores': int(cluster_cores),
-                           'description': 'CPU Utilization (unavailable)'
-                       }
-               except Exception as e:
-                   logger.warning(f"Failed to fetch CPU utilization metrics: {e}")
-                   metrics['cpu'] = {
-                       'percentage': 0.0,
-                       'total_cores': int(cluster_cores),
-                       'description': 'CPU Utilization (unavailable)'
-                   }
+                        metrics['cpu'] = {
+                            'percentage': round(cpu_percentage, 1),
+                            'total_cores': int(cluster_cores),
+                            'description': 'CPU Utilization (netdata)'
+                        }
+                    else:
+                        # Fallback if data structure is different
+                        cpu_percentage = latest[1] if len(latest) > 1 and isinstance(latest[1], (int, float)) else 0
+                        cpu_percentage = min(100.0, max(0.0, cpu_percentage))
+                        metrics['cpu'] = {
+                            'percentage': round(cpu_percentage, 1),
+                            'total_cores': int(cluster_cores),
+                            'description': 'CPU Utilization (netdata)'
+                        }
+            else:
+                logger.warning(f"system.cpu chart not found (status: {cpu_response.status_code})")
+                metrics['cpu'] = {
+                    'percentage': 0.0,
+                    'total_cores': int(cluster_cores),
+                    'description': 'CPU Utilization (unavailable)'
+                }
+        except Exception as e:
+            logger.warning(f"Failed to fetch CPU utilization metrics: {e}")
+            metrics['cpu'] = {
+                'percentage': 0.0,
+                'total_cores': int(cluster_cores),
+                'description': 'CPU Utilization (unavailable)'
+            }
 
-               try:
-                   # Get memory utilization metrics from system.ram (aggregated from child nodes)
-                   memory_response = requests.get(
-                       f"{netdata_url}/api/v1/data",
-                       params={'chart': 'system.ram', 'points': 1, 'format': 'json'},
-                       timeout=timeout
-                   )
-                   if memory_response.status_code == 200:
-                       memory_data = memory_response.json()
-                       if 'data' in memory_data and len(memory_data['data']) > 0:
-                           latest = memory_data['data'][0]
-                           # system.ram typically has: [timestamp, used, free, cached, buffers]
-                           # Use 'used' and 'free' fields for memory utilization
-                           if len(latest) >= 3:  # Ensure we have timestamp, used, free
-                               memory_used_bytes = latest[1] if isinstance(latest[1], (int, float)) else 0
-                               memory_free_bytes = latest[2] if isinstance(latest[2], (int, float)) else 0
+        try:
+            # Get memory utilization metrics from system.ram (aggregated from child nodes)
+            memory_response = requests.get(
+                f"{netdata_url}/api/v1/data",
+                params={'chart': 'system.ram', 'points': 1, 'format': 'json'},
+                timeout=timeout
+            )
+            if memory_response.status_code == 200:
+                memory_data = memory_response.json()
+                if 'data' in memory_data and len(memory_data['data']) > 0:
+                    latest = memory_data['data'][0]
+                    # system.ram typically has: [timestamp, used, free, cached, buffers]
+                    # Use 'used' and 'free' fields for memory utilization
+                    if len(latest) >= 3:  # Ensure we have timestamp, used, free
+                        memory_used_bytes = latest[1] if isinstance(latest[1], (int, float)) else 0
+                        memory_free_bytes = latest[2] if isinstance(latest[2], (int, float)) else 0
 
-                               # Convert to GB
-                               memory_used_gb = round(memory_used_bytes / (1024**3), 1)
-                               memory_free_gb = round(memory_free_bytes / (1024**3), 1)
+                        # Convert to GB
+                        memory_used_gb = round(memory_used_bytes / (1024**3), 1)
+                        memory_free_gb = round(memory_free_bytes / (1024**3), 1)
 
-                               # Calculate total memory (used + free)
-                               memory_total_gb = memory_used_gb + memory_free_gb
+                        # Calculate total memory (used + free)
+                        memory_total_gb = memory_used_gb + memory_free_gb
 
-                               # Calculate percentage
-                               memory_percentage = round((memory_used_gb / memory_total_gb) * 100, 1) if memory_total_gb > 0 else 0
-                               
-                               metrics['memory'] = {
-                                   'total_gb': round(memory_total_gb, 1),
-                                   'used_gb': memory_used_gb,
-                                   'percentage': memory_percentage,
-                                   'description': 'Memory Utilization (netdata)'
-                               }
-                           else:
-                               # Fallback if data structure is different
-                               memory_used_bytes = latest[1] if len(latest) > 1 and isinstance(latest[1], (int, float)) else 0
-                               memory_used_gb = round(memory_used_bytes / (1024**3), 1)
-                               memory_percentage = round((memory_used_gb / cluster_ram_gb) * 100, 1) if cluster_ram_gb > 0 else 0
-                               
-                               metrics['memory'] = {
-                                   'total_gb': cluster_ram_gb,
-                                   'used_gb': memory_used_gb,
-                                   'percentage': memory_percentage,
-                                   'description': 'Memory Utilization (netdata)'
-                               }
-                   else:
-                       logger.warning(f"system.ram chart not found (status: {memory_response.status_code})")
-                       metrics['memory'] = {
-                           'total_gb': cluster_ram_gb,
-                           'used_gb': 0.0,
-                           'percentage': 0.0,
-                           'description': 'Memory Utilization (unavailable)'
-                       }
-               except Exception as e:
-                   logger.warning(f"Failed to fetch memory utilization metrics: {e}")
-                   metrics['memory'] = {
-                       'total_gb': cluster_ram_gb,
-                       'used_gb': 0.0,
-                       'percentage': 0.0,
-                       'description': 'Memory Utilization (unavailable)'
-                   }
+                        # Calculate percentage
+                        memory_percentage = round((memory_used_gb / memory_total_gb) * 100, 1) if memory_total_gb > 0 else 0
+
+                        metrics['memory'] = {
+                            'total_gb': round(memory_total_gb, 1),
+                            'used_gb': memory_used_gb,
+                            'percentage': memory_percentage,
+                            'description': 'Memory Utilization (netdata)'
+                        }
+                    else:
+                        # Fallback if data structure is different
+                        memory_used_bytes = latest[1] if len(latest) > 1 and isinstance(latest[1], (int, float)) else 0
+                        memory_used_gb = round(memory_used_bytes / (1024**3), 1)
+                        memory_percentage = round((memory_used_gb / cluster_ram_gb) * 100, 1) if cluster_ram_gb > 0 else 0
+
+                        metrics['memory'] = {
+                            'total_gb': cluster_ram_gb,
+                            'used_gb': memory_used_gb,
+                            'percentage': memory_percentage,
+                            'description': 'Memory Utilization (netdata)'
+                        }
+            else:
+                logger.warning(f"system.ram chart not found (status: {memory_response.status_code})")
+                metrics['memory'] = {
+                    'total_gb': cluster_ram_gb,
+                    'used_gb': 0.0,
+                    'percentage': 0.0,
+                    'description': 'Memory Utilization (unavailable)'
+                }
+        except Exception as e:
+            logger.warning(f"Failed to fetch memory utilization metrics: {e}")
+            metrics['memory'] = {
+                'total_gb': cluster_ram_gb,
+                'used_gb': 0.0,
+                'percentage': 0.0,
+                'description': 'Memory Utilization (unavailable)'
+            }
 
         # Get network activity from netdata
         try:
