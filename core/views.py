@@ -334,39 +334,78 @@ def get_netdata_metrics(request):
                 'description': 'Memory Utilization (unavailable)'
             }
 
-        # Get network activity from netdata
+        # Get network traffic metrics (actual bandwidth usage)
         try:
-            clients_response = requests.get(
+            # Try system.net first (aggregated network interface traffic)
+            net_response = requests.get(
                 f"{netdata_url}/api/v1/data",
-                params={'chart': 'netdata.clients', 'points': 1},
+                params={'chart': 'system.net', 'points': 1},
                 timeout=timeout
             )
-            requests_response = requests.get(
-                f"{netdata_url}/api/v1/data",
-                params={'chart': 'netdata.requests', 'points': 1},
-                timeout=timeout
-            )
-            
-            total_clients = 0
-            total_requests = 0
-            
-            if clients_response.status_code == 200:
-                clients_data = clients_response.json()
-                if 'data' in clients_data and len(clients_data['data']) > 0:
-                    latest = clients_data['data'][0]
-                    total_clients = latest[1] if len(latest) > 1 and isinstance(latest[1], (int, float)) else 0
-            
-            if requests_response.status_code == 200:
-                requests_data = requests_response.json()
-                if 'data' in requests_data and len(requests_data['data']) > 0:
-                    latest = requests_data['data'][0]
-                    total_requests = latest[1] if len(latest) > 1 and isinstance(latest[1], (int, float)) else 0
-            
-            metrics['network'] = {
-                'active_connections': int(total_clients),
-                'api_requests_ps': round(total_requests, 1),
-                'description': 'Network Activity'
-            }
+
+            if net_response.status_code == 200:
+                net_data = net_response.json()
+                if 'data' in net_data and len(net_data['data']) > 0:
+                    latest = net_data['data'][0]
+                    # system.net typically has: [timestamp, received, sent] in bytes/s
+                    if len(latest) >= 3:
+                        received_bps = latest[1] if isinstance(latest[1], (int, float)) else 0
+                        sent_bps = latest[2] if isinstance(latest[2], (int, float)) else 0
+
+                        # Convert to Mbps for display
+                        received_mbps = round(received_bps / (1024**2), 1)
+                        sent_mbps = round(sent_bps / (1024**2), 1)
+                        total_mbps = round(received_mbps + sent_mbps, 1)
+
+                        metrics['network'] = {
+                            'bandwidth_mbps': total_mbps,
+                            'received_mbps': received_mbps,
+                            'sent_mbps': sent_mbps,
+                            'description': 'Network Bandwidth (Mbps)'
+                        }
+                    else:
+                        # Fallback: try TCP connection count
+                        tcp_response = requests.get(
+                            f"{netdata_url}/api/v1/data",
+                            params={'chart': 'system.ip.tcp', 'points': 1},
+                            timeout=timeout
+                        )
+                        if tcp_response.status_code == 200:
+                            tcp_data = tcp_response.json()
+                            if 'data' in tcp_data and len(tcp_data['data']) > 0:
+                                latest = tcp_data['data'][0]
+                                # system.ip.tcp has active connections count
+                                active_connections = latest[1] if len(latest) > 1 and isinstance(latest[1], (int, float)) else 0
+
+                                metrics['network'] = {
+                                    'active_connections': int(active_connections),
+                                    'description': 'Active TCP Connections'
+                                }
+                            else:
+                                metrics['network'] = None
+                        else:
+                            metrics['network'] = None
+                else:
+                    metrics['network'] = None
+            else:
+                # Fallback to original metrics if system.net unavailable
+                clients_response = requests.get(
+                    f"{netdata_url}/api/v1/data",
+                    params={'chart': 'netdata.clients', 'points': 1},
+                    timeout=timeout
+                )
+
+                total_clients = 0
+                if clients_response.status_code == 200:
+                    clients_data = clients_response.json()
+                    if 'data' in clients_data and len(clients_data['data']) > 0:
+                        latest = clients_data['data'][0]
+                        total_clients = latest[1] if len(latest) > 1 and isinstance(latest[1], (int, float)) else 0
+
+                metrics['network'] = {
+                    'active_connections': int(total_clients),
+                    'description': 'Active Connections'
+                }
             
         except Exception as e:
             logger.warning(f"Failed to fetch network metrics: {e}")

@@ -73,11 +73,26 @@ function fetchMetrics() {
             
             // Network Activity Card
             if (data.network !== null) {
+                let networkValue, networkDetail;
+                if (data.network.bandwidth_mbps !== undefined) {
+                    // Bandwidth metrics
+                    networkValue = `${data.network.bandwidth_mbps} Mbps`;
+                    networkDetail = `↑${data.network.sent_mbps} ↓${data.network.received_mbps} Mbps`;
+                } else if (data.network.active_connections !== undefined) {
+                    // Connection count (TCP or client connections)
+                    networkValue = `${data.network.active_connections}`;
+                    networkDetail = data.network.api_requests_ps ? `${data.network.api_requests_ps} req/s` : 'active connections';
+                } else {
+                    // Fallback
+                    networkValue = 'N/A';
+                    networkDetail = 'metrics unavailable';
+                }
+
                 html += `
                     <div class="metric-card">
                         <div class="metric-label">${data.network.description}</div>
-                        <div class="metric-value">${data.network.active_connections} connections</div>
-                        <div class="metric-detail">${data.network.api_requests_ps} API calls per second</div>
+                        <div class="metric-value">${networkValue}</div>
+                        <div class="metric-detail">${networkDetail}</div>
                     </div>
                 `;
             }
