@@ -367,21 +367,21 @@ def get_netdata_metrics(request):
                     continue
 
             if node_count > 0:
-                # Average memory across all nodes
-                avg_used_memory_mb = total_used_memory_mb / node_count
-                avg_total_memory_mb = total_total_memory_mb / node_count
+                # Sum memory across all nodes (total cluster memory)
+                cluster_used_memory_mb = total_used_memory_mb
+                cluster_total_memory_mb = total_total_memory_mb
 
                 # Convert MB to GB
-                memory_used_gb = round(avg_used_memory_mb / 1024, 1)
-                memory_total_gb = round(avg_total_memory_mb / 1024, 1)
-                memory_percentage = round((avg_used_memory_mb / avg_total_memory_mb) * 100, 1) if avg_total_memory_mb > 0 else 0
-                logger.warning(f"Aggregated Memory: {avg_used_memory_mb}MB used, {avg_total_memory_mb}MB total from {node_count} nodes, average: {memory_used_gb}GB used, {memory_total_gb}GB total, {memory_percentage}%")
+                memory_used_gb = round(cluster_used_memory_mb / 1024, 1)
+                memory_total_gb = round(cluster_total_memory_mb / 1024, 1)
+                memory_percentage = round((cluster_used_memory_mb / cluster_total_memory_mb) * 100, 1) if cluster_total_memory_mb > 0 else 0
+                logger.warning(f"Total Cluster Memory: {cluster_used_memory_mb}MB used, {cluster_total_memory_mb}MB total across {node_count} nodes, {memory_used_gb}GB used, {memory_total_gb}GB total, {memory_percentage}%")
 
                 metrics['memory'] = {
                     'total_gb': memory_total_gb,
                     'used_gb': memory_used_gb,
                     'percentage': memory_percentage,
-                    'description': f'Memory Utilization ({node_count} nodes)'
+                    'description': f'Cluster Memory ({node_count} nodes)'
                 }
             else:
                 metrics['memory'] = {
@@ -435,19 +435,19 @@ def get_netdata_metrics(request):
                     continue
 
             if node_count > 0:
-                # Average network metrics across all nodes
-                avg_received_bps = total_received_bps / node_count
-                avg_sent_bps = total_sent_bps / node_count
+                # Sum network metrics across all nodes (total cluster network traffic)
+                cluster_received_bps = total_received_bps
+                cluster_sent_bps = total_sent_bps
 
-                received_mbps = round(avg_received_bps / (1024**2), 1)
-                sent_mbps = round(avg_sent_bps / (1024**2), 1)
-                logger.warning(f"Aggregated Network: {avg_received_bps}bps received, {avg_sent_bps}bps sent from {node_count} nodes, average: {received_mbps}Mbps received, {sent_mbps}Mbps sent")
+                received_mbps = round(cluster_received_bps / (1024**2), 1)
+                sent_mbps = round(cluster_sent_bps / (1024**2), 1)
+                logger.warning(f"Total Cluster Network: {cluster_received_bps}bps received, {cluster_sent_bps}bps sent across {node_count} nodes, {received_mbps}Mbps received, {sent_mbps}Mbps sent")
 
                 metrics['network'] = {
                     'bandwidth_mbps': round(received_mbps + sent_mbps, 1),
                     'received_mbps': received_mbps,
                     'sent_mbps': sent_mbps,
-                    'description': f'Network Bandwidth ({node_count} nodes)'
+                    'description': f'Cluster Network ({node_count} nodes)'
                 }
             else:
                 logger.warning("No network data from any nodes")
