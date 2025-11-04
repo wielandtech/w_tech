@@ -426,11 +426,18 @@ def get_netdata_metrics(request):
                             if len(latest) >= 3:  # timestamp, received, sent
                                 received_bps = latest[1] if isinstance(latest[1], (int, float)) else 0
                                 sent_bps = latest[2] if isinstance(latest[2], (int, float)) else 0
-                                logger.warning(f"Network for {node} - received: {received_bps}, sent: {sent_bps}")
+                                logger.warning(f"Network for {node} - received: {received_bps}bps, sent: {sent_bps}bps")
 
                                 total_received_bps += received_bps
                                 total_sent_bps += sent_bps
                                 node_count += 1
+                                logger.warning(f"Network node {node} added successfully - running total: {total_received_bps}bps received, {total_sent_bps}bps sent")
+                            else:
+                                logger.warning(f"Network data for {node} has insufficient fields: {len(latest)}")
+                        else:
+                            logger.warning(f"Network response for {node} has no data array")
+                    else:
+                        logger.warning(f"Network API for {node} returned status {net_response.status_code}")
                 except Exception as e:
                     logger.warning(f"Failed to fetch network from node {node}: {e}")
                     continue
