@@ -11,92 +11,66 @@
 <div class="contact-container">
     <div class="contact-header">
         <h1>Get In Touch</h1>
-        <p>Have a question or want to work together? I'd love to hear from you. Send me a message and I'll respond as soon as possible!</p>
+        <p>Have a question or want to work together? Send me a message and I'll respond as soon as possible!</p>
     </div>
 
-    <div class="contact-content">
-        <div class="contact-form-container">
-            {% if messages %}
-                <div class="messages">
-                    {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }}">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
+    <div class="contact-form-container">
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
 
-            <form method="post" class="contact-form">
-                {% csrf_token %}
-                
-                <div class="form-group">
-                    <label for="{{ form.name.id_for_label }}">Name *</label>
-                    {{ form.name }}
-                    {% if form.name.errors %}
-                        <div class="error-message">{{ form.name.errors.0 }}</div>
-                    {% endif %}
-                </div>
+        <form method="post" class="contact-form">
+            {% csrf_token %}
 
-                <div class="form-group">
-                    <label for="{{ form.email.id_for_label }}">Email *</label>
-                    {{ form.email }}
-                    {% if form.email.errors %}
-                        <div class="error-message">{{ form.email.errors.0 }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="form-group">
-                    <label for="{{ form.subject.id_for_label }}">Subject *</label>
-                    {{ form.subject }}
-                    {% if form.subject.errors %}
-                        <div class="error-message">{{ form.subject.errors.0 }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="form-group">
-                    <label for="{{ form.message.id_for_label }}">Message *</label>
-                    {{ form.message }}
-                    {% if form.message.errors %}
-                        <div class="error-message">{{ form.message.errors.0 }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="form-group captcha-group">
-                    {{ form.captcha }}
-                    {% if form.captcha.errors %}
-                        <div class="error-message">{{ form.captcha.errors.0 }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="form-group">
-                    <button type="submit" class="submit-btn">Send Message</button>
-                </div>
-            </form>
-        </div>
-
-        <div class="contact-info">
-            <div class="info-section">
-                <h3>Contact Information</h3>
-                <div class="info-item">
-                    <strong>Email:</strong>
-                    <a href="mailto:raphael@wielandtech.com">raphael@wielandtech.com</a>
-                </div>
-                <div class="info-item">
-                    <strong>Response Time:</strong>
-                    Usually within 24 hours
-                </div>
+            <div class="form-group">
+                <label for="{{ form.name.id_for_label }}">Name *</label>
+                {{ form.name }}
+                {% if form.name.errors %}
+                    <div class="error-message">{{ form.name.errors.0 }}</div>
+                {% endif %}
             </div>
 
-            <div class="info-section">
-                <h3>What I Can Help With</h3>
-                <ul>
-                    <li>Web Development Projects</li>
-                    <li>Technical Consulting</li>
-                    <li>Portfolio Reviews</li>
-                    <li>General Inquiries</li>
-                </ul>
+            <div class="form-group">
+                <label for="{{ form.email.id_for_label }}">Email *</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                    <div class="error-message">{{ form.email.errors.0 }}</div>
+                {% endif %}
             </div>
-        </div>
+
+            <div class="form-group">
+                <label for="{{ form.subject.id_for_label }}">Subject *</label>
+                {{ form.subject }}
+                {% if form.subject.errors %}
+                    <div class="error-message">{{ form.subject.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.message.id_for_label }}">Message *</label>
+                {{ form.message }}
+                {% if form.message.errors %}
+                    <div class="error-message">{{ form.message.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group captcha-group">
+                {{ form.captcha }}
+                {% if form.captcha.errors %}
+                    <div class="error-message">{{ form.captcha.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="submit-btn">Send Message</button>
+            </div>
+        </form>
     </div>
 </div>
 {% endblock %}

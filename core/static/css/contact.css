@@ -27,15 +27,10 @@
     line-height: 1.6;
 }
 
-.contact-content {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 3rem;
-    align-items: start;
-}
-
 /* Form Styles */
 .contact-form-container {
+    max-width: 600px;
+    margin: 0 auto;
     background: var(--background-secondary);
     padding: 2rem;
     border-radius: 8px;
@@ -146,88 +141,17 @@ textarea.form-control {
     margin-top: 0.25rem;
 }
 
-/* Contact Info */
-.contact-info {
-    background: var(--background-secondary);
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    height: fit-content;
-}
-
-.info-section {
-    margin-bottom: 2rem;
-}
-
-.info-section:last-child {
-    margin-bottom: 0;
-}
-
-.info-section h3 {
-    color: var(--text-primary);
-    margin-bottom: 1rem;
-    font-size: 1.25rem;
-    font-weight: 600;
-}
-
-.info-item {
-    margin-bottom: 1rem;
-    color: var(--text-secondary);
-}
-
-.info-item strong {
-    color: var(--text-primary);
-    display: block;
-    margin-bottom: 0.25rem;
-}
-
-.info-item a {
-    color: var(--accent-color);
-    text-decoration: none;
-}
-
-.info-item a:hover {
-    text-decoration: underline;
-}
-
-.info-section ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.info-section li {
-    padding: 0.5rem 0;
-    border-bottom: 1px solid var(--border-color);
-    color: var(--text-secondary);
-}
-
-.info-section li:last-child {
-    border-bottom: none;
-}
-
-.info-section li:before {
-    content: "→";
-    color: var(--accent-color);
-    margin-right: 0.5rem;
-}
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .contact-content {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-    }
-    
     .contact-header h1 {
         font-size: 2rem;
     }
-    
-    .contact-form-container,
-    .contact-info {
+
+    .contact-form-container {
         padding: 1.5rem;
     }
-    
+
     .contact-container {
         padding: 1rem;
     }
@@ -237,16 +161,15 @@ textarea.form-control {
     .contact-header h1 {
         font-size: 1.75rem;
     }
-    
+
     .contact-header p {
         font-size: 1rem;
     }
-    
-    .contact-form-container,
-    .contact-info {
+
+    .contact-form-container {
         padding: 1rem;
     }
-    
+
     .submit-btn {
         padding: 0.875rem 1.5rem;
         font-size: 0.9rem;
@@ -255,23 +178,22 @@ textarea.form-control {
 
 /* Dark mode adjustments */
 @media (prefers-color-scheme: dark) {
-    .contact-form-container,
-    .contact-info {
+    .contact-form-container {
         background: var(--background-secondary);
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
     }
-    
+
     .form-control {
         background: var(--background-primary);
         border-color: var(--border-color);
     }
-    
+
     .alert-success {
         background: #1e4d2b;
         color: #d1e7dd;
         border-color: #2d5a3d;
     }
-    
+
     .alert-error {
         background: #4a1e1e;
         color: #f8d7da;
