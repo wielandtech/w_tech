@@ -139,10 +139,11 @@ def get_netdata_metrics(request):
     Shows cluster CPU utilization, memory usage, pod counts, and network activity.
     Implements caching to reduce API calls.
     """
-    cached_metrics = cache.get('netdata_metrics')
-    if cached_metrics:
-        cached_metrics['cache_hit'] = True
-        return JsonResponse(cached_metrics)
+    # Temporarily disable caching for debugging
+    # cached_metrics = cache.get('netdata_metrics')
+    # if cached_metrics:
+    #     cached_metrics['cache_hit'] = True
+    #     return JsonResponse(cached_metrics)
 
     try:
         netdata_url = settings.NETDATA_URL
@@ -456,8 +457,8 @@ def get_netdata_metrics(request):
             logger.warning(f"Failed to fetch network metrics: {e}")
             metrics['network'] = None
 
-        # Cache the metrics for 5 seconds
-        cache.set('netdata_metrics', metrics, 5)
+        # Temporarily disable caching for debugging
+        # cache.set('netdata_metrics', metrics, 5)
 
         return JsonResponse(metrics)
 
