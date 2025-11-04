@@ -399,46 +399,58 @@ def get_netdata_metrics(request):
                 'description': 'Memory Utilization (error)'
             }
 
-        # Get network metrics
+        # Get network metrics aggregated across nodes
         try:
-            net_response = requests.get(
-                f"{netdata_url}/api/v1/data",
-                params={'chart': 'system.net', 'points': 1},
-                timeout=timeout
-            )
+            total_received_bps = 0
+            total_sent_bps = 0
+            node_count = 0
 
-            logger.warning(f"Network API call: {netdata_url}/api/v1/data?chart=system.net&points=1")
-            logger.warning(f"Network response status: {net_response.status_code}")
+            for node in netdata_hosts:
+                try:
+                    net_response = requests.get(
+                        f"{netdata_url}/api/v1/data",
+                        params={'chart': 'system.net', 'node': node, 'points': 1},
+                        timeout=timeout
+                    )
 
-            if net_response.status_code == 200:
-                net_data = net_response.json()
-                logger.warning(f"Network response data: {net_data}")
-                if 'data' in net_data and len(net_data['data']) > 0:
-                    latest = net_data['data'][0]
-                    logger.warning(f"Network latest data: {latest}")
-                    if len(latest) >= 3:  # timestamp, received, sent
-                        received_bps = latest[1] if isinstance(latest[1], (int, float)) else 0
-                        sent_bps = latest[2] if isinstance(latest[2], (int, float)) else 0
-                        logger.warning(f"Network received: {received_bps}, sent: {sent_bps}")
+                    logger.warning(f"Network API call for node {node}: {netdata_url}/api/v1/data?chart=system.net&node={node}&points=1")
+                    logger.warning(f"Network response status for {node}: {net_response.status_code}")
 
-                        received_mbps = round(received_bps / (1024**2), 1)
-                        sent_mbps = round(sent_bps / (1024**2), 1)
-                        logger.warning(f"Network: {received_mbps}Mbps received, {sent_mbps}Mbps sent")
+                    if net_response.status_code == 200:
+                        net_data = net_response.json()
+                        logger.warning(f"Network response data for {node}: {net_data}")
+                        if 'data' in net_data and len(net_data['data']) > 0:
+                            latest = net_data['data'][0]
+                            logger.warning(f"Network latest data for {node}: {latest}")
+                            if len(latest) >= 3:  # timestamp, received, sent
+                                received_bps = latest[1] if isinstance(latest[1], (int, float)) else 0
+                                sent_bps = latest[2] if isinstance(latest[2], (int, float)) else 0
+                                logger.warning(f"Network for {node} - received: {received_bps}, sent: {sent_bps}")
 
-                        metrics['network'] = {
-                            'bandwidth_mbps': round(received_mbps + sent_mbps, 1),
-                            'received_mbps': received_mbps,
-                            'sent_mbps': sent_mbps,
-                            'description': 'Network Bandwidth (Mbps)'
-                        }
-                    else:
-                        logger.warning("Network data has insufficient fields")
-                        metrics['network'] = None
-                else:
-                    logger.warning("Network response has no data")
-                    metrics['network'] = None
+                                total_received_bps += received_bps
+                                total_sent_bps += sent_bps
+                                node_count += 1
+                except Exception as e:
+                    logger.warning(f"Failed to fetch network from node {node}: {e}")
+                    continue
+
+            if node_count > 0:
+                # Average network metrics across all nodes
+                avg_received_bps = total_received_bps / node_count
+                avg_sent_bps = total_sent_bps / node_count
+
+                received_mbps = round(avg_received_bps / (1024**2), 1)
+                sent_mbps = round(avg_sent_bps / (1024**2), 1)
+                logger.warning(f"Aggregated Network: {avg_received_bps}bps received, {avg_sent_bps}bps sent from {node_count} nodes, average: {received_mbps}Mbps received, {sent_mbps}Mbps sent")
+
+                metrics['network'] = {
+                    'bandwidth_mbps': round(received_mbps + sent_mbps, 1),
+                    'received_mbps': received_mbps,
+                    'sent_mbps': sent_mbps,
+                    'description': f'Network Bandwidth ({node_count} nodes)'
+                }
             else:
-                logger.warning(f"Network API returned status {net_response.status_code}")
+                logger.warning("No network data from any nodes")
                 metrics['network'] = None
         except Exception as e:
             logger.warning(f"Failed to fetch network metrics: {e}")
