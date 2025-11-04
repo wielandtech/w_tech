@@ -147,7 +147,7 @@ def get_netdata_metrics(request):
     try:
         netdata_url = settings.NETDATA_URL
         timeout = 3
-        logger.info(f"Using Netdata URL: {netdata_url}")
+        logger.warning(f"Using Netdata URL: {netdata_url}")
 
         # Cluster constants
         cluster_cores = 18  # 3 nodes * 6 cores per node
@@ -170,46 +170,46 @@ def get_netdata_metrics(request):
             # Try the k8s_state service first
             k8s_state_url = f"{netdata_url.replace('netdata-parent', 'netdata-k8s-state')}"
             pods_url = f"{k8s_state_url}/api/v1/data?chart=k8s_state.pod_status.running&points=1"
-            logger.info(f"Pods API call (k8s_state): {pods_url}")
+            logger.warning(f"Pods API call (k8s_state): {pods_url}")
             pods_response = requests.get(
                 f"{k8s_state_url}/api/v1/data",
                 params={'chart': 'k8s_state.pod_status.running', 'points': 1},
                 timeout=timeout
             )
 
-            logger.info(f"Pods response status (k8s_state): {pods_response.status_code}")
+            logger.warning(f"Pods response status (k8s_state): {pods_response.status_code}")
 
             if pods_response.status_code == 200:
                 pods_data = pods_response.json()
-                logger.info(f"Pods response data: {pods_data}")
+                logger.warning(f"Pods response data: {pods_data}")
                 if 'data' in pods_data and len(pods_data['data']) > 0:
                     latest = pods_data['data'][0]
-                    logger.info(f"Pods latest data: {latest}")
+                    logger.warning(f"Pods latest data: {latest}")
                     running_pods = int(latest[1]) if len(latest) > 1 and isinstance(latest[1], (int, float)) else 0
-                    logger.info(f"Pods count: {running_pods}")
+                    logger.warning(f"Pods count: {running_pods}")
                     metrics['pods'] = {
                         'count': running_pods,
                         'description': 'Running Pods'
                     }
                 else:
-                    logger.info("Pods response has no data from k8s_state")
+                    logger.warning("Pods response has no data from k8s_state")
                     # Try fallback chart on main netdata
                     pods_response = requests.get(
                         f"{netdata_url}/api/v1/data",
                         params={'chart': 'k8s_state.pods', 'points': 1},
                         timeout=timeout
                     )
-                    logger.info(f"Pods fallback API call: {netdata_url}/api/v1/data?chart=k8s_state.pods&points=1")
-                    logger.info(f"Pods fallback response status: {pods_response.status_code}")
+                    logger.warning(f"Pods fallback API call: {netdata_url}/api/v1/data?chart=k8s_state.pods&points=1")
+                    logger.warning(f"Pods fallback response status: {pods_response.status_code}")
 
                     if pods_response.status_code == 200:
                         pods_data = pods_response.json()
-                        logger.info(f"Pods fallback response data: {pods_data}")
+                        logger.warning(f"Pods fallback response data: {pods_data}")
                         if 'data' in pods_data and len(pods_data['data']) > 0:
                             latest = pods_data['data'][0]
-                            logger.info(f"Pods fallback latest data: {latest}")
+                            logger.warning(f"Pods fallback latest data: {latest}")
                             running_pods = int(latest[1]) if len(latest) > 1 and isinstance(latest[1], (int, float)) else 0
-                            logger.info(f"Pods fallback count: {running_pods}")
+                            logger.warning(f"Pods fallback count: {running_pods}")
                             metrics['pods'] = {
                                 'count': running_pods,
                                 'description': 'Running Pods'
@@ -232,17 +232,17 @@ def get_netdata_metrics(request):
                     params={'chart': 'k8s_state.pods', 'points': 1},
                     timeout=timeout
                 )
-                logger.info(f"Pods fallback API call: {netdata_url}/api/v1/data?chart=k8s_state.pods&points=1")
-                logger.info(f"Pods fallback response status: {pods_response.status_code}")
+                logger.warning(f"Pods fallback API call: {netdata_url}/api/v1/data?chart=k8s_state.pods&points=1")
+                logger.warning(f"Pods fallback response status: {pods_response.status_code}")
 
                 if pods_response.status_code == 200:
                     pods_data = pods_response.json()
-                    logger.info(f"Pods fallback response data: {pods_data}")
+                    logger.warning(f"Pods fallback response data: {pods_data}")
                     if 'data' in pods_data and len(pods_data['data']) > 0:
                         latest = pods_data['data'][0]
-                        logger.info(f"Pods fallback latest data: {latest}")
+                        logger.warning(f"Pods fallback latest data: {latest}")
                         running_pods = int(latest[1]) if len(latest) > 1 and isinstance(latest[1], (int, float)) else 0
-                        logger.info(f"Pods fallback count: {running_pods}")
+                        logger.warning(f"Pods fallback count: {running_pods}")
                         metrics['pods'] = {
                             'count': running_pods,
                             'description': 'Running Pods'
@@ -272,22 +272,22 @@ def get_netdata_metrics(request):
                 timeout=timeout
             )
 
-            logger.info(f"CPU API call: {netdata_url}/api/v1/data?chart=system.cpu&points=1")
-            logger.info(f"CPU response status: {cpu_response.status_code}")
+            logger.warning(f"CPU API call: {netdata_url}/api/v1/data?chart=system.cpu&points=1")
+            logger.warning(f"CPU response status: {cpu_response.status_code}")
 
             if cpu_response.status_code == 200:
                 cpu_data = cpu_response.json()
-                logger.info(f"CPU response data: {cpu_data}")
+                logger.warning(f"CPU response data: {cpu_data}")
                 if 'data' in cpu_data and len(cpu_data['data']) > 0:
                     latest = cpu_data['data'][0]
-                    logger.info(f"CPU latest data: {latest}")
+                    logger.warning(f"CPU latest data: {latest}")
                     if len(latest) >= 2:
                         cpu_value = latest[1] if isinstance(latest[1], (int, float)) else None
-                        logger.info(f"CPU value: {cpu_value}")
+                        logger.warning(f"CPU value: {cpu_value}")
                         if cpu_value is not None:
                             # Convert to percentage if needed
                             cpu_percentage = min(100.0, max(0.0, cpu_value if cpu_value <= 100 else cpu_value / 10.0))
-                            logger.info(f"CPU percentage: {cpu_percentage}")
+                            logger.warning(f"CPU percentage: {cpu_percentage}")
                             metrics['cpu'] = {
                                 'percentage': round(cpu_percentage, 1),
                                 'total_cores': cluster_cores,
@@ -334,25 +334,25 @@ def get_netdata_metrics(request):
                 timeout=timeout
             )
 
-            logger.info(f"Memory API call: {netdata_url}/api/v1/data?chart=system.ram&points=1")
-            logger.info(f"Memory response status: {memory_response.status_code}")
+            logger.warning(f"Memory API call: {netdata_url}/api/v1/data?chart=system.ram&points=1")
+            logger.warning(f"Memory response status: {memory_response.status_code}")
 
             if memory_response.status_code == 200:
                 memory_data = memory_response.json()
-                logger.info(f"Memory response data: {memory_data}")
+                logger.warning(f"Memory response data: {memory_data}")
                 if 'data' in memory_data and len(memory_data['data']) > 0:
                     latest = memory_data['data'][0]
-                    logger.info(f"Memory latest data: {latest}")
+                    logger.warning(f"Memory latest data: {latest}")
                     if len(latest) >= 3:  # timestamp, used, free
                         memory_used_bytes = latest[1] if isinstance(latest[1], (int, float)) else 0
                         memory_free_bytes = latest[2] if isinstance(latest[2], (int, float)) else 0
-                        logger.info(f"Memory used: {memory_used_bytes}, free: {memory_free_bytes}")
+                        logger.warning(f"Memory used: {memory_used_bytes}, free: {memory_free_bytes}")
 
                         memory_used_gb = round(memory_used_bytes / (1024**3), 1)
                         memory_free_gb = round(memory_free_bytes / (1024**3), 1)
                         memory_total_gb = memory_used_gb + memory_free_gb
                         memory_percentage = round((memory_used_gb / memory_total_gb) * 100, 1) if memory_total_gb > 0 else 0
-                        logger.info(f"Memory: {memory_used_gb}GB used, {memory_total_gb}GB total, {memory_percentage}%")
+                        logger.warning(f"Memory: {memory_used_gb}GB used, {memory_total_gb}GB total, {memory_percentage}%")
 
                         metrics['memory'] = {
                             'total_gb': memory_total_gb,
@@ -399,23 +399,23 @@ def get_netdata_metrics(request):
                 timeout=timeout
             )
 
-            logger.info(f"Network API call: {netdata_url}/api/v1/data?chart=system.net&points=1")
-            logger.info(f"Network response status: {net_response.status_code}")
+            logger.warning(f"Network API call: {netdata_url}/api/v1/data?chart=system.net&points=1")
+            logger.warning(f"Network response status: {net_response.status_code}")
 
             if net_response.status_code == 200:
                 net_data = net_response.json()
-                logger.info(f"Network response data: {net_data}")
+                logger.warning(f"Network response data: {net_data}")
                 if 'data' in net_data and len(net_data['data']) > 0:
                     latest = net_data['data'][0]
-                    logger.info(f"Network latest data: {latest}")
+                    logger.warning(f"Network latest data: {latest}")
                     if len(latest) >= 3:  # timestamp, received, sent
                         received_bps = latest[1] if isinstance(latest[1], (int, float)) else 0
                         sent_bps = latest[2] if isinstance(latest[2], (int, float)) else 0
-                        logger.info(f"Network received: {received_bps}, sent: {sent_bps}")
+                        logger.warning(f"Network received: {received_bps}, sent: {sent_bps}")
 
                         received_mbps = round(received_bps / (1024**2), 1)
                         sent_mbps = round(sent_bps / (1024**2), 1)
-                        logger.info(f"Network: {received_mbps}Mbps received, {sent_mbps}Mbps sent")
+                        logger.warning(f"Network: {received_mbps}Mbps received, {sent_mbps}Mbps sent")
 
                         metrics['network'] = {
                             'bandwidth_mbps': round(received_mbps + sent_mbps, 1),
@@ -424,10 +424,10 @@ def get_netdata_metrics(request):
                             'description': 'Network Bandwidth (Mbps)'
                         }
                     else:
-                        logger.info("Network data has insufficient fields")
+                        logger.warning("Network data has insufficient fields")
                         metrics['network'] = None
                 else:
-                    logger.info("Network response has no data")
+                    logger.warning("Network response has no data")
                     metrics['network'] = None
             else:
                 logger.warning(f"Network API returned status {net_response.status_code}")
