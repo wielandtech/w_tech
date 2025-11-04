@@ -376,3 +376,4 @@ def get_netdata_metrics(request):
             'status': 'error',
             'error': 'Internal error'
         })
+
