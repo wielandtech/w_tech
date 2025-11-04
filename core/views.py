@@ -278,11 +278,11 @@ def get_netdata_metrics(request):
                 try:
                     cpu_response = requests.get(
                         f"{netdata_url}/api/v1/data",
-                        params={'chart': 'system.cpu', 'node': node, 'points': 1},
+                        params={'chart': 'system.cpu', 'node': node, 'points': 1, 'after': -10},
                         timeout=timeout
                     )
 
-                    logger.warning(f"CPU API call for node {node}: {netdata_url}/api/v1/data?chart=system.cpu&node={node}&points=1")
+                    logger.warning(f"CPU API call for node {node}: {netdata_url}/api/v1/data?chart=system.cpu&node={node}&points=1&after=-10")
                     logger.warning(f"CPU response status for {node}: {cpu_response.status_code}")
 
                     if cpu_response.status_code == 200:
@@ -336,11 +336,11 @@ def get_netdata_metrics(request):
                 try:
                     memory_response = requests.get(
                         f"{netdata_url}/api/v1/data",
-                        params={'chart': 'system.ram', 'node': node, 'points': 1},
+                        params={'chart': 'system.ram', 'node': node, 'points': 1, 'after': -10},
                         timeout=timeout
                     )
 
-                    logger.warning(f"Memory API call for node {node}: {netdata_url}/api/v1/data?chart=system.ram&node={node}&points=1")
+                    logger.warning(f"Memory API call for node {node}: {netdata_url}/api/v1/data?chart=system.ram&node={node}&points=1&after=-10")
                     logger.warning(f"Memory response status for {node}: {memory_response.status_code}")
 
                     if memory_response.status_code == 200:
@@ -410,11 +410,11 @@ def get_netdata_metrics(request):
                 try:
                     net_response = requests.get(
                         f"{netdata_url}/api/v1/data",
-                        params={'chart': 'system.net', 'node': node, 'points': 1},
+                        params={'chart': 'system.net', 'node': node, 'points': 1, 'after': -10},
                         timeout=timeout
                     )
 
-                    logger.warning(f"Network API call for node {node}: {netdata_url}/api/v1/data?chart=system.net&node={node}&points=1")
+                    logger.warning(f"Network API call for node {node}: {netdata_url}/api/v1/data?chart=system.net&node={node}&points=1&after=-10")
                     logger.warning(f"Network response status for {node}: {net_response.status_code}")
 
                     if net_response.status_code == 200:
