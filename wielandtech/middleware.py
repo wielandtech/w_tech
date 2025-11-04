@@ -62,6 +62,7 @@ class SecurityHeadersMiddleware:
                 "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
                 "img-src 'self' data: https:; "
                 "font-src 'self' data: https://fonts.gstatic.com; "
+                "frame-src 'self' https://www.google.com https://www.gstatic.com; "
                 "connect-src 'self' https://www.google-analytics.com https://cdn.jsdelivr.net "
                 "https://www.google.com https://www.gstatic.com;"
             )
