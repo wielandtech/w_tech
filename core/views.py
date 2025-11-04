@@ -264,62 +264,58 @@ def get_netdata_metrics(request):
                 'description': 'Running Pods (error)'
             }
 
-        # Get CPU utilization
+        # Get list of nodes to query
+        netdata_hosts = settings.NETDATA_HOSTS
+        logger.warning(f"Querying nodes: {netdata_hosts}")
+
+        # Get CPU utilization aggregated across nodes
         try:
-            cpu_response = requests.get(
-                f"{netdata_url}/api/v1/data",
-                params={'chart': 'system.cpu', 'points': 1},
-                timeout=timeout
-            )
+            total_cpu_percentage = 0
+            node_count = 0
 
-            logger.warning(f"CPU API call: {netdata_url}/api/v1/data?chart=system.cpu&points=1")
-            logger.warning(f"CPU response status: {cpu_response.status_code}")
+            for node in netdata_hosts:
+                try:
+                    cpu_response = requests.get(
+                        f"{netdata_url}/api/v1/data",
+                        params={'chart': 'system.cpu', 'node': node, 'points': 1},
+                        timeout=timeout
+                    )
 
-            if cpu_response.status_code == 200:
-                cpu_data = cpu_response.json()
-                logger.warning(f"CPU response data: {cpu_data}")
-                if 'data' in cpu_data and len(cpu_data['data']) > 0:
-                    latest = cpu_data['data'][0]
-                    logger.warning(f"CPU latest data: {latest}")
-                    if len(latest) >= 2:
-                        # CPU data is an array of different CPU usage types, sum them for total usage
-                        # Skip timestamp (index 0) and sum all CPU values including iowait
-                        cpu_values = [v for v in latest[1:] if isinstance(v, (int, float))]
-                        total_cpu_usage = sum(cpu_values)
-                        logger.warning(f"CPU values: {cpu_values}, total: {total_cpu_usage}")
-                        if total_cpu_usage >= 0:
-                            # Netdata CPU is already in percentage
-                            cpu_percentage = min(100.0, max(0.0, total_cpu_usage))
-                            logger.warning(f"CPU percentage: {cpu_percentage}")
-                            metrics['cpu'] = {
-                                'percentage': round(cpu_percentage, 1),
-                                'total_cores': cluster_cores,
-                                'description': 'CPU Utilization'
-                            }
-                        else:
-                            metrics['cpu'] = {
-                                'percentage': 0.0,
-                                'total_cores': cluster_cores,
-                                'description': 'CPU Utilization (invalid data)'
-                            }
-                    else:
-                        metrics['cpu'] = {
-                            'percentage': 0.0,
-                            'total_cores': cluster_cores,
-                            'description': 'CPU Utilization (no data)'
-                        }
-                else:
-                    metrics['cpu'] = {
-                        'percentage': 0.0,
-                        'total_cores': cluster_cores,
-                        'description': 'CPU Utilization (empty response)'
-                    }
+                    logger.warning(f"CPU API call for node {node}: {netdata_url}/api/v1/data?chart=system.cpu&node={node}&points=1")
+                    logger.warning(f"CPU response status for {node}: {cpu_response.status_code}")
+
+                    if cpu_response.status_code == 200:
+                        cpu_data = cpu_response.json()
+                        logger.warning(f"CPU response data for {node}: {cpu_data}")
+                        if 'data' in cpu_data and len(cpu_data['data']) > 0:
+                            latest = cpu_data['data'][0]
+                            logger.warning(f"CPU latest data for {node}: {latest}")
+                            if len(latest) >= 2:
+                                # CPU data is an array of different CPU usage types, sum them for total usage
+                                # Skip timestamp (index 0) and sum all CPU values including iowait
+                                cpu_values = [v for v in latest[1:] if isinstance(v, (int, float))]
+                                node_cpu_usage = sum(cpu_values)
+                                logger.warning(f"CPU values for {node}: {cpu_values}, total: {node_cpu_usage}")
+                                total_cpu_percentage += node_cpu_usage
+                                node_count += 1
+                except Exception as e:
+                    logger.warning(f"Failed to fetch CPU from node {node}: {e}")
+                    continue
+
+            if node_count > 0:
+                # Average CPU across all nodes
+                avg_cpu_percentage = total_cpu_percentage / node_count
+                logger.warning(f"Aggregated CPU: {total_cpu_percentage} total from {node_count} nodes, average: {avg_cpu_percentage}")
+                metrics['cpu'] = {
+                    'percentage': round(avg_cpu_percentage, 1),
+                    'total_cores': cluster_cores,
+                    'description': f'CPU Utilization ({node_count} nodes)'
+                }
             else:
-                logger.warning(f"CPU API returned status {cpu_response.status_code}")
                 metrics['cpu'] = {
                     'percentage': 0.0,
                     'total_cores': cluster_cores,
-                    'description': 'CPU Utilization (unavailable)'
+                    'description': 'CPU Utilization (no nodes available)'
                 }
         except Exception as e:
             logger.warning(f"Failed to fetch CPU metrics: {e}")
@@ -329,63 +325,70 @@ def get_netdata_metrics(request):
                 'description': 'CPU Utilization (error)'
             }
 
-        # Get memory utilization
+        # Get memory utilization aggregated across nodes
         try:
-            memory_response = requests.get(
-                f"{netdata_url}/api/v1/data",
-                params={'chart': 'system.ram', 'points': 1},
-                timeout=timeout
-            )
+            total_used_memory_mb = 0
+            total_total_memory_mb = 0
+            node_count = 0
 
-            logger.warning(f"Memory API call: {netdata_url}/api/v1/data?chart=system.ram&points=1")
-            logger.warning(f"Memory response status: {memory_response.status_code}")
+            for node in netdata_hosts:
+                try:
+                    memory_response = requests.get(
+                        f"{netdata_url}/api/v1/data",
+                        params={'chart': 'system.ram', 'node': node, 'points': 1},
+                        timeout=timeout
+                    )
 
-            if memory_response.status_code == 200:
-                memory_data = memory_response.json()
-                logger.warning(f"Memory response data: {memory_data}")
-                if 'data' in memory_data and len(memory_data['data']) > 0:
-                    latest = memory_data['data'][0]
-                    logger.warning(f"Memory latest data: {latest}")
-                    # Memory data format: [time, free, used, cached, buffers] (in MB)
-                    if len(latest) >= 3:
-                        memory_free_mb = latest[1] if isinstance(latest[1], (int, float)) else 0
-                        memory_used_mb = latest[2] if isinstance(latest[2], (int, float)) else 0
-                        logger.warning(f"Memory free: {memory_free_mb}MB, used: {memory_used_mb}MB")
+                    logger.warning(f"Memory API call for node {node}: {netdata_url}/api/v1/data?chart=system.ram&node={node}&points=1")
+                    logger.warning(f"Memory response status for {node}: {memory_response.status_code}")
 
-                        # Convert MB to GB
-                        memory_used_gb = round(memory_used_mb / 1024, 1)
-                        memory_free_gb = round(memory_free_mb / 1024, 1)
-                        memory_total_gb = memory_used_gb + memory_free_gb
-                        memory_percentage = round((memory_used_gb / memory_total_gb) * 100, 1) if memory_total_gb > 0 else 0
-                        logger.warning(f"Memory: {memory_used_gb}GB used, {memory_total_gb}GB total, {memory_percentage}%")
+                    if memory_response.status_code == 200:
+                        memory_data = memory_response.json()
+                        logger.warning(f"Memory response data for {node}: {memory_data}")
+                        if 'data' in memory_data and len(memory_data['data']) > 0:
+                            latest = memory_data['data'][0]
+                            logger.warning(f"Memory latest data for {node}: {latest}")
+                            # Memory data format: [time, free, used, cached, buffers] (in MB)
+                            if len(latest) >= 5:
+                                memory_free_mb = latest[1] if isinstance(latest[1], (int, float)) else 0
+                                memory_used_mb = latest[2] if isinstance(latest[2], (int, float)) else 0
+                                memory_cached_mb = latest[3] if isinstance(latest[3], (int, float)) else 0
+                                memory_buffers_mb = latest[4] if isinstance(latest[4], (int, float)) else 0
 
-                        metrics['memory'] = {
-                            'total_gb': memory_total_gb,
-                            'used_gb': memory_used_gb,
-                            'percentage': memory_percentage,
-                            'description': 'Memory Utilization'
-                        }
-                    else:
-                        metrics['memory'] = {
-                            'total_gb': cluster_ram_gb,
-                            'used_gb': 0.0,
-                            'percentage': 0.0,
-                            'description': 'Memory Utilization (invalid data)'
-                        }
-                else:
-                    metrics['memory'] = {
-                        'total_gb': cluster_ram_gb,
-                        'used_gb': 0.0,
-                        'percentage': 0.0,
-                        'description': 'Memory Utilization (no data)'
-                    }
+                                # Total memory = used + free + cached + buffers
+                                node_total_mb = memory_used_mb + memory_free_mb + memory_cached_mb + memory_buffers_mb
+                                logger.warning(f"Memory for {node} - free: {memory_free_mb}MB, used: {memory_used_mb}MB, cached: {memory_cached_mb}MB, buffers: {memory_buffers_mb}MB, total: {node_total_mb}MB")
+
+                                total_used_memory_mb += memory_used_mb
+                                total_total_memory_mb += node_total_mb
+                                node_count += 1
+                except Exception as e:
+                    logger.warning(f"Failed to fetch RAM from node {node}: {e}")
+                    continue
+
+            if node_count > 0:
+                # Average memory across all nodes
+                avg_used_memory_mb = total_used_memory_mb / node_count
+                avg_total_memory_mb = total_total_memory_mb / node_count
+
+                # Convert MB to GB
+                memory_used_gb = round(avg_used_memory_mb / 1024, 1)
+                memory_total_gb = round(avg_total_memory_mb / 1024, 1)
+                memory_percentage = round((avg_used_memory_mb / avg_total_memory_mb) * 100, 1) if avg_total_memory_mb > 0 else 0
+                logger.warning(f"Aggregated Memory: {avg_used_memory_mb}MB used, {avg_total_memory_mb}MB total from {node_count} nodes, average: {memory_used_gb}GB used, {memory_total_gb}GB total, {memory_percentage}%")
+
+                metrics['memory'] = {
+                    'total_gb': memory_total_gb,
+                    'used_gb': memory_used_gb,
+                    'percentage': memory_percentage,
+                    'description': f'Memory Utilization ({node_count} nodes)'
+                }
             else:
-                logger.warning(f"Memory API returned status {memory_response.status_code}")
                 metrics['memory'] = {
                     'total_gb': cluster_ram_gb,
                     'used_gb': 0.0,
                     'percentage': 0.0,
-                    'description': 'Memory Utilization (unavailable)'
+                    'description': 'Memory Utilization (no nodes available)'
                 }
         except Exception as e:
             logger.warning(f"Failed to fetch memory metrics: {e}")
