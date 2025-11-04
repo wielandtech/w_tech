@@ -167,16 +167,17 @@ def get_netdata_metrics(request):
 
         # Get pod count from k8s_state
         try:
+            # Try the k8s_state service first
             k8s_state_url = f"{netdata_url.replace('netdata-parent', 'netdata-k8s-state')}"
             pods_url = f"{k8s_state_url}/api/v1/data?chart=k8s_state.pod_status.running&points=1"
-            logger.info(f"Pods API call: {pods_url}")
+            logger.info(f"Pods API call (k8s_state): {pods_url}")
             pods_response = requests.get(
                 f"{k8s_state_url}/api/v1/data",
                 params={'chart': 'k8s_state.pod_status.running', 'points': 1},
                 timeout=timeout
             )
 
-            logger.info(f"Pods response status: {pods_response.status_code}")
+            logger.info(f"Pods response status (k8s_state): {pods_response.status_code}")
 
             if pods_response.status_code == 200:
                 pods_data = pods_response.json()
@@ -191,17 +192,71 @@ def get_netdata_metrics(request):
                         'description': 'Running Pods'
                     }
                 else:
-                    logger.info("Pods response has no data")
+                    logger.info("Pods response has no data from k8s_state")
+                    # Try fallback chart on main netdata
+                    pods_response = requests.get(
+                        f"{netdata_url}/api/v1/data",
+                        params={'chart': 'k8s_state.pods', 'points': 1},
+                        timeout=timeout
+                    )
+                    logger.info(f"Pods fallback API call: {netdata_url}/api/v1/data?chart=k8s_state.pods&points=1")
+                    logger.info(f"Pods fallback response status: {pods_response.status_code}")
+
+                    if pods_response.status_code == 200:
+                        pods_data = pods_response.json()
+                        logger.info(f"Pods fallback response data: {pods_data}")
+                        if 'data' in pods_data and len(pods_data['data']) > 0:
+                            latest = pods_data['data'][0]
+                            logger.info(f"Pods fallback latest data: {latest}")
+                            running_pods = int(latest[1]) if len(latest) > 1 and isinstance(latest[1], (int, float)) else 0
+                            logger.info(f"Pods fallback count: {running_pods}")
+                            metrics['pods'] = {
+                                'count': running_pods,
+                                'description': 'Running Pods'
+                            }
+                        else:
+                            metrics['pods'] = {
+                                'count': 0,
+                                'description': 'Running Pods (no data)'
+                            }
+                    else:
+                        metrics['pods'] = {
+                            'count': 0,
+                            'description': 'Running Pods (unavailable)'
+                        }
+            else:
+                logger.warning(f"Pods API returned status {pods_response.status_code}, trying fallback")
+                # Try fallback chart on main netdata
+                pods_response = requests.get(
+                    f"{netdata_url}/api/v1/data",
+                    params={'chart': 'k8s_state.pods', 'points': 1},
+                    timeout=timeout
+                )
+                logger.info(f"Pods fallback API call: {netdata_url}/api/v1/data?chart=k8s_state.pods&points=1")
+                logger.info(f"Pods fallback response status: {pods_response.status_code}")
+
+                if pods_response.status_code == 200:
+                    pods_data = pods_response.json()
+                    logger.info(f"Pods fallback response data: {pods_data}")
+                    if 'data' in pods_data and len(pods_data['data']) > 0:
+                        latest = pods_data['data'][0]
+                        logger.info(f"Pods fallback latest data: {latest}")
+                        running_pods = int(latest[1]) if len(latest) > 1 and isinstance(latest[1], (int, float)) else 0
+                        logger.info(f"Pods fallback count: {running_pods}")
+                        metrics['pods'] = {
+                            'count': running_pods,
+                            'description': 'Running Pods'
+                        }
+                    else:
+                        metrics['pods'] = {
+                            'count': 0,
+                            'description': 'Running Pods (no data)'
+                        }
+                else:
                     metrics['pods'] = {
                         'count': 0,
-                        'description': 'Running Pods (no data)'
+                        'description': 'Running Pods (unavailable)'
                     }
-            else:
-                logger.warning(f"Pods API returned status {pods_response.status_code}")
-                metrics['pods'] = {
-                    'count': 0,
-                    'description': 'Running Pods (unavailable)'
-                }
         except Exception as e:
             logger.warning(f"Failed to fetch pod counts: {e}")
             metrics['pods'] = {
