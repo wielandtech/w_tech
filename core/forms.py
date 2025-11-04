@@ -38,7 +38,6 @@ class ContactForm(forms.Form):
     captcha = ReCaptchaField(
         widget=ReCaptchaV3(
             attrs={
-                'data-callback': 'onSubmit',
                 'data-action': 'contact_form'
             }
         )

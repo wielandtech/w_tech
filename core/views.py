@@ -19,6 +19,11 @@ def homepage(request):
 def contact(request):
     """Contact page view with form handling and email sending."""
     from .forms import ContactForm
+
+    # Check ReCaptcha configuration
+    if not settings.RECAPTCHA_PUBLIC_KEY or not settings.RECAPTCHA_PRIVATE_KEY:
+        messages.warning(request, 'Anti-spam verification is not configured. Please contact the administrator if this persists.')
+        logger.warning("ReCaptcha keys not configured: RECAPTCHA_PUBLIC_KEY or RECAPTCHA_PRIVATE_KEY missing")
     
     if request.method == 'POST':
         form = ContactForm(request.POST)

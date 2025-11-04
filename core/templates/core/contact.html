@@ -100,3 +100,72 @@
     </div>
 </div>
 {% endblock %}
+
+{% block domready %}
+// Contact form ReCaptcha handling
+$(document).ready(function() {
+    $('.contact-form').on('submit', function(e) {
+        var $form = $(this);
+        var $submitBtn = $form.find('.submit-btn');
+
+        // Check if ReCaptcha token is already present
+        var $tokenInput = $form.find('input[name="g-recaptcha-response"]');
+        if ($tokenInput.length === 0 || !$tokenInput.val()) {
+            // Token not present, prevent submission and try to get one
+            e.preventDefault();
+
+            // Disable submit button to prevent multiple submissions
+            $submitBtn.prop('disabled', true).text('Verifying...');
+
+            // Check if grecaptcha is available
+            if (typeof grecaptcha !== 'undefined') {
+                // Wait a bit for ReCaptcha to initialize, then try to execute
+                setTimeout(function() {
+                    try {
+                        // For ReCaptchaV3, the token should be automatically generated
+                        // Let's check if it was created after a short delay
+                        var $tokenInput = $form.find('input[name="g-recaptcha-response"]');
+                        if ($tokenInput.length > 0 && $tokenInput.val()) {
+                            // Token is now present, submit the form
+                            $submitBtn.prop('disabled', false).text('Send Message');
+                            $form.off('submit'); // Remove this handler
+                            $form[0].submit(); // Submit normally
+                        } else {
+                            // Still no token, show error
+                            $submitBtn.prop('disabled', false).text('Send Message');
+
+                            var $messages = $form.closest('.contact-form-container').find('.messages');
+                            if ($messages.length === 0) {
+                                $messages = $('<div class="messages"></div>');
+                                $form.closest('.contact-form-container').prepend($messages);
+                            }
+                            $messages.html('<div class="alert alert-error">Please wait for verification to complete, then try again.</div>');
+                        }
+                    } catch (error) {
+                        console.error('ReCaptcha error:', error);
+                        $submitBtn.prop('disabled', false).text('Send Message');
+
+                        var $messages = $form.closest('.contact-form-container').find('.messages');
+                        if ($messages.length === 0) {
+                            $messages = $('<div class="messages"></div>');
+                            $form.closest('.contact-form-container').prepend($messages);
+                        }
+                        $messages.html('<div class="alert alert-error">Anti-spam verification failed. Please try again.</div>');
+                    }
+                }, 1000); // Wait 1 second for ReCaptcha to initialize
+            } else {
+                // ReCaptcha not loaded
+                $submitBtn.prop('disabled', false).text('Send Message');
+
+                var $messages = $form.closest('.contact-form-container').find('.messages');
+                if ($messages.length === 0) {
+                    $messages = $('<div class="messages"></div>');
+                    $form.closest('.contact-form-container').prepend($messages);
+                }
+                $messages.html('<div class="alert alert-error">Anti-spam verification not available. Please contact us directly.</div>');
+            }
+        }
+        // If token is already present, allow normal submission
+    });
+});
+{% endblock %}
