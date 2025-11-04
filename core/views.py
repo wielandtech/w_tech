@@ -282,11 +282,14 @@ def get_netdata_metrics(request):
                     latest = cpu_data['data'][0]
                     logger.warning(f"CPU latest data: {latest}")
                     if len(latest) >= 2:
-                        cpu_value = latest[1] if isinstance(latest[1], (int, float)) else None
-                        logger.warning(f"CPU value: {cpu_value}")
-                        if cpu_value is not None:
-                            # Convert to percentage if needed
-                            cpu_percentage = min(100.0, max(0.0, cpu_value if cpu_value <= 100 else cpu_value / 10.0))
+                        # CPU data is an array of different CPU usage types, sum them for total usage
+                        # Skip timestamp (index 0) and sum all CPU values including iowait
+                        cpu_values = [v for v in latest[1:] if isinstance(v, (int, float))]
+                        total_cpu_usage = sum(cpu_values)
+                        logger.warning(f"CPU values: {cpu_values}, total: {total_cpu_usage}")
+                        if total_cpu_usage >= 0:
+                            # Netdata CPU is already in percentage
+                            cpu_percentage = min(100.0, max(0.0, total_cpu_usage))
                             logger.warning(f"CPU percentage: {cpu_percentage}")
                             metrics['cpu'] = {
                                 'percentage': round(cpu_percentage, 1),
@@ -343,13 +346,15 @@ def get_netdata_metrics(request):
                 if 'data' in memory_data and len(memory_data['data']) > 0:
                     latest = memory_data['data'][0]
                     logger.warning(f"Memory latest data: {latest}")
-                    if len(latest) >= 3:  # timestamp, used, free
-                        memory_used_bytes = latest[1] if isinstance(latest[1], (int, float)) else 0
-                        memory_free_bytes = latest[2] if isinstance(latest[2], (int, float)) else 0
-                        logger.warning(f"Memory used: {memory_used_bytes}, free: {memory_free_bytes}")
+                    # Memory data format: [time, free, used, cached, buffers] (in MB)
+                    if len(latest) >= 3:
+                        memory_free_mb = latest[1] if isinstance(latest[1], (int, float)) else 0
+                        memory_used_mb = latest[2] if isinstance(latest[2], (int, float)) else 0
+                        logger.warning(f"Memory free: {memory_free_mb}MB, used: {memory_used_mb}MB")
 
-                        memory_used_gb = round(memory_used_bytes / (1024**3), 1)
-                        memory_free_gb = round(memory_free_bytes / (1024**3), 1)
+                        # Convert MB to GB
+                        memory_used_gb = round(memory_used_mb / 1024, 1)
+                        memory_free_gb = round(memory_free_mb / 1024, 1)
                         memory_total_gb = memory_used_gb + memory_free_gb
                         memory_percentage = round((memory_used_gb / memory_total_gb) * 100, 1) if memory_total_gb > 0 else 0
                         logger.warning(f"Memory: {memory_used_gb}GB used, {memory_total_gb}GB total, {memory_percentage}%")
