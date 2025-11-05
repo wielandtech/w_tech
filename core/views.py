@@ -326,11 +326,12 @@ def get_netdata_metrics(request):
                 'description': 'CPU Utilization (error)'
             }
 
-        # Get memory utilization aggregated across nodes
-        try:
-            total_used_memory_mb = 0
-            total_total_memory_mb = 0
-            node_count = 0
+            # Get memory utilization aggregated across nodes
+            try:
+                total_used_memory_mb = 0
+                total_total_memory_mb = 0
+                node_count = 0
+                memory_data_points = []
 
             for node in netdata_hosts:
                 try:
@@ -364,11 +365,33 @@ def get_netdata_metrics(request):
                                 total_used_memory_mb += memory_used_mb
                                 total_total_memory_mb += node_total_mb
                                 node_count += 1
+
+                                # Store data point for analysis
+                                memory_data_points.append({
+                                    'node': node,
+                                    'timestamp': timestamp,
+                                    'used_mb': memory_used_mb,
+                                    'total_mb': node_total_mb
+                                })
                 except Exception as e:
                     logger.warning(f"Failed to fetch RAM from node {node}: {e}")
                     continue
 
             if node_count > 0:
+                # Check if all nodes have identical data
+                if len(memory_data_points) > 1:
+                    first_point = memory_data_points[0]
+                    all_identical = all(
+                        point['timestamp'] == first_point['timestamp'] and
+                        point['used_mb'] == first_point['used_mb'] and
+                        point['total_mb'] == first_point['total_mb']
+                        for point in memory_data_points[1:]
+                    )
+                    if all_identical:
+                        logger.warning(f"WARNING: All {len(memory_data_points)} nodes have identical memory data! This suggests node-specific memory charts may not be working properly.")
+                        for point in memory_data_points:
+                            logger.warning(f"  {point['node']}: timestamp={point['timestamp']}, used={point['used_mb']}MB, total={point['total_mb']}MB")
+
                 # Sum memory across all nodes (total cluster memory)
                 cluster_used_memory_mb = total_used_memory_mb
                 cluster_total_memory_mb = total_total_memory_mb
