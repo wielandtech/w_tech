@@ -29,7 +29,7 @@ function fetchMetrics() {
             }
             
             let html = '<div class="metrics-grid">';
-            
+
                    // CPU Card
                    if (data.cpu !== null) {
                        const cpuClass = data.cpu.percentage > 80 ? 'critical' : (data.cpu.percentage > 60 ? 'warning' : '');
@@ -44,7 +44,7 @@ function fetchMetrics() {
                            </div>
                        `;
                    }
-            
+
                    // Memory Card
                    if (data.memory !== null) {
                        const memoryClass = data.memory.percentage > 85 ? 'critical' : (data.memory.percentage > 70 ? 'warning' : '');
@@ -59,7 +59,7 @@ function fetchMetrics() {
                            </div>
                        `;
                    }
-            
+
                    // Pods Card
                    if (data.pods !== null) {
                        html += `
@@ -70,33 +70,29 @@ function fetchMetrics() {
                            </div>
                        `;
                    }
-            
-            // Network Activity Card
-            if (data.network !== null) {
-                let networkValue, networkDetail;
-                if (data.network.bandwidth_mbps !== undefined) {
-                    // Bandwidth metrics
-                    networkValue = `${data.network.bandwidth_mbps} Mbps`;
-                    networkDetail = `↑${data.network.sent_mbps} ↓${data.network.received_mbps} Mbps`;
-                } else if (data.network.active_connections !== undefined) {
-                    // Connection count (TCP or client connections)
-                    networkValue = `${data.network.active_connections}`;
-                    networkDetail = data.network.api_requests_ps ? `${data.network.api_requests_ps} req/s` : 'active connections';
-                } else {
-                    // Fallback
-                    networkValue = 'N/A';
-                    networkDetail = 'metrics unavailable';
-                }
 
-                html += `
-                    <div class="metric-card">
-                        <div class="metric-label">${data.network.description}</div>
-                        <div class="metric-value">${networkValue}</div>
-                        <div class="metric-detail">${networkDetail}</div>
-                    </div>
-                `;
-            }
-            
+                   // Network Card
+                   if (data.network !== null) {
+                       let networkValue, networkDetail;
+                       if (data.network.bandwidth_mbps !== undefined) {
+                           // Bandwidth metrics
+                           networkValue = `${data.network.bandwidth_mbps} Mbps`;
+                           networkDetail = `↑${data.network.sent_mbps} ↓${data.network.received_mbps} Mbps`;
+                       } else {
+                           // Fallback
+                           networkValue = 'N/A';
+                           networkDetail = 'metrics unavailable';
+                       }
+
+                       html += `
+                           <div class="metric-card">
+                               <div class="metric-label">${data.network.description}</div>
+                               <div class="metric-value">${networkValue}</div>
+                               <div class="metric-detail">${networkDetail}</div>
+                           </div>
+                       `;
+                   }
+
             html += '</div>';
             
             // Add status indicator
