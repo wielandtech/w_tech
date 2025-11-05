@@ -336,11 +336,11 @@ def get_netdata_metrics(request):
                 try:
                     memory_response = requests.get(
                         f"{netdata_url}/api/v1/data",
-                        params={'chart': 'system.ram', 'node': node, 'points': 1, 'after': -10},
+                        params={'chart': 'system.ram', 'node': node, 'points': 1, 'after': 0},
                         timeout=timeout
                     )
 
-                    logger.warning(f"Memory API call for node {node}: {netdata_url}/api/v1/data?chart=system.ram&node={node}&points=1&after=-10")
+                    logger.warning(f"Memory API call for node {node}: {netdata_url}/api/v1/data?chart=system.ram&node={node}&points=1&after=0")
                     logger.warning(f"Memory response status for {node}: {memory_response.status_code}")
 
                     if memory_response.status_code == 200:
@@ -351,6 +351,7 @@ def get_netdata_metrics(request):
                             logger.warning(f"Memory latest data for {node}: {latest}")
                             # Memory data format: [time, free, used, cached, buffers] (in MB)
                             if len(latest) >= 5:
+                                timestamp = latest[0]
                                 memory_free_mb = latest[1] if isinstance(latest[1], (int, float)) else 0
                                 memory_used_mb = latest[2] if isinstance(latest[2], (int, float)) else 0
                                 memory_cached_mb = latest[3] if isinstance(latest[3], (int, float)) else 0
@@ -358,7 +359,7 @@ def get_netdata_metrics(request):
 
                                 # Total memory = used + free + cached + buffers
                                 node_total_mb = memory_used_mb + memory_free_mb + memory_cached_mb + memory_buffers_mb
-                                logger.warning(f"Memory for {node} - free: {memory_free_mb}MB, used: {memory_used_mb}MB, cached: {memory_cached_mb}MB, buffers: {memory_buffers_mb}MB, total: {node_total_mb}MB")
+                                logger.warning(f"Memory for {node} (timestamp: {timestamp}) - free: {memory_free_mb}MB, used: {memory_used_mb}MB, cached: {memory_cached_mb}MB, buffers: {memory_buffers_mb}MB, total: {node_total_mb}MB")
 
                                 total_used_memory_mb += memory_used_mb
                                 total_total_memory_mb += node_total_mb
