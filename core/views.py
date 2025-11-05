@@ -327,6 +327,7 @@ def get_netdata_metrics(request):
             }
 
             # Get memory utilization aggregated across nodes
+            logger.warning("Starting memory metrics collection")
             try:
                 total_used_memory_mb = 0
                 total_total_memory_mb = 0
