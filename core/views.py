@@ -333,90 +333,90 @@ def get_netdata_metrics(request):
                 node_count = 0
                 memory_data_points = []
 
-            for node in netdata_hosts:
-                try:
-                    memory_response = requests.get(
-                        f"{netdata_url}/api/v1/data",
-                        params={'chart': 'system.ram', 'node': node, 'points': 1, 'after': 0},
-                        timeout=timeout
-                    )
+                for node in netdata_hosts:
+                    try:
+                        memory_response = requests.get(
+                            f"{netdata_url}/api/v1/data",
+                            params={'chart': 'system.ram', 'node': node, 'points': 1, 'after': 0},
+                            timeout=timeout
+                        )
 
-                    logger.warning(f"Memory API call for node {node}: {netdata_url}/api/v1/data?chart=system.ram&node={node}&points=1&after=0")
-                    logger.warning(f"Memory response status for {node}: {memory_response.status_code}")
+                        logger.warning(f"Memory API call for node {node}: {netdata_url}/api/v1/data?chart=system.ram&node={node}&points=1&after=0")
+                        logger.warning(f"Memory response status for {node}: {memory_response.status_code}")
 
-                    if memory_response.status_code == 200:
-                        memory_data = memory_response.json()
-                        logger.warning(f"Memory response data for {node}: {memory_data}")
-                        if 'data' in memory_data and len(memory_data['data']) > 0:
-                            latest = memory_data['data'][0]
-                            logger.warning(f"Memory latest data for {node}: {latest}")
-                            # Memory data format: [time, free, used, cached, buffers] (in MB)
-                            if len(latest) >= 5:
-                                timestamp = latest[0]
-                                memory_free_mb = latest[1] if isinstance(latest[1], (int, float)) else 0
-                                memory_used_mb = latest[2] if isinstance(latest[2], (int, float)) else 0
-                                memory_cached_mb = latest[3] if isinstance(latest[3], (int, float)) else 0
-                                memory_buffers_mb = latest[4] if isinstance(latest[4], (int, float)) else 0
+                        if memory_response.status_code == 200:
+                            memory_data = memory_response.json()
+                            logger.warning(f"Memory response data for {node}: {memory_data}")
+                            if 'data' in memory_data and len(memory_data['data']) > 0:
+                                latest = memory_data['data'][0]
+                                logger.warning(f"Memory latest data for {node}: {latest}")
+                                # Memory data format: [time, free, used, cached, buffers] (in MB)
+                                if len(latest) >= 5:
+                                    timestamp = latest[0]
+                                    memory_free_mb = latest[1] if isinstance(latest[1], (int, float)) else 0
+                                    memory_used_mb = latest[2] if isinstance(latest[2], (int, float)) else 0
+                                    memory_cached_mb = latest[3] if isinstance(latest[3], (int, float)) else 0
+                                    memory_buffers_mb = latest[4] if isinstance(latest[4], (int, float)) else 0
 
-                                # Total memory = used + free + cached + buffers
-                                node_total_mb = memory_used_mb + memory_free_mb + memory_cached_mb + memory_buffers_mb
-                                logger.warning(f"Memory for {node} (timestamp: {timestamp}) - free: {memory_free_mb}MB, used: {memory_used_mb}MB, cached: {memory_cached_mb}MB, buffers: {memory_buffers_mb}MB, total: {node_total_mb}MB")
+                                    # Total memory = used + free + cached + buffers
+                                    node_total_mb = memory_used_mb + memory_free_mb + memory_cached_mb + memory_buffers_mb
+                                    logger.warning(f"Memory for {node} (timestamp: {timestamp}) - free: {memory_free_mb}MB, used: {memory_used_mb}MB, cached: {memory_cached_mb}MB, buffers: {memory_buffers_mb}MB, total: {node_total_mb}MB")
 
-                                total_used_memory_mb += memory_used_mb
-                                total_total_memory_mb += node_total_mb
-                                node_count += 1
+                                    total_used_memory_mb += memory_used_mb
+                                    total_total_memory_mb += node_total_mb
+                                    node_count += 1
 
-                                # Store data point for analysis
-                                memory_data_points.append({
-                                    'node': node,
-                                    'timestamp': timestamp,
-                                    'used_mb': memory_used_mb,
-                                    'total_mb': node_total_mb
-                                })
-                except Exception as e:
-                    logger.warning(f"Failed to fetch RAM from node {node}: {e}")
-                    continue
+                                    # Store data point for analysis
+                                    memory_data_points.append({
+                                        'node': node,
+                                        'timestamp': timestamp,
+                                        'used_mb': memory_used_mb,
+                                        'total_mb': node_total_mb
+                                    })
+                    except Exception as e:
+                        logger.warning(f"Failed to fetch RAM from node {node}: {e}")
+                        continue
 
-            if node_count > 0:
-                # Check if all nodes have identical data
-                if len(memory_data_points) > 1:
-                    first_point = memory_data_points[0]
-                    all_identical = all(
-                        point['timestamp'] == first_point['timestamp'] and
-                        point['used_mb'] == first_point['used_mb'] and
-                        point['total_mb'] == first_point['total_mb']
-                        for point in memory_data_points[1:]
-                    )
-                    if all_identical:
-                        logger.warning(f"WARNING: All {len(memory_data_points)} nodes have identical memory data! This suggests node-specific memory charts may not be working properly.")
-                        for point in memory_data_points:
-                            logger.warning(f"  {point['node']}: timestamp={point['timestamp']}, used={point['used_mb']}MB, total={point['total_mb']}MB")
+                if node_count > 0:
+                    # Check if all nodes have identical data
+                    if len(memory_data_points) > 1:
+                        first_point = memory_data_points[0]
+                        all_identical = all(
+                            point['timestamp'] == first_point['timestamp'] and
+                            point['used_mb'] == first_point['used_mb'] and
+                            point['total_mb'] == first_point['total_mb']
+                            for point in memory_data_points[1:]
+                        )
+                        if all_identical:
+                            logger.warning(f"WARNING: All {len(memory_data_points)} nodes have identical memory data! This suggests node-specific memory charts may not be working properly.")
+                            for point in memory_data_points:
+                                logger.warning(f"  {point['node']}: timestamp={point['timestamp']}, used={point['used_mb']}MB, total={point['total_mb']}MB")
 
-                # Sum memory across all nodes (total cluster memory)
-                cluster_used_memory_mb = total_used_memory_mb
-                cluster_total_memory_mb = total_total_memory_mb
+                    # Sum memory across all nodes (total cluster memory)
+                    cluster_used_memory_mb = total_used_memory_mb
+                    cluster_total_memory_mb = total_total_memory_mb
 
-                # Convert MB to GB
-                memory_used_gb = round(cluster_used_memory_mb / 1024, 1)
-                memory_total_gb = round(cluster_total_memory_mb / 1024, 1)
-                memory_percentage = round((cluster_used_memory_mb / cluster_total_memory_mb) * 100, 1) if cluster_total_memory_mb > 0 else 0
-                logger.warning(f"Total Cluster Memory: {cluster_used_memory_mb}MB used, {cluster_total_memory_mb}MB total across {node_count} nodes, {memory_used_gb}GB used, {memory_total_gb}GB total, {memory_percentage}%")
+                    # Convert MB to GB
+                    memory_used_gb = round(cluster_used_memory_mb / 1024, 1)
+                    memory_total_gb = round(cluster_total_memory_mb / 1024, 1)
+                    memory_percentage = round((cluster_used_memory_mb / cluster_total_memory_mb) * 100, 1) if cluster_total_memory_mb > 0 else 0
+                    logger.warning(f"Total Cluster Memory: {cluster_used_memory_mb}MB used, {cluster_total_memory_mb}MB total across {node_count} nodes, {memory_used_gb}GB used, {memory_total_gb}GB total, {memory_percentage}%")
 
-                metrics['memory'] = {
-                    'total_gb': memory_total_gb,
-                    'used_gb': memory_used_gb,
-                    'percentage': memory_percentage,
-                    'description': f'Cluster Memory ({node_count} nodes)'
-                }
-            else:
-                metrics['memory'] = {
-                    'total_gb': cluster_ram_gb,
-                    'used_gb': 0.0,
-                    'percentage': 0.0,
-                    'description': 'Memory Utilization (no nodes available)'
-                }
-        except Exception as e:
-            logger.warning(f"Failed to fetch memory metrics: {e}")
+                    metrics['memory'] = {
+                        'total_gb': memory_total_gb,
+                        'used_gb': memory_used_gb,
+                        'percentage': memory_percentage,
+                        'description': f'Cluster Memory ({node_count} nodes)'
+                    }
+                else:
+                    metrics['memory'] = {
+                        'total_gb': cluster_ram_gb,
+                        'used_gb': 0.0,
+                        'percentage': 0.0,
+                        'description': 'Memory Utilization (no nodes available)'
+                    }
+            except Exception as e:
+                logger.warning(f"Failed to fetch memory metrics: {e}")
             metrics['memory'] = {
                 'total_gb': cluster_ram_gb,
                 'used_gb': 0.0,
