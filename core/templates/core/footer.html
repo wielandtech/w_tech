@@ -51,8 +51,8 @@ function fetchMetrics() {
                        html += `
                            <div class="metric-card">
                                <div class="metric-label">${data.memory.description}</div>
-                               <div class="metric-value">${data.memory.used_gb} / ${data.memory.total_gb} GB</div>
-                               <div class="metric-detail">${data.memory.percentage}%</div>
+                               <div class="metric-value">${data.memory.percentage}%</div>
+                               <div class="metric-detail">${data.memory.used_gb} / ${data.memory.total_gb} GB</div>
                                <div class="metric-bar">
                                    <div class="metric-bar-fill ${memoryClass}" style="width: ${Math.min(data.memory.percentage, 100)}%"></div>
                                </div>
