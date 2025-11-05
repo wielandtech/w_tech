@@ -329,12 +329,15 @@ def get_netdata_metrics(request):
             # Get memory utilization aggregated across nodes
             logger.warning("Starting memory metrics collection")
             try:
+                logger.warning("Memory section: initializing variables")
                 total_used_memory_mb = 0
                 total_total_memory_mb = 0
                 memory_node_count = 0
                 memory_data_points = []
 
+                logger.warning(f"Memory section: about to loop through {len(netdata_hosts)} nodes")
                 for node in netdata_hosts:
+                    logger.warning(f"Memory section: processing node {node}")
                     try:
                         memory_response = requests.get(
                             f"{netdata_url}/api/v1/data",
