@@ -330,7 +330,7 @@ def get_netdata_metrics(request):
             try:
                 total_used_memory_mb = 0
                 total_total_memory_mb = 0
-                node_count = 0
+                memory_node_count = 0
                 memory_data_points = []
 
                 for node in netdata_hosts:
@@ -364,7 +364,7 @@ def get_netdata_metrics(request):
 
                                     total_used_memory_mb += memory_used_mb
                                     total_total_memory_mb += node_total_mb
-                                    node_count += 1
+                                    memory_node_count += 1
 
                                     # Store data point for analysis
                                     memory_data_points.append({
@@ -377,7 +377,7 @@ def get_netdata_metrics(request):
                         logger.warning(f"Failed to fetch RAM from node {node}: {e}")
                         continue
 
-                if node_count > 0:
+                if memory_node_count > 0:
                     # Check if all nodes have identical data
                     if len(memory_data_points) > 1:
                         first_point = memory_data_points[0]
@@ -400,13 +400,13 @@ def get_netdata_metrics(request):
                     memory_used_gb = round(cluster_used_memory_mb / 1024, 1)
                     memory_total_gb = round(cluster_total_memory_mb / 1024, 1)
                     memory_percentage = round((cluster_used_memory_mb / cluster_total_memory_mb) * 100, 1) if cluster_total_memory_mb > 0 else 0
-                    logger.warning(f"Total Cluster Memory: {cluster_used_memory_mb}MB used, {cluster_total_memory_mb}MB total across {node_count} nodes, {memory_used_gb}GB used, {memory_total_gb}GB total, {memory_percentage}%")
+                    logger.warning(f"Total Cluster Memory: {cluster_used_memory_mb}MB used, {cluster_total_memory_mb}MB total across {memory_node_count} nodes, {memory_used_gb}GB used, {memory_total_gb}GB total, {memory_percentage}%")
 
                     metrics['memory'] = {
                         'total_gb': memory_total_gb,
                         'used_gb': memory_used_gb,
                         'percentage': memory_percentage,
-                        'description': f'Cluster Memory ({node_count} nodes)'
+                        'description': f'Cluster Memory ({memory_node_count} nodes)'
                     }
                 else:
                     metrics['memory'] = {
