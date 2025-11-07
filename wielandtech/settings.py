@@ -31,6 +31,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://www.wielandtech.com",
     "https://wielandtech.com",
     "https://wielandtech.k8s.local",
+    "http://wielandtech.k8s.local"
 ]
 
 SITE_ID = 1
