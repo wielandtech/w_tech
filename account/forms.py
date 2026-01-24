@@ -1,5 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
+from django_recaptcha.fields import ReCaptchaField
+from django_recaptcha.widgets import ReCaptchaV3
 
 from .models import Profile
 
@@ -26,6 +28,13 @@ class UserRegistrationForm(forms.ModelForm):
                                widget=forms.PasswordInput)
     password2 = forms.CharField(label='Repeat password',
                                 widget=forms.PasswordInput)
+    captcha = ReCaptchaField(
+        widget=ReCaptchaV3(
+            attrs={
+                'data-action': 'registration_form'
+            }
+        )
+    )
 
     class Meta:
         model = User

@@ -3,9 +3,127 @@
 {% block account_content %}
     <h1>Create an account</h1>
     <p>Please, sign up using the following form:</p>
-    <form method="post">
-        {{ user_form.as_p }}
+    <form method="post" class="registration-form">
         {% csrf_token %}
-        <p><input type="submit" value="Create my account"></p>
+
+        <div class="form-group">
+            <label for="{{ user_form.username.id_for_label }}">Username *</label>
+            {{ user_form.username }}
+            {% if user_form.username.errors %}
+                <div class="error-message">{{ user_form.username.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ user_form.first_name.id_for_label }}">First name</label>
+            {{ user_form.first_name }}
+            {% if user_form.first_name.errors %}
+                <div class="error-message">{{ user_form.first_name.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ user_form.email.id_for_label }}">Email *</label>
+            {{ user_form.email }}
+            {% if user_form.email.errors %}
+                <div class="error-message">{{ user_form.email.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ user_form.password.id_for_label }}">Password *</label>
+            {{ user_form.password }}
+            {% if user_form.password.errors %}
+                <div class="error-message">{{ user_form.password.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ user_form.password2.id_for_label }}">Repeat password *</label>
+            {{ user_form.password2 }}
+            {% if user_form.password2.errors %}
+                <div class="error-message">{{ user_form.password2.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group captcha-group">
+            {{ user_form.captcha }}
+            {% if user_form.captcha.errors %}
+                <div class="error-message">{{ user_form.captcha.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <p><input type="submit" value="Create my account" class="submit-btn"></p>
+        </div>
     </form>
+{% endblock %}
+
+{% block domready %}
+// Registration form ReCaptcha handling
+$(document).ready(function() {
+    $('.registration-form').on('submit', function(e) {
+        var $form = $(this);
+        var $submitBtn = $form.find('.submit-btn');
+
+        // Check if ReCaptcha token is already present
+        var $tokenInput = $form.find('input[name="g-recaptcha-response"]');
+        if ($tokenInput.length === 0 || !$tokenInput.val()) {
+            // Token not present, prevent submission and try to get one
+            e.preventDefault();
+
+            // Disable submit button to prevent multiple submissions
+            $submitBtn.prop('disabled', true).val('Verifying...');
+
+            // Check if grecaptcha is available
+            if (typeof grecaptcha !== 'undefined') {
+                // Wait a bit for ReCaptcha to initialize, then try to execute
+                setTimeout(function() {
+                    try {
+                        // For ReCaptchaV3, the token should be automatically generated
+                        // Let's check if it was created after a short delay
+                        var $tokenInput = $form.find('input[name="g-recaptcha-response"]');
+                        if ($tokenInput.length > 0 && $tokenInput.val()) {
+                            // Token is now present, submit the form
+                            $submitBtn.prop('disabled', false).val('Create my account');
+                            $form.off('submit'); // Remove this handler
+                            $form[0].submit(); // Submit normally
+                        } else {
+                            // Still no token, show error
+                            $submitBtn.prop('disabled', false).val('Create my account');
+
+                            var $messages = $form.closest('.content').find('.messages');
+                            if ($messages.length === 0) {
+                                $messages = $('<ul class="messages"></ul>');
+                                $form.closest('.content').prepend($messages);
+                            }
+                            $messages.html('<li class="error">Please wait for verification to complete, then try again.<a href="#" class="close">x</a></li>');
+                        }
+                    } catch (error) {
+                        console.error('ReCaptcha error:', error);
+                        $submitBtn.prop('disabled', false).val('Create my account');
+
+                        var $messages = $form.closest('.content').find('.messages');
+                        if ($messages.length === 0) {
+                            $messages = $('<ul class="messages"></ul>');
+                            $form.closest('.content').prepend($messages);
+                        }
+                        $messages.html('<li class="error">Anti-spam verification failed. Please try again.<a href="#" class="close">x</a></li>');
+                    }
+                }, 1000); // Wait 1 second for ReCaptcha to initialize
+            } else {
+                // ReCaptcha not loaded
+                $submitBtn.prop('disabled', false).val('Create my account');
+
+                var $messages = $form.closest('.content').find('.messages');
+                if ($messages.length === 0) {
+                    $messages = $('<ul class="messages"></ul>');
+                    $form.closest('.content').prepend($messages);
+                }
+                $messages.html('<li class="error">Anti-spam verification not available. Please try again later.<a href="#" class="close">x</a></li>');
+            }
+        }
+        // If token is already present, allow normal submission
+    });
+});
 {% endblock %}
