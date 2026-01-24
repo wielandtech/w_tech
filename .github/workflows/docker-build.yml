@@ -23,6 +23,17 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
     
+    - name: Set version vars
+      id: vars
+      run: |
+        DATE=$(date +'%Y.%m.%d')
+        SHA=$(git rev-parse --short HEAD)
+        echo "date=$DATE" >> $GITHUB_OUTPUT
+        echo "sha=$SHA" >> $GITHUB_OUTPUT
+        if [ "${{ github.event_name }}" == "push" ] && [ "${{ github.ref }}" == "refs/heads/main" ]; then
+          echo "versioned_tag=ghcr.io/wielandtech/w_tech:${DATE}-${SHA}" >> $GITHUB_OUTPUT
+        fi
+    
     - name: Extract metadata
       id: meta
       uses: docker/metadata-action@v5
@@ -38,8 +49,10 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         context: .
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}
+        push: ${{ github.event_name != 'pull_request' }}
+        tags: |
+          ${{ steps.meta.outputs.tags }}
+          ${{ steps.vars.outputs.versioned_tag }}
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
