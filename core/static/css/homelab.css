@@ -40,6 +40,41 @@
     color: var(--text-primary);
 }
 
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.section-header h2 {
+    margin-bottom: 0;
+}
+
+.section-repo-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.75rem;
+    background: var(--background-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.section-repo-link:hover {
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+}
+
+.section-repo-link svg {
+    flex-shrink: 0;
+}
+
 .homelab-section > p {
     color: var(--text-secondary);
     line-height: 1.6;
