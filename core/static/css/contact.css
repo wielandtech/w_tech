@@ -69,12 +69,13 @@
 
 .form-control:focus {
     outline: none;
-    border-color: var(--accent-color);
-    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(53, 168, 156, 0.2);
 }
 
 .form-control::placeholder {
-    color: var(--text-muted);
+    color: var(--text-secondary);
+    opacity: 0.6;
 }
 
 textarea.form-control {
@@ -89,26 +90,33 @@ textarea.form-control {
 /* reCAPTCHA v3 is invisible, so no special styling needed */
 
 .submit-btn {
-    background: var(--accent-color);
-    color: white;
+    background: var(--accent-primary);
+    color: #FDFFFC;
     border: none;
     padding: 1rem 2rem;
     font-size: 1rem;
     font-weight: 600;
     border-radius: 4px;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
 .submit-btn:hover {
-    background: var(--accent-hover);
+    background: #2a8c82;
     transform: translateY(-1px);
+    box-shadow: 0 4px 12px var(--shadow-color);
 }
 
 .submit-btn:active {
     transform: translateY(0);
+}
+
+.submit-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
 }
 
 /* Messages */
