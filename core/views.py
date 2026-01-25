@@ -338,62 +338,55 @@ def get_netdata_metrics(request):
                 'description': 'Running Pods (error)'
             }
 
-        # Get network metrics aggregated across nodes
-        # system.net returns bandwidth in kilobits/s (received/sent)
-        network_debug = []
+        # Get network metrics using API v2 with net.net context (aggregates all interfaces)
+        # Values are in kilobits/s, sent values are negative
         try:
-            total_received_kbps = 0
-            total_sent_kbps = 0
-            network_node_count = 0
+            net_response = requests.get(
+                f"{netdata_url}/api/v2/data",
+                params={
+                    'contexts': 'net.net',
+                    'nodes': ','.join(netdata_hosts),
+                    'points': 1
+                },
+                timeout=timeout
+            )
 
-            for node in netdata_hosts:
-                node_info = {'node': node}
-                try:
-                    net_response = requests.get(
-                        f"{netdata_url}/api/v1/data",
-                        params={'chart': 'system.net', 'node': node, 'points': 1, 'after': -10},
-                        timeout=timeout
-                    )
-                    node_info['status'] = net_response.status_code
+            if net_response.status_code == 200:
+                net_data = net_response.json()
+                # API v2 returns result.data with format [timestamp, [received, arp, pa], [sent, arp, pa]]
+                if 'result' in net_data and 'data' in net_data['result'] and len(net_data['result']['data']) > 0:
+                    latest = net_data['result']['data'][0]
+                    # Format: [timestamp, [received_value, ...], [sent_value, ...]]
+                    received_kbps = 0
+                    sent_kbps = 0
+                    if len(latest) >= 3:
+                        # received is positive, sent is negative in netdata
+                        if isinstance(latest[1], list) and len(latest[1]) > 0:
+                            received_kbps = abs(latest[1][0]) if isinstance(latest[1][0], (int, float)) else 0
+                        if isinstance(latest[2], list) and len(latest[2]) > 0:
+                            sent_kbps = abs(latest[2][0]) if isinstance(latest[2][0], (int, float)) else 0
 
-                    if net_response.status_code == 200:
-                        net_data = net_response.json()
-                        node_info['raw_response'] = net_data
-                        if 'data' in net_data and len(net_data['data']) > 0:
-                            latest = net_data['data'][0]
-                            node_info['latest'] = latest
-                            if len(latest) >= 3:  # timestamp, received, sent
-                                # Values are in kilobits/s
-                                received_kbps = abs(latest[1]) if isinstance(latest[1], (int, float)) else 0
-                                sent_kbps = abs(latest[2]) if isinstance(latest[2], (int, float)) else 0
-                                node_info['received_kbps'] = received_kbps
-                                node_info['sent_kbps'] = sent_kbps
-                                total_received_kbps += received_kbps
-                                total_sent_kbps += sent_kbps
-                                network_node_count += 1
-                    else:
-                        node_info['error'] = net_response.text[:200]
-                except Exception as e:
-                    node_info['exception'] = str(e)
-                    logger.warning(f"Failed to fetch network from node {node}: {e}")
-                network_debug.append(node_info)
+                    # Convert kilobits/s to Mbps (1 Mbps = 1000 kbps)
+                    received_mbps = round(received_kbps / 1000, 2)
+                    sent_mbps = round(sent_kbps / 1000, 2)
 
-            if network_node_count > 0:
-                # Convert kilobits/s to Mbps (1 Mbps = 1000 kbps)
-                received_mbps = round(total_received_kbps / 1000, 2)
-                sent_mbps = round(total_sent_kbps / 1000, 2)
-                metrics['network'] = {
-                    'bandwidth_mbps': round(received_mbps + sent_mbps, 2),
-                    'received_mbps': received_mbps,
-                    'sent_mbps': sent_mbps,
-                    'description': f'Cluster Network ({network_node_count} nodes)',
-                    'debug': network_debug
-                }
+                    # Count how many nodes contributed
+                    node_count = len(net_data.get('summary', {}).get('nodes', [])) or len(netdata_hosts)
+
+                    metrics['network'] = {
+                        'bandwidth_mbps': round(received_mbps + sent_mbps, 2),
+                        'received_mbps': received_mbps,
+                        'sent_mbps': sent_mbps,
+                        'description': f'Cluster Network ({node_count} nodes)'
+                    }
+                else:
+                    metrics['network'] = None
             else:
-                metrics['network'] = {'debug': network_debug}
+                logger.warning(f"Network API returned status {net_response.status_code}")
+                metrics['network'] = None
         except Exception as e:
             logger.warning(f"Failed to fetch network metrics: {e}")
-            metrics['network'] = {'error': str(e), 'debug': network_debug}
+            metrics['network'] = None
 
         # Temporarily disable caching for debugging
         # cache.set('netdata_metrics', metrics, 5)
