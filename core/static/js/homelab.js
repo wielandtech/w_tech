@@ -20,7 +20,8 @@ function fetchMetrics() {
             
             let html = '<div class="metrics-grid">';
 
-            // CPU Card
+            // Row 1: Utilization metrics
+            // CPU Utilization Card
             if (data.cpu !== null) {
                 const cpuClass = data.cpu.percentage > 80 ? 'critical' : (data.cpu.percentage > 60 ? 'warning' : '');
                 html += `
@@ -35,7 +36,7 @@ function fetchMetrics() {
                 `;
             }
 
-            // Memory Card
+            // Memory Utilization Card
             if (data.memory !== null) {
                 const memoryClass = data.memory.percentage > 85 ? 'critical' : (data.memory.percentage > 70 ? 'warning' : '');
                 html += `
@@ -50,26 +51,13 @@ function fetchMetrics() {
                 `;
             }
 
-            // Pods Card
-            if (data.pods !== null) {
-                html += `
-                    <div class="metric-card">
-                        <div class="metric-label">${data.pods.description}</div>
-                        <div class="metric-value">${data.pods.count}</div>
-                        <div class="metric-detail">in cluster</div>
-                    </div>
-                `;
-            }
-
-            // Network Card
+            // Network Utilization Card
             if (data.network !== null) {
                 let networkValue, networkDetail;
                 if (data.network.bandwidth_mbps !== undefined) {
-                    // Bandwidth metrics
                     networkValue = `${data.network.bandwidth_mbps} Mbps`;
                     networkDetail = `↑${data.network.sent_mbps} ↓${data.network.received_mbps} Mbps`;
                 } else {
-                    // Fallback
                     networkValue = 'N/A';
                     networkDetail = 'metrics unavailable';
                 }
@@ -94,7 +82,20 @@ function fetchMetrics() {
                 `;
             }
 
-            // Uptime Card
+            // Row 2: Other metrics (CPU Temp under CPU Util)
+            // CPU Temperature Card
+            if (data.temperature !== null) {
+                const tempClass = data.temperature.max_celsius > 80 ? 'critical' : (data.temperature.max_celsius > 65 ? 'warning' : '');
+                html += `
+                    <div class="metric-card">
+                        <div class="metric-label">${data.temperature.description}</div>
+                        <div class="metric-value ${tempClass}">${data.temperature.avg_celsius}°C</div>
+                        <div class="metric-detail">peak ${data.temperature.max_celsius}°C</div>
+                    </div>
+                `;
+            }
+
+            // Cluster Uptime Card
             if (data.uptime !== null) {
                 html += `
                     <div class="metric-card">
@@ -105,14 +106,13 @@ function fetchMetrics() {
                 `;
             }
 
-            // Temperature Card
-            if (data.temperature !== null) {
-                const tempClass = data.temperature.max_celsius > 80 ? 'critical' : (data.temperature.max_celsius > 65 ? 'warning' : '');
+            // Pods Running Card
+            if (data.pods !== null) {
                 html += `
                     <div class="metric-card">
-                        <div class="metric-label">${data.temperature.description}</div>
-                        <div class="metric-value ${tempClass}">${data.temperature.avg_celsius}°C</div>
-                        <div class="metric-detail">peak ${data.temperature.max_celsius}°C</div>
+                        <div class="metric-label">${data.pods.description}</div>
+                        <div class="metric-value">${data.pods.count}</div>
+                        <div class="metric-detail">in cluster</div>
                     </div>
                 `;
             }
