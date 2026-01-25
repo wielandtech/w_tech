@@ -395,22 +395,32 @@ ul {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
   max-width: 1200px;
   margin: 0 auto;
-  gap: 10px;
+}
+
+.footer-left,
+.footer-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.footer-left {
+  justify-content: flex-start;
+}
+
+.footer-right {
+  justify-content: flex-end;
+}
+
+.footer-center {
+  flex: 1;
+  text-align: center;
 }
 
 .footer-content h3 {
   margin: 0;
-}
-
-.footer-weather {
-  font-size: 0.9em;
-  opacity: 0.9;
-  display: flex;
-  align-items: center;
-  gap: 5px;
 }
 
 .weather-icon {
@@ -420,13 +430,13 @@ ul {
 .weather-location {
   font-size: 0.85em;
   opacity: 0.8;
-  margin-left: 5px;
 }
 
 .weather-temp-display {
   display: flex;
   align-items: center;
   gap: 3px;
+  font-size: 0.9em;
 }
 
 /* Wind Compass Rose Styles */
@@ -434,7 +444,6 @@ ul {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin: 0 15px;
 }
 
 .compass-rose {
@@ -476,16 +485,19 @@ ul {
   .footer-content {
     flex-direction: column;
     text-align: center;
+    gap: 15px;
   }
   
-  .footer-weather {
-    margin-top: 10px;
-    flex-direction: column;
-    gap: 10px;
+  .footer-left,
+  .footer-center,
+  .footer-right {
+    flex: none;
+    width: 100%;
+    justify-content: center;
   }
   
   .wind-compass {
-    margin: 10px 0;
+    justify-content: center;
   }
   
   .wind-info {
