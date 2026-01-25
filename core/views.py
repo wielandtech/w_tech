@@ -216,7 +216,7 @@ def get_netdata_metrics(request):
                 metrics['cpu'] = {
                     'percentage': round(avg_cpu_percentage, 1),
                     'total_cores': cluster_cores,
-                    'description': f'CPU Utilization ({node_count} nodes)'
+                    'description': 'CPU Utilization'
                 }
             else:
                 metrics['cpu'] = {
@@ -284,7 +284,7 @@ def get_netdata_metrics(request):
                     'total_gb': memory_total_gb,
                     'used_gb': memory_used_gb,
                     'percentage': memory_percentage,
-                    'description': f'Cluster Memory ({memory_node_count} nodes)'
+                    'description': 'Cluster Memory'
                 }
             else:
                 metrics['memory'] = {
@@ -328,19 +328,19 @@ def get_netdata_metrics(request):
 
                 metrics['pods'] = {
                     'count': running_pods,
-                    'description': 'Running Pods'
+                    'description': 'Pods Running'
                 }
             else:
                 logger.warning(f"Pods API returned status {pods_response.status_code}")
                 metrics['pods'] = {
                     'count': 0,
-                    'description': 'Running Pods (unavailable)'
+                    'description': 'Pods Running (unavailable)'
                 }
         except Exception as e:
             logger.warning(f"Failed to fetch pod counts: {e}")
             metrics['pods'] = {
                 'count': 0,
-                'description': 'Running Pods (error)'
+                'description': 'Pods Running (error)'
             }
 
         # Get network metrics using API v2 with net.net context (aggregates all interfaces)
@@ -383,7 +383,7 @@ def get_netdata_metrics(request):
                         'bandwidth_mbps': round(received_mbps + sent_mbps, 2),
                         'received_mbps': received_mbps,
                         'sent_mbps': sent_mbps,
-                        'description': f'Cluster Network ({node_count} nodes)'
+                        'description': 'Cluster Network'
                     }
                 else:
                     metrics['network'] = None
