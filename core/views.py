@@ -297,40 +297,42 @@ def get_netdata_metrics(request):
                 'description': 'Memory Utilization (error)'
             }
 
-        # Get pod count from k8s_state collector using node_pods_phase chart
+        # Get pod count from k8s_state collector using API v2 with context aggregation
         try:
-            # Use k8s_state.node_pods_phase with dimensions=running to get running pod count
+            # Use API v2 with contexts to get running pods across all nodes
+            # The k8s_state.node_pods_phase context spans multiple nodes
             pods_response = requests.get(
-                f"{netdata_url}/api/v1/data",
+                f"{netdata_url}/api/v2/data",
                 params={
-                    'chart': 'k8s_state.node_pods_phase',
-                    'points': 1,
-                    'dimensions': 'running'
+                    'contexts': 'k8s_state.node_pods_phase',
+                    'dimensions': 'running',
+                    'points': 1
                 },
                 timeout=timeout
             )
 
-            logger.warning(f"Pods API call: {netdata_url}/api/v1/data?chart=k8s_state.node_pods_phase&points=1&dimensions=running")
+            logger.warning(f"Pods API call: {netdata_url}/api/v2/data?contexts=k8s_state.node_pods_phase&dimensions=running&points=1")
             logger.warning(f"Pods response status: {pods_response.status_code}")
 
             if pods_response.status_code == 200:
                 pods_data = pods_response.json()
-                logger.warning(f"Pods response data: {pods_data}")
-                if 'data' in pods_data and len(pods_data['data']) > 0:
-                    latest = pods_data['data'][0]
-                    logger.warning(f"Pods latest data: {latest}")
-                    # The running dimension value is at index 1 (after timestamp)
-                    running_pods = int(latest[1]) if len(latest) > 1 and isinstance(latest[1], (int, float)) else 0
-                    logger.warning(f"Pods count: {running_pods}")
-                    metrics['pods'] = {
-                        'count': running_pods,
-                        'description': 'Running Pods'
-                    }
-                else:
-                    metrics['pods'] = {
-                        'count': 0,
-                        'description': 'Running Pods (no data)'
-                    }
+                logger.warning(f"Pods response data keys: {pods_data.keys() if isinstance(pods_data, dict) else 'not a dict'}")
+
+                # API v2 returns summary.instances with per-node data
+                # Sum the 'avg' (which is current value) from each instance
+                running_pods = 0
+                if 'summary' in pods_data and 'instances' in pods_data['summary']:
+                    for instance in pods_data['summary']['instances']:
+                        # Each instance has 'sts' with 'avg' being the current value
+                        if 'sts' in instance and 'avg' in instance['sts']:
+                            running_pods += int(instance['sts']['avg'])
+                        logger.warning(f"Instance {instance.get('id', 'unknown')}: {instance.get('sts', {}).get('avg', 0)} pods")
+
+                logger.warning(f"Total running pods: {running_pods}")
+                metrics['pods'] = {
+                    'count': running_pods,
+                    'description': 'Running Pods'
+                }
             else:
                 logger.warning(f"Pods API returned status {pods_response.status_code}")
                 metrics['pods'] = {
