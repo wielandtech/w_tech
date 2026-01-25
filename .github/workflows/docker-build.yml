@@ -26,14 +26,16 @@ jobs:
     - name: Set version vars
       id: vars
       run: |
-        DATE=$(date +'%Y.%m.%d')
+        DATE=$(date +'%Y%m%d')
+        TIME=$(date +'%H%M%S')
         SHA=$(git rev-parse --short HEAD)
         echo "date=$DATE" >> $GITHUB_OUTPUT
+        echo "time=$TIME" >> $GITHUB_OUTPUT
         echo "sha=$SHA" >> $GITHUB_OUTPUT
         echo "event_name=${{ github.event_name }}" >> $GITHUB_OUTPUT
         echo "ref=${{ github.ref }}" >> $GITHUB_OUTPUT
         if [ "${{ github.event_name }}" == "push" ] && [ "${{ github.ref }}" == "refs/heads/main" ]; then
-          VERSIONED_TAG="ghcr.io/wielandtech/w_tech:${DATE}-${SHA}"
+          VERSIONED_TAG="ghcr.io/wielandtech/w_tech:${DATE}-${TIME}-${SHA}"
           echo "versioned_tag=${VERSIONED_TAG}" >> $GITHUB_OUTPUT
           echo "Created versioned tag: ${VERSIONED_TAG}"
         else
@@ -50,7 +52,7 @@ jobs:
           type=ref,event=pr
           type=sha,prefix={{branch}}-
           type=raw,value=latest,enable={{is_default_branch}}
-          type=raw,value=${{ steps.vars.outputs.date }}-${{ steps.vars.outputs.sha }},enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          type=raw,value=${{ steps.vars.outputs.date }}-${{ steps.vars.outputs.time }}-${{ steps.vars.outputs.sha }},enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     
     - name: Build and push Docker image
       uses: docker/build-push-action@v5
