@@ -393,10 +393,11 @@ ul {
 
 .footer-content {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   flex-wrap: wrap;
   max-width: 1200px;
+  position: relative;
   margin: 0 auto;
   gap: 10px;
 }
@@ -411,16 +412,12 @@ ul {
   display: flex;
   align-items: center;
   gap: 5px;
+  position: absolute;
+  right: 0;
 }
 
 .weather-icon {
   font-size: 1.2em;
-}
-
-.weather-location {
-  font-size: 0.85em;
-  opacity: 0.8;
-  margin-left: 5px;
 }
 
 @media screen and (max-width: 600px) {
@@ -430,6 +427,7 @@ ul {
   }
   
   .footer-weather {
+    position: static;
     margin-top: 10px;
   }
 }

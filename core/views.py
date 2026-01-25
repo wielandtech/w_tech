@@ -689,7 +689,6 @@ def get_weather_data(request):
                 weather = {
                     'temperature_c': round(temp_celsius, 1),
                     'temperature_f': temp_fahrenheit,
-                    'location': 'Norton Shores, MI',
                     'status': 'ok',
                     'cache_hit': False
                 }
