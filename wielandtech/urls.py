@@ -28,6 +28,7 @@ sitemaps = {
 }
 
 urlpatterns = [
+    path('', include('django_prometheus.urls')),  # Prometheus metrics at /metrics
     path('', include('core.urls')),
     path('account/', include('account.urls', namespace='account')),
     path('account/', include('django.contrib.auth.urls')),

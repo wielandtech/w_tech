@@ -38,6 +38,7 @@ SITE_ID = 1
 
 # Application definition
 INSTALLED_APPS = [
+    'django_prometheus',  # Prometheus monitoring (must be first)
     'account.apps.AccountConfig',
     'actions.apps.ActionsConfig',
     'django.contrib.admin',
@@ -56,9 +57,11 @@ INSTALLED_APPS = [
     'images.apps.ImagesConfig',
     'easy_thumbnails',
     'django_recaptcha',
+    'django_prometheus',  # Prometheus monitoring (must also be last for DB instrumentation)
 ]
 
 MIDDLEWARE = [
+    'django_prometheus.middleware.PrometheusBeforeMiddleware',  # Prometheus (must be first)
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -70,6 +73,7 @@ MIDDLEWARE = [
     # Custom security middleware
     'wielandtech.middleware.RestrictAdminMiddleware',
     'wielandtech.middleware.SecurityHeadersMiddleware',
+    'django_prometheus.middleware.PrometheusAfterMiddleware',  # Prometheus (must be last)
 ]
 
 ROOT_URLCONF = 'wielandtech.urls'
