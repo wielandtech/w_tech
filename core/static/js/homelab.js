@@ -113,5 +113,5 @@ function fetchMetrics() {
 // Initial fetch
 fetchMetrics();
 
-// Refresh every 5 seconds
-setInterval(fetchMetrics, 5000);
+// Refresh every second
+setInterval(fetchMetrics, 1000);
