@@ -1,0 +1,31 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Homelab - WielandTech{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/metrics.css' %}">
+<link rel="stylesheet" href="{% static 'css/homelab.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="homelab-container">
+    <div class="homelab-header">
+        <h1>Homelab Dashboard</h1>
+        <p>Real-time monitoring of my Kubernetes cluster running on Proxmox. These metrics are pulled directly from Netdata agents running across the cluster nodes.</p>
+    </div>
+
+    <div class="cluster-info">
+        <h2>Cluster Overview</h2>
+        <p>This dashboard displays live statistics from a 3-node Kubernetes cluster. The metrics are aggregated across all nodes and updated every 5 seconds.</p>
+    </div>
+
+    <div class="metrics-container" id="metrics-container">
+        <div id="metrics-content">
+            <div class="metrics-loading">Loading metrics...</div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/homelab.js' %}"></script>
+{% endblock %}

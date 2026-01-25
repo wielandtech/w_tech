@@ -16,6 +16,11 @@ def homepage(request):
     return render(request, 'core/index.html')
 
 
+def homelab(request):
+    """Homelab dashboard page displaying cluster metrics."""
+    return render(request, 'core/homelab.html')
+
+
 def contact(request):
     """Contact page view with form handling and email sending."""
     from .forms import ContactForm
