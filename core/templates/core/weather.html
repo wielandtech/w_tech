@@ -1,0 +1,122 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Weather Station - WielandTech{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/weather.css' %}">
+{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="weather-container">
+    <div class="weather-header">
+        <h1>Weather Station</h1>
+        <p>Live weather data from Norton Shores, Michigan</p>
+    </div>
+
+    <!-- Current Conditions Section -->
+    <div class="weather-section">
+        <div class="section-header">
+            <h2>Current Conditions</h2>
+            <span class="update-time" id="update-time">--</span>
+        </div>
+        <div id="current-conditions">
+            <div class="conditions-loading">Loading weather data...</div>
+        </div>
+    </div>
+
+    <!-- Wind Section with Compass -->
+    <div class="weather-section">
+        <h2>Wind</h2>
+        <div class="wind-section" id="wind-section">
+            <div class="wind-compass-large">
+                <svg viewBox="0 0 200 200" class="compass-rose-large">
+                    <!-- Outer circle -->
+                    <circle cx="100" cy="100" r="90" class="compass-outer"/>
+                    <!-- Inner circle -->
+                    <circle cx="100" cy="100" r="70" class="compass-inner"/>
+                    <!-- Cardinal directions -->
+                    <text x="100" y="25" class="cardinal-large">N</text>
+                    <text x="175" y="105" class="cardinal-large">E</text>
+                    <text x="100" y="190" class="cardinal-large">S</text>
+                    <text x="25" y="105" class="cardinal-large">W</text>
+                    <!-- Intercardinal directions -->
+                    <text x="155" y="50" class="intercardinal">NE</text>
+                    <text x="155" y="160" class="intercardinal">SE</text>
+                    <text x="40" y="160" class="intercardinal">SW</text>
+                    <text x="40" y="50" class="intercardinal">NW</text>
+                    <!-- Tick marks -->
+                    <g class="tick-marks">
+                        <line x1="100" y1="15" x2="100" y2="25"/>
+                        <line x1="100" y1="175" x2="100" y2="185"/>
+                        <line x1="15" y1="100" x2="25" y2="100"/>
+                        <line x1="175" y1="100" x2="185" y2="100"/>
+                    </g>
+                    <!-- Wind arrow -->
+                    <g id="wind-arrow-large" transform="rotate(0, 100, 100)">
+                        <polygon points="100,25 90,70 100,60 110,70" class="arrow-large"/>
+                        <line x1="100" y1="60" x2="100" y2="140" class="arrow-stem"/>
+                    </g>
+                </svg>
+            </div>
+            <div class="wind-info-large">
+                <div class="wind-speed-display">
+                    <span class="wind-speed-value" id="wind-speed-large">--</span>
+                    <span class="wind-speed-unit">mph</span>
+                </div>
+                <div class="wind-direction-display">
+                    <span id="wind-cardinal-large">--</span>
+                    <span class="wind-degrees">(<span id="wind-degrees">--</span>°)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Historical Charts Section -->
+    <div class="weather-section">
+        <div class="section-header">
+            <h2>Historical Data</h2>
+            <div class="period-toggle">
+                <button class="period-btn active" data-period="24h">24 Hours</button>
+                <button class="period-btn" data-period="7d">7 Days</button>
+            </div>
+        </div>
+        <div class="charts-container">
+            <div class="chart-wrapper">
+                <h3>Temperature</h3>
+                <canvas id="temperature-chart"></canvas>
+            </div>
+            <div class="chart-wrapper">
+                <h3>Wind Speed</h3>
+                <canvas id="wind-chart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Station Info Section -->
+    <div class="weather-section station-info">
+        <h2>About This Station</h2>
+        <p>This weather station is located in Norton Shores, Michigan (near Muskegon). Data is collected by a personal weather station connected to Home Assistant and exposed via Prometheus metrics.</p>
+        <div class="station-details">
+            <div class="detail-item">
+                <span class="detail-label">Location</span>
+                <span class="detail-value">Norton Shores, MI</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Data Source</span>
+                <span class="detail-value">Home Assistant</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Update Interval</span>
+                <span class="detail-value">~1 minute</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/weather.js' %}"></script>
+{% endblock %}
