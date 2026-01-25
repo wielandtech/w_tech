@@ -490,14 +490,15 @@ def get_netdata_metrics(request):
             logger.warning(f"Failed to fetch uptime metrics: {e}")
             metrics['uptime'] = None
 
-        # Get CPU temperature using API v2 with sensors context
+        # Get CPU temperature using the correct context from Netdata
         try:
             temps = []
-            # Use API v2 to query temperature contexts across all nodes
+            
+            # Use API v2 with the correct context for temperature sensors
             temp_response = requests.get(
                 f"{netdata_url}/api/v2/data",
                 params={
-                    'contexts': 'sensors.temperature',
+                    'contexts': 'system.hw.sensor.temperature.input',
                     'nodes': ','.join(netdata_hosts),
                     'points': 1
                 },
@@ -506,56 +507,31 @@ def get_netdata_metrics(request):
 
             if temp_response.status_code == 200:
                 temp_data = temp_response.json()
-                logger.warning(f"Temperature API v2 response: {temp_data}")
                 
-                # Extract temperatures from summary instances
-                if 'summary' in temp_data and 'instances' in temp_data['summary']:
+                # Extract temperatures from dimensions - look for Package or Core temps
+                if 'summary' in temp_data and 'dimensions' in temp_data['summary']:
+                    for dim in temp_data['summary']['dimensions']:
+                        dim_id = dim.get('id', '').lower()
+                        # Prioritize Package temps (overall CPU temp), also accept Core temps
+                        if 'package' in dim_id or 'coretemp' in dim_id:
+                            if 'sts' in dim and 'avg' in dim['sts']:
+                                temp_val = dim['sts']['avg']
+                                if isinstance(temp_val, (int, float)) and 20 < temp_val < 120:
+                                    temps.append(temp_val)
+                
+                # If no package temps found, try instances
+                if not temps and 'summary' in temp_data and 'instances' in temp_data['summary']:
                     for instance in temp_data['summary']['instances']:
-                        if 'sts' in instance and 'avg' in instance['sts']:
-                            temp_val = instance['sts']['avg']
-                            if isinstance(temp_val, (int, float)) and temp_val > 0:
-                                temps.append(temp_val)
+                        inst_id = instance.get('id', '').lower()
+                        if 'package' in inst_id or 'coretemp' in inst_id:
+                            if 'sts' in instance and 'avg' in instance['sts']:
+                                temp_val = instance['sts']['avg']
+                                if isinstance(temp_val, (int, float)) and 20 < temp_val < 120:
+                                    temps.append(temp_val)
                 
-                # Also try to get from result data if available
-                if not temps and 'result' in temp_data and 'data' in temp_data['result']:
-                    if len(temp_data['result']['data']) > 0:
-                        latest = temp_data['result']['data'][0]
-                        for val in latest[1:]:
-                            if isinstance(val, (int, float)) and 20 < val < 120:
-                                temps.append(val)
-                            elif isinstance(val, list):
-                                for v in val:
-                                    if isinstance(v, (int, float)) and 20 < v < 120:
-                                        temps.append(v)
+                logger.warning(f"Temperature data found: {len(temps)} readings")
             else:
                 logger.warning(f"Temperature API v2 returned status {temp_response.status_code}")
-                
-                # Fallback to API v1 with various chart names
-                for node in netdata_hosts:
-                    for chart_name in [
-                        'sensors.coretemp_isa_0000_temperature',
-                        'sensors.coretemp-isa-0000_temperature',
-                        'sensors.cpu_thermal-virtual-0_temperature',
-                        'sensors.acpitz-acpi-0_temperature',
-                        'sensors.k10temp-pci-00c3_temperature'
-                    ]:
-                        try:
-                            temp_response = requests.get(
-                                f"{netdata_url}/api/v1/data",
-                                params={'chart': chart_name, 'node': node, 'points': 1, 'after': -10},
-                                timeout=timeout
-                            )
-                            if temp_response.status_code == 200:
-                                temp_data = temp_response.json()
-                                if 'data' in temp_data and len(temp_data['data']) > 0:
-                                    latest = temp_data['data'][0]
-                                    core_temps = [v for v in latest[1:] if isinstance(v, (int, float)) and 20 < v < 120]
-                                    if core_temps:
-                                        temps.append(max(core_temps))
-                                        logger.warning(f"Found temperature {max(core_temps)} from {chart_name} on {node}")
-                                        break
-                        except Exception:
-                            continue
 
             if temps:
                 avg_temp = round(sum(temps) / len(temps), 1)
@@ -566,9 +542,9 @@ def get_netdata_metrics(request):
                     'node_count': len(temps),
                     'description': 'CPU Temperature'
                 }
-                logger.warning(f"Temperature metrics: avg={avg_temp}, max={max_temp}, nodes={len(temps)}")
+                logger.warning(f"Temperature metrics: avg={avg_temp}, max={max_temp}, readings={len(temps)}")
             else:
-                logger.warning("No temperature data found from any source")
+                logger.warning("No CPU temperature data found from context")
         except Exception as e:
             logger.warning(f"Failed to fetch temperature metrics: {e}")
             metrics['temperature'] = None
