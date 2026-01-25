@@ -56,7 +56,7 @@ function fetchMetrics() {
                 let networkValue, networkDetail;
                 if (data.network.bandwidth_mbps !== undefined) {
                     networkValue = `${data.network.bandwidth_mbps} Mbps`;
-                    networkDetail = `↑${data.network.sent_mbps} ↓${data.network.received_mbps} Mbps`;
+                    networkDetail = `↑ ${data.network.sent_mbps} · ↓ ${data.network.received_mbps} Mbps`;
                 } else {
                     networkValue = 'N/A';
                     networkDetail = 'metrics unavailable';
@@ -77,7 +77,7 @@ function fetchMetrics() {
                     <div class="metric-card">
                         <div class="metric-label">${data.disk_io.description}</div>
                         <div class="metric-value">${data.disk_io.total_mbps} MB/s</div>
-                        <div class="metric-detail">↑${data.disk_io.write_mbps} ↓${data.disk_io.read_mbps} MB/s</div>
+                        <div class="metric-detail">↑ ${data.disk_io.write_mbps} · ↓ ${data.disk_io.read_mbps} MB/s</div>
                     </div>
                 `;
             }
@@ -91,17 +91,6 @@ function fetchMetrics() {
                         <div class="metric-label">${data.temperature.description}</div>
                         <div class="metric-value ${tempClass}">${data.temperature.avg_celsius}°C</div>
                         <div class="metric-detail">peak ${data.temperature.max_celsius}°C</div>
-                    </div>
-                `;
-            }
-
-            // Cluster Uptime Card
-            if (data.uptime !== null) {
-                html += `
-                    <div class="metric-card">
-                        <div class="metric-label">${data.uptime.description}</div>
-                        <div class="metric-value">${data.uptime.formatted}</div>
-                        <div class="metric-detail">since last reboot</div>
                     </div>
                 `;
             }
@@ -126,6 +115,17 @@ function fetchMetrics() {
                         <div class="metric-label">${data.deployments.description}</div>
                         <div class="metric-value ${deployClass}">${data.deployments.healthy}/${data.deployments.total}</div>
                         <div class="metric-detail">${deployDetail}</div>
+                    </div>
+                `;
+            }
+
+            // Cluster Uptime Card
+            if (data.uptime !== null) {
+                html += `
+                    <div class="metric-card">
+                        <div class="metric-label">${data.uptime.description}</div>
+                        <div class="metric-value">${data.uptime.formatted}</div>
+                        <div class="metric-detail">since last reboot</div>
                     </div>
                 `;
             }
