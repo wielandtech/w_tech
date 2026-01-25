@@ -5,6 +5,27 @@ from django.http import HttpResponseForbidden
 from django.conf import settings
 
 
+class AllowMetricsEndpointMiddleware:
+    """
+    Allow /metrics endpoint to bypass ALLOWED_HOSTS validation.
+    This is necessary for Prometheus scraping which connects via pod IP.
+    Must be placed BEFORE SecurityMiddleware in MIDDLEWARE list.
+    """
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        # For the metrics endpoint, set a flag to bypass host validation
+        # by temporarily allowing any host for this specific path
+        if request.path == '/metrics' or request.path == '/metrics/':
+            # Set the HTTP_HOST to an allowed value for metrics requests
+            # This allows Prometheus to scrape via pod IP
+            request.META['HTTP_HOST'] = 'localhost'
+        
+        response = self.get_response(request)
+        return response
+
+
 class RestrictAdminMiddleware:
     """
     Restrict Django admin access to internal domains only.
