@@ -393,11 +393,10 @@ ul {
 
 .footer-content {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
   max-width: 1200px;
-  position: relative;
   margin: 0 auto;
   gap: 10px;
 }
@@ -412,12 +411,65 @@ ul {
   display: flex;
   align-items: center;
   gap: 5px;
-  position: absolute;
-  right: 0;
 }
 
 .weather-icon {
   font-size: 1.2em;
+}
+
+.weather-location {
+  font-size: 0.85em;
+  opacity: 0.8;
+  margin-left: 5px;
+}
+
+.weather-temp-display {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+/* Wind Compass Rose Styles */
+.wind-compass {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 15px;
+}
+
+.compass-rose {
+  width: 50px;
+  height: 50px;
+}
+
+.compass-circle {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.3);
+  stroke-width: 2;
+}
+
+.compass-rose .cardinal {
+  font-size: 10px;
+  fill: rgba(255, 255, 255, 0.8);
+  text-anchor: middle;
+  dominant-baseline: middle;
+  font-family: sans-serif;
+}
+
+.compass-rose .arrow {
+  fill: #FDFFFC;
+}
+
+#wind-arrow {
+  transition: transform 0.5s ease;
+}
+
+.wind-info {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.85em;
+  line-height: 1.3;
+  text-align: left;
 }
 
 @media screen and (max-width: 600px) {
@@ -427,8 +479,17 @@ ul {
   }
   
   .footer-weather {
-    position: static;
     margin-top: 10px;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .wind-compass {
+    margin: 10px 0;
+  }
+  
+  .wind-info {
+    text-align: center;
   }
 }
 

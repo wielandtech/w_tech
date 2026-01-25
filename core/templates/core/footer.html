@@ -1,10 +1,36 @@
 <div class="footer">
     <div class="footer-content">
         <h3>VLAN Technology Services LLC 2025</h3>
-        <span class="footer-weather" id="footer-weather">
-            <span class="weather-icon">🌡️</span>
-            <span id="weather-temp">--</span>°F
-        </span>
+        <div class="footer-weather" id="footer-weather">
+            <!-- Temperature -->
+            <span class="weather-temp-display">
+                <span class="weather-icon">🌡️</span>
+                <span id="weather-temp">--</span>°F
+            </span>
+            
+            <!-- Wind Compass Rose -->
+            <div class="wind-compass" id="wind-compass">
+                <svg viewBox="0 0 100 100" class="compass-rose">
+                    <!-- Compass circle -->
+                    <circle cx="50" cy="50" r="45" class="compass-circle"/>
+                    <!-- Cardinal directions -->
+                    <text x="50" y="12" class="cardinal">N</text>
+                    <text x="88" y="54" class="cardinal">E</text>
+                    <text x="50" y="96" class="cardinal">S</text>
+                    <text x="12" y="54" class="cardinal">W</text>
+                    <!-- Wind arrow (rotates based on direction) -->
+                    <g id="wind-arrow" transform="rotate(0, 50, 50)">
+                        <polygon points="50,15 45,40 50,35 55,40" class="arrow"/>
+                    </g>
+                </svg>
+                <div class="wind-info">
+                    <span><span id="wind-speed">--</span> mph</span>
+                    <span id="wind-cardinal">--</span>
+                </div>
+            </div>
+            
+            <span class="weather-location">Norton Shores, MI</span>
+        </div>
     </div>
 </div>
 
@@ -14,7 +40,26 @@ function updateWeather() {
         .then(response => response.json())
         .then(data => {
             if (data.status === 'ok') {
+                // Update temperature
                 document.getElementById('weather-temp').textContent = data.temperature_f;
+                
+                // Update wind speed
+                if (data.wind_speed_mph !== null) {
+                    document.getElementById('wind-speed').textContent = data.wind_speed_mph;
+                }
+                
+                // Update wind direction cardinal
+                if (data.wind_direction_cardinal) {
+                    document.getElementById('wind-cardinal').textContent = data.wind_direction_cardinal;
+                }
+                
+                // Rotate compass arrow to wind direction
+                if (data.wind_direction !== null) {
+                    const arrow = document.getElementById('wind-arrow');
+                    if (arrow) {
+                        arrow.setAttribute('transform', `rotate(${data.wind_direction}, 50, 50)`);
+                    }
+                }
             }
         })
         .catch(err => console.log('Weather fetch error:', err));

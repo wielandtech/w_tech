@@ -658,10 +658,18 @@ def get_netdata_metrics(request):
         })
 
 
+def get_cardinal_direction(degrees):
+    """Convert degrees to cardinal direction (N, NE, E, etc.)"""
+    directions = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE',
+                  'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW']
+    index = round(degrees / 22.5) % 16
+    return directions[index]
+
+
 def get_weather_data(request):
     """
-    Fetch weather temperature from Prometheus (Home Assistant metrics).
-    Queries the Norton Shores weather station temperature sensor.
+    Fetch weather data from Prometheus (Home Assistant metrics).
+    Queries the Norton Shores weather station for temperature, wind speed, and wind direction.
     Implements caching to reduce API calls (1 minute TTL).
     """
     cached_weather = cache.get('weather_data')
@@ -671,35 +679,75 @@ def get_weather_data(request):
 
     try:
         prometheus_url = "http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090"
-        query = 'homeassistant_sensor_temperature_celsius{entity="sensor.norton_shores_weather_station_temperature"}'
         timeout = 5
 
-        response = requests.get(
+        # Query temperature
+        temp_query = 'homeassistant_sensor_temperature_celsius{entity="sensor.norton_shores_weather_station_temperature"}'
+        temp_response = requests.get(
             f"{prometheus_url}/api/v1/query",
-            params={'query': query},
+            params={'query': temp_query},
             timeout=timeout
         )
 
-        if response.status_code == 200:
-            data = response.json()
+        # Query wind speed
+        wind_speed_query = 'homeassistant_sensor_wind_speed_mph{entity="sensor.norton_shores_weather_station_wind_speed"}'
+        wind_speed_response = requests.get(
+            f"{prometheus_url}/api/v1/query",
+            params={'query': wind_speed_query},
+            timeout=timeout
+        )
+
+        # Query wind direction (note: u0xb0 is the encoded degree symbol)
+        wind_dir_query = 'homeassistant_sensor_wind_direction_u0xb0{entity="sensor.norton_shores_weather_station_wind_direction"}'
+        wind_dir_response = requests.get(
+            f"{prometheus_url}/api/v1/query",
+            params={'query': wind_dir_query},
+            timeout=timeout
+        )
+
+        # Parse temperature
+        temp_celsius = None
+        temp_fahrenheit = None
+        if temp_response.status_code == 200:
+            data = temp_response.json()
             if data.get('status') == 'success' and data.get('data', {}).get('result'):
                 temp_celsius = float(data['data']['result'][0]['value'][1])
                 temp_fahrenheit = round((temp_celsius * 9/5) + 32, 1)
+                temp_celsius = round(temp_celsius, 1)
 
-                weather = {
-                    'temperature_c': round(temp_celsius, 1),
-                    'temperature_f': temp_fahrenheit,
-                    'status': 'ok',
-                    'cache_hit': False
-                }
-                cache.set('weather_data', weather, 60)  # 1 minute cache
-                return JsonResponse(weather)
-            else:
-                logger.warning("No weather data found in Prometheus response")
-                return JsonResponse({'status': 'error', 'error': 'No data available'})
+        # Parse wind speed
+        wind_speed = None
+        if wind_speed_response.status_code == 200:
+            data = wind_speed_response.json()
+            if data.get('status') == 'success' and data.get('data', {}).get('result'):
+                wind_speed = round(float(data['data']['result'][0]['value'][1]), 1)
+
+        # Parse wind direction
+        wind_direction = None
+        wind_cardinal = None
+        if wind_dir_response.status_code == 200:
+            data = wind_dir_response.json()
+            if data.get('status') == 'success' and data.get('data', {}).get('result'):
+                wind_direction = round(float(data['data']['result'][0]['value'][1]))
+                wind_cardinal = get_cardinal_direction(wind_direction)
+
+        # Build response if we have at least temperature
+        if temp_celsius is not None:
+            weather = {
+                'temperature_c': temp_celsius,
+                'temperature_f': temp_fahrenheit,
+                'wind_speed_mph': wind_speed,
+                'wind_direction': wind_direction,
+                'wind_direction_cardinal': wind_cardinal,
+                'location': 'Norton Shores, MI',
+                'status': 'ok',
+                'cache_hit': False
+            }
+            cache.set('weather_data', weather, 60)  # 1 minute cache
+            return JsonResponse(weather)
         else:
-            logger.warning(f"Prometheus weather query returned status {response.status_code}")
-            return JsonResponse({'status': 'error', 'error': f'Prometheus returned {response.status_code}'})
+            logger.warning("No weather data found in Prometheus response")
+            return JsonResponse({'status': 'error', 'error': 'No data available'})
 
     except requests.exceptions.RequestException as e:
         logger.error(f"Failed to connect to Prometheus for weather data: {e}")
