@@ -326,23 +326,6 @@
     background: linear-gradient(90deg, var(--accent-primary), var(--highlight));
     border-radius: 3px;
     transition: width 0.6s ease, background 0.3s ease;
-    position: relative;
-}
-
-.metric-bar-fill::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    animation: shimmer 2s infinite;
-}
-
-@keyframes shimmer {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
 }
 
 .metric-bar-fill.warning {
@@ -500,10 +483,6 @@
     .hardware-card,
     .gallery-item img {
         transition: none;
-    }
-
-    .metric-bar-fill::after {
-        animation: none;
     }
 
     .metrics-loading::before {
