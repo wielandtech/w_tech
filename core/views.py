@@ -298,168 +298,91 @@ def get_netdata_metrics(request):
             }
 
         # Get pod count from k8s_state collector using API v2 with context aggregation
-        pods_debug = {}
         try:
             # Use API v2 with contexts to get running pods across all nodes
             # The k8s_state.node_pods_phase context spans multiple nodes
-            pods_url = f"{netdata_url}/api/v2/data"
-            pods_params = {
-                'contexts': 'k8s_state.node_pods_phase',
-                'dimensions': 'running',
-                'points': 1
-            }
-            pods_debug['url'] = pods_url
-            pods_debug['params'] = pods_params
-
-            logger.warning(f"Pods API call: {pods_url} with params {pods_params}")
-
-            pods_response = requests.get(pods_url, params=pods_params, timeout=timeout)
-
-            pods_debug['status_code'] = pods_response.status_code
-            logger.warning(f"Pods response status: {pods_response.status_code}")
+            pods_response = requests.get(
+                f"{netdata_url}/api/v2/data",
+                params={
+                    'contexts': 'k8s_state.node_pods_phase',
+                    'dimensions': 'running',
+                    'points': 1
+                },
+                timeout=timeout
+            )
 
             if pods_response.status_code == 200:
                 pods_data = pods_response.json()
-                pods_debug['response_keys'] = list(pods_data.keys()) if isinstance(pods_data, dict) else str(type(pods_data))
-                logger.warning(f"Pods response data keys: {pods_debug['response_keys']}")
-
                 # API v2 returns summary.instances with per-node data
                 # Sum the 'avg' (which is current value) from each instance
                 running_pods = 0
-                instances_found = []
                 if 'summary' in pods_data and 'instances' in pods_data['summary']:
-                    pods_debug['instances_count'] = len(pods_data['summary']['instances'])
                     for instance in pods_data['summary']['instances']:
-                        # Each instance has 'sts' with 'avg' being the current value
-                        instance_id = instance.get('id', 'unknown')
-                        instance_avg = instance.get('sts', {}).get('avg', 0)
-                        instances_found.append({'id': instance_id, 'avg': instance_avg})
                         if 'sts' in instance and 'avg' in instance['sts']:
                             running_pods += int(instance['sts']['avg'])
-                        logger.warning(f"Instance {instance_id}: {instance_avg} pods")
-                    pods_debug['instances'] = instances_found
-                else:
-                    pods_debug['error'] = 'No summary.instances in response'
-                    pods_debug['has_summary'] = 'summary' in pods_data
-                    if 'summary' in pods_data:
-                        pods_debug['summary_keys'] = list(pods_data['summary'].keys())
 
-                logger.warning(f"Total running pods: {running_pods}")
-                pods_debug['total'] = running_pods
                 metrics['pods'] = {
                     'count': running_pods,
-                    'description': 'Running Pods',
-                    'debug': pods_debug
+                    'description': 'Running Pods'
                 }
             else:
-                pods_debug['response_text'] = pods_response.text[:500] if pods_response.text else 'empty'
-                logger.warning(f"Pods API returned status {pods_response.status_code}: {pods_debug['response_text']}")
+                logger.warning(f"Pods API returned status {pods_response.status_code}")
                 metrics['pods'] = {
                     'count': 0,
-                    'description': 'Running Pods (unavailable)',
-                    'debug': pods_debug
+                    'description': 'Running Pods (unavailable)'
                 }
         except Exception as e:
-            import traceback
-            pods_debug['exception'] = str(e)
-            pods_debug['traceback'] = traceback.format_exc()
             logger.warning(f"Failed to fetch pod counts: {e}")
             metrics['pods'] = {
                 'count': 0,
-                'description': 'Running Pods (error)',
-                'debug': pods_debug
+                'description': 'Running Pods (error)'
             }
 
         # Get network metrics aggregated across nodes
         # system.net returns bandwidth in kilobits/s (received/sent)
-        network_debug = {'nodes': []}
         try:
             total_received_kbps = 0
             total_sent_kbps = 0
             network_node_count = 0
 
             for node in netdata_hosts:
-                node_debug = {'node': node}
                 try:
-                    net_url = f"{netdata_url}/api/v1/data"
-                    net_params = {'chart': 'system.net', 'node': node, 'points': 1, 'after': -10}
-                    node_debug['url'] = net_url
-                    node_debug['params'] = net_params
-
-                    net_response = requests.get(net_url, params=net_params, timeout=timeout)
-                    node_debug['status_code'] = net_response.status_code
-
-                    logger.warning(f"Network API call for node {node}: {net_url} with params {net_params}")
-                    logger.warning(f"Network response status for {node}: {net_response.status_code}")
+                    net_response = requests.get(
+                        f"{netdata_url}/api/v1/data",
+                        params={'chart': 'system.net', 'node': node, 'points': 1, 'after': -10},
+                        timeout=timeout
+                    )
 
                     if net_response.status_code == 200:
                         net_data = net_response.json()
-                        node_debug['response'] = net_data
-                        logger.warning(f"Network response data for {node}: {net_data}")
                         if 'data' in net_data and len(net_data['data']) > 0:
                             latest = net_data['data'][0]
-                            node_debug['latest'] = latest
-                            logger.warning(f"Network latest data for {node}: {latest}")
                             if len(latest) >= 3:  # timestamp, received, sent
                                 # Values are in kilobits/s
                                 received_kbps = abs(latest[1]) if isinstance(latest[1], (int, float)) else 0
                                 sent_kbps = abs(latest[2]) if isinstance(latest[2], (int, float)) else 0
-                                node_debug['received_kbps'] = received_kbps
-                                node_debug['sent_kbps'] = sent_kbps
-                                logger.warning(f"Network for {node} - received: {received_kbps} kbps, sent: {sent_kbps} kbps")
-
                                 total_received_kbps += received_kbps
                                 total_sent_kbps += sent_kbps
                                 network_node_count += 1
-                            else:
-                                node_debug['error'] = f'Not enough data points: {len(latest)}'
-                        else:
-                            node_debug['error'] = 'No data in response'
-                    else:
-                        node_debug['response_text'] = net_response.text[:200] if net_response.text else 'empty'
                 except Exception as e:
-                    node_debug['exception'] = str(e)
                     logger.warning(f"Failed to fetch network from node {node}: {e}")
-                finally:
-                    network_debug['nodes'].append(node_debug)
-
-            network_debug['total_received_kbps'] = total_received_kbps
-            network_debug['total_sent_kbps'] = total_sent_kbps
-            network_debug['node_count'] = network_node_count
+                    continue
 
             if network_node_count > 0:
                 # Convert kilobits/s to Mbps (1 Mbps = 1000 kbps)
                 received_mbps = round(total_received_kbps / 1000, 2)
                 sent_mbps = round(total_sent_kbps / 1000, 2)
-                logger.warning(f"Total Cluster Network: {total_received_kbps} kbps received, {total_sent_kbps} kbps sent across {network_node_count} nodes")
-
                 metrics['network'] = {
                     'bandwidth_mbps': round(received_mbps + sent_mbps, 2),
                     'received_mbps': received_mbps,
                     'sent_mbps': sent_mbps,
-                    'description': f'Cluster Network ({network_node_count} nodes)',
-                    'debug': network_debug
+                    'description': f'Cluster Network ({network_node_count} nodes)'
                 }
             else:
-                metrics['network'] = {
-                    'bandwidth_mbps': 0,
-                    'received_mbps': 0,
-                    'sent_mbps': 0,
-                    'description': 'Cluster Network (no data)',
-                    'debug': network_debug
-                }
+                metrics['network'] = None
         except Exception as e:
-            import traceback
-            network_debug['exception'] = str(e)
-            network_debug['traceback'] = traceback.format_exc()
             logger.warning(f"Failed to fetch network metrics: {e}")
-            metrics['network'] = {
-                'bandwidth_mbps': 0,
-                'received_mbps': 0,
-                'sent_mbps': 0,
-                'description': 'Cluster Network (error)',
-                'debug': network_debug
-            }
+            metrics['network'] = None
 
         # Temporarily disable caching for debugging
         # cache.set('netdata_metrics', metrics, 5)
