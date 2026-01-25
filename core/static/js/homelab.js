@@ -56,7 +56,7 @@ function fetchMetrics() {
                     <div class="metric-card">
                         <div class="metric-label">${data.pods.description}</div>
                         <div class="metric-value">${data.pods.count}</div>
-                        <div class="metric-detail">running on cluster</div>
+                        <div class="metric-detail">in cluster</div>
                     </div>
                 `;
             }

@@ -160,6 +160,8 @@
     padding: 0.4rem 0.75rem;
     font-size: 0.85rem;
     color: var(--text-primary);
+    text-decoration: none;
+    display: inline-block;
     transition: all 0.2s ease;
 }
 
