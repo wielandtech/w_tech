@@ -237,8 +237,8 @@
 .metrics-container {
     margin: 1rem 0 0 0;
     padding: 1.5rem;
-    background: var(--background-primary);
-    border: 1px solid var(--border-color);
+    background: transparent;
+    border: none;
     border-radius: 8px;
     transition: all 0.3s ease;
 }
@@ -256,7 +256,7 @@
 }
 
 .metric-card {
-    background: var(--background-secondary);
+    background: var(--background-primary);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 1.25rem;
