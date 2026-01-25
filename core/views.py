@@ -490,31 +490,72 @@ def get_netdata_metrics(request):
             logger.warning(f"Failed to fetch uptime metrics: {e}")
             metrics['uptime'] = None
 
-        # Get CPU temperature aggregated across nodes
+        # Get CPU temperature using API v2 with sensors context
         try:
             temps = []
-            for node in netdata_hosts:
-                try:
-                    # Try different sensor chart names common on Intel systems
-                    for chart_name in ['sensors.coretemp_isa_0000_temperature', 'sensors.coretemp-isa-0000_temperature']:
-                        temp_response = requests.get(
-                            f"{netdata_url}/api/v1/data",
-                            params={'chart': chart_name, 'node': node, 'points': 1, 'after': -10},
-                            timeout=timeout
-                        )
+            # Use API v2 to query temperature contexts across all nodes
+            temp_response = requests.get(
+                f"{netdata_url}/api/v2/data",
+                params={
+                    'contexts': 'sensors.temperature',
+                    'nodes': ','.join(netdata_hosts),
+                    'points': 1
+                },
+                timeout=timeout
+            )
 
-                        if temp_response.status_code == 200:
-                            temp_data = temp_response.json()
-                            if 'data' in temp_data and len(temp_data['data']) > 0:
-                                latest = temp_data['data'][0]
-                                # Temperature data: [time, temp1, temp2, ...] - get max core temp
-                                core_temps = [v for v in latest[1:] if isinstance(v, (int, float))]
-                                if core_temps:
-                                    temps.append(max(core_temps))
-                                    break
-                except Exception as e:
-                    logger.warning(f"Failed to fetch temperature from node {node}: {e}")
-                    continue
+            if temp_response.status_code == 200:
+                temp_data = temp_response.json()
+                logger.warning(f"Temperature API v2 response: {temp_data}")
+                
+                # Extract temperatures from summary instances
+                if 'summary' in temp_data and 'instances' in temp_data['summary']:
+                    for instance in temp_data['summary']['instances']:
+                        if 'sts' in instance and 'avg' in instance['sts']:
+                            temp_val = instance['sts']['avg']
+                            if isinstance(temp_val, (int, float)) and temp_val > 0:
+                                temps.append(temp_val)
+                
+                # Also try to get from result data if available
+                if not temps and 'result' in temp_data and 'data' in temp_data['result']:
+                    if len(temp_data['result']['data']) > 0:
+                        latest = temp_data['result']['data'][0]
+                        for val in latest[1:]:
+                            if isinstance(val, (int, float)) and 20 < val < 120:
+                                temps.append(val)
+                            elif isinstance(val, list):
+                                for v in val:
+                                    if isinstance(v, (int, float)) and 20 < v < 120:
+                                        temps.append(v)
+            else:
+                logger.warning(f"Temperature API v2 returned status {temp_response.status_code}")
+                
+                # Fallback to API v1 with various chart names
+                for node in netdata_hosts:
+                    for chart_name in [
+                        'sensors.coretemp_isa_0000_temperature',
+                        'sensors.coretemp-isa-0000_temperature',
+                        'sensors.cpu_thermal-virtual-0_temperature',
+                        'sensors.acpitz-acpi-0_temperature',
+                        'sensors.k10temp-pci-00c3_temperature'
+                    ]:
+                        try:
+                            temp_response = requests.get(
+                                f"{netdata_url}/api/v1/data",
+                                params={'chart': chart_name, 'node': node, 'points': 1, 'after': -10},
+                                timeout=timeout
+                            )
+                            if temp_response.status_code == 200:
+                                temp_data = temp_response.json()
+                                if 'data' in temp_data and len(temp_data['data']) > 0:
+                                    latest = temp_data['data'][0]
+                                    core_temps = [v for v in latest[1:] if isinstance(v, (int, float)) and 20 < v < 120]
+                                    if core_temps:
+                                        temps.append(max(core_temps))
+                                        logger.warning(f"Found temperature {max(core_temps)} from {chart_name} on {node}")
+                                        break
+                        except Exception:
+                            continue
 
             if temps:
                 avg_temp = round(sum(temps) / len(temps), 1)
@@ -525,42 +566,78 @@ def get_netdata_metrics(request):
                     'node_count': len(temps),
                     'description': 'CPU Temperature'
                 }
+                logger.warning(f"Temperature metrics: avg={avg_temp}, max={max_temp}, nodes={len(temps)}")
+            else:
+                logger.warning("No temperature data found from any source")
         except Exception as e:
             logger.warning(f"Failed to fetch temperature metrics: {e}")
             metrics['temperature'] = None
 
         # Get deployment status from k8s_state collector
         try:
-            deployments_response = requests.get(
-                f"{netdata_url}/api/v2/data",
-                params={
-                    'contexts': 'k8s_state.deployment_replicas_ready',
-                    'points': 1
-                },
-                timeout=timeout
-            )
+            # Try multiple context names for deployments
+            deployment_contexts = [
+                'k8s_state.deployment_replicas',
+                'k8s_state.deployment_replicas_ready',
+                'k8s_state.deployment_condition'
+            ]
+            
+            deploy_data = None
+            for context in deployment_contexts:
+                deployments_response = requests.get(
+                    f"{netdata_url}/api/v2/data",
+                    params={
+                        'contexts': context,
+                        'points': 1
+                    },
+                    timeout=timeout
+                )
+                
+                if deployments_response.status_code == 200:
+                    deploy_data = deployments_response.json()
+                    logger.warning(f"Deployments API response for {context}: {deploy_data}")
+                    
+                    # Check if we got actual data
+                    if 'summary' in deploy_data:
+                        if 'instances' in deploy_data['summary'] and len(deploy_data['summary']['instances']) > 0:
+                            logger.warning(f"Found deployment data using context: {context}")
+                            break
+                        elif 'dimensions' in deploy_data['summary'] and len(deploy_data['summary']['dimensions']) > 0:
+                            logger.warning(f"Found deployment dimensions using context: {context}")
+                            break
+                    deploy_data = None  # Reset if no useful data
 
-            if deployments_response.status_code == 200:
-                deploy_data = deployments_response.json()
-                # Count deployments and check their status
+            if deploy_data:
                 total_deployments = 0
                 healthy_deployments = 0
 
+                # Try to count from instances
                 if 'summary' in deploy_data and 'instances' in deploy_data['summary']:
                     for instance in deploy_data['summary']['instances']:
                         total_deployments += 1
-                        # If ready replicas > 0, consider it healthy
                         if 'sts' in instance and 'avg' in instance['sts']:
                             if instance['sts']['avg'] > 0:
                                 healthy_deployments += 1
+                
+                # If no instances, try dimensions (each dimension might be a deployment)
+                if total_deployments == 0 and 'summary' in deploy_data and 'dimensions' in deploy_data['summary']:
+                    for dim in deploy_data['summary']['dimensions']:
+                        total_deployments += 1
+                        if 'sts' in dim and 'avg' in dim['sts']:
+                            if dim['sts']['avg'] > 0:
+                                healthy_deployments += 1
 
-                metrics['deployments'] = {
-                    'total': total_deployments,
-                    'healthy': healthy_deployments,
-                    'description': 'Deployments'
-                }
+                if total_deployments > 0:
+                    metrics['deployments'] = {
+                        'total': total_deployments,
+                        'healthy': healthy_deployments,
+                        'description': 'Deployments'
+                    }
+                    logger.warning(f"Deployments metrics: {healthy_deployments}/{total_deployments} healthy")
+                else:
+                    logger.warning("No deployment instances found in response")
             else:
-                logger.warning(f"Deployments API returned status {deployments_response.status_code}")
+                logger.warning("No deployment data found from any context")
         except Exception as e:
             logger.warning(f"Failed to fetch deployment metrics: {e}")
             metrics['deployments'] = None
