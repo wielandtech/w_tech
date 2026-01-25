@@ -91,9 +91,6 @@ function fetchMetrics() {
                 const reachable = data.reachable_nodes || 0;
                 statusParts.push(reachable + '/' + data.nodes_count + ' nodes');
             }
-            if (data.cache_hit) {
-                statusParts.push('cached');
-            }
             if (data.errors && data.errors.length > 0) {
                 statusParts.push(data.errors.length + ' warnings');
             }
