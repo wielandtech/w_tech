@@ -50,6 +50,7 @@ jobs:
           type=ref,event=pr
           type=sha,prefix={{branch}}-
           type=raw,value=latest,enable={{is_default_branch}}
+          type=raw,value=${{ steps.vars.outputs.date }}-${{ steps.vars.outputs.sha }},enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     
     - name: Build and push Docker image
       uses: docker/build-push-action@v5
@@ -57,9 +58,7 @@ jobs:
       with:
         context: .
         push: ${{ github.event_name != 'pull_request' }}
-        tags: |
-          ${{ steps.meta.outputs.tags }}
-          ${{ steps.vars.outputs.versioned_tag }}
+        tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
