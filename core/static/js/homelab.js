@@ -51,6 +51,17 @@ function fetchMetrics() {
                 `;
             }
 
+            // Disk I/O Card
+            if (data.disk_io !== null) {
+                html += `
+                    <div class="metric-card">
+                        <div class="metric-label">${data.disk_io.description}</div>
+                        <div class="metric-value">${data.disk_io.total_mbps} MB/s</div>
+                        <div class="metric-detail">↑ ${data.disk_io.write_mbps} · ↓ ${data.disk_io.read_mbps} MB/s</div>
+                    </div>
+                `;
+            }
+
             // Network Utilization Card
             if (data.network !== null) {
                 let networkValue, networkDetail;
@@ -67,17 +78,6 @@ function fetchMetrics() {
                         <div class="metric-label">${data.network.description}</div>
                         <div class="metric-value">${networkValue}</div>
                         <div class="metric-detail">${networkDetail}</div>
-                    </div>
-                `;
-            }
-
-            // Disk I/O Card
-            if (data.disk_io !== null) {
-                html += `
-                    <div class="metric-card">
-                        <div class="metric-label">${data.disk_io.description}</div>
-                        <div class="metric-value">${data.disk_io.total_mbps} MB/s</div>
-                        <div class="metric-detail">↑ ${data.disk_io.write_mbps} · ↓ ${data.disk_io.read_mbps} MB/s</div>
                     </div>
                 `;
             }

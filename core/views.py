@@ -434,7 +434,7 @@ def get_netdata_metrics(request):
                     'read_mbps': read_mbps,
                     'write_mbps': write_mbps,
                     'total_mbps': round(read_mbps + write_mbps, 2),
-                    'description': 'Disk Utilization'
+                    'description': 'Disk I/O'
                 }
         except Exception as e:
             logger.warning(f"Failed to fetch disk I/O metrics: {e}")
