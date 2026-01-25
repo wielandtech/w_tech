@@ -297,18 +297,21 @@ def get_netdata_metrics(request):
                 'description': 'Memory Utilization (error)'
             }
 
-        # Get pod count from k8s_state collector
+        # Get pod count from k8s_state collector using node_pods_phase chart
         try:
-            # Try the k8s_state service first
-            k8s_state_url = f"{netdata_url.replace('netdata-parent', 'netdata-k8s-state')}"
+            # Use k8s_state.node_pods_phase with dimensions=running to get running pod count
             pods_response = requests.get(
-                f"{k8s_state_url}/api/v1/data",
-                params={'chart': 'k8s_state.pod_status.running', 'points': 1},
+                f"{netdata_url}/api/v1/data",
+                params={
+                    'chart': 'k8s_state.node_pods_phase',
+                    'points': 1,
+                    'dimensions': 'running'
+                },
                 timeout=timeout
             )
 
-            logger.warning(f"Pods API call (k8s_state): {k8s_state_url}/api/v1/data?chart=k8s_state.pod_status.running&points=1")
-            logger.warning(f"Pods response status (k8s_state): {pods_response.status_code}")
+            logger.warning(f"Pods API call: {netdata_url}/api/v1/data?chart=k8s_state.node_pods_phase&points=1&dimensions=running")
+            logger.warning(f"Pods response status: {pods_response.status_code}")
 
             if pods_response.status_code == 200:
                 pods_data = pods_response.json()
@@ -316,6 +319,7 @@ def get_netdata_metrics(request):
                 if 'data' in pods_data and len(pods_data['data']) > 0:
                     latest = pods_data['data'][0]
                     logger.warning(f"Pods latest data: {latest}")
+                    # The running dimension value is at index 1 (after timestamp)
                     running_pods = int(latest[1]) if len(latest) > 1 and isinstance(latest[1], (int, float)) else 0
                     logger.warning(f"Pods count: {running_pods}")
                     metrics['pods'] = {
@@ -341,9 +345,10 @@ def get_netdata_metrics(request):
             }
 
         # Get network metrics aggregated across nodes
+        # system.net returns bandwidth in kilobits/s (received/sent)
         try:
-            total_received_bps = 0
-            total_sent_bps = 0
+            total_received_kbps = 0
+            total_sent_kbps = 0
             network_node_count = 0
 
             for node in netdata_hosts:
@@ -364,25 +369,26 @@ def get_netdata_metrics(request):
                             latest = net_data['data'][0]
                             logger.warning(f"Network latest data for {node}: {latest}")
                             if len(latest) >= 3:  # timestamp, received, sent
-                                received_bps = latest[1] if isinstance(latest[1], (int, float)) else 0
-                                sent_bps = latest[2] if isinstance(latest[2], (int, float)) else 0
-                                logger.warning(f"Network for {node} - received: {received_bps}bps, sent: {sent_bps}bps")
+                                # Values are in kilobits/s
+                                received_kbps = abs(latest[1]) if isinstance(latest[1], (int, float)) else 0
+                                sent_kbps = abs(latest[2]) if isinstance(latest[2], (int, float)) else 0
+                                logger.warning(f"Network for {node} - received: {received_kbps} kbps, sent: {sent_kbps} kbps")
 
-                                total_received_bps += received_bps
-                                total_sent_bps += sent_bps
+                                total_received_kbps += received_kbps
+                                total_sent_kbps += sent_kbps
                                 network_node_count += 1
                 except Exception as e:
                     logger.warning(f"Failed to fetch network from node {node}: {e}")
                     continue
 
             if network_node_count > 0:
-                # Calculate cluster-wide network metrics
-                received_mbps = round(total_received_bps / (1024**2), 1)
-                sent_mbps = round(total_sent_bps / (1024**2), 1)
-                logger.warning(f"Total Cluster Network: {total_received_bps}bps received, {total_sent_bps}bps sent across {network_node_count} nodes")
+                # Convert kilobits/s to Mbps (1 Mbps = 1000 kbps)
+                received_mbps = round(total_received_kbps / 1000, 2)
+                sent_mbps = round(total_sent_kbps / 1000, 2)
+                logger.warning(f"Total Cluster Network: {total_received_kbps} kbps received, {total_sent_kbps} kbps sent across {network_node_count} nodes")
 
                 metrics['network'] = {
-                    'bandwidth_mbps': round(received_mbps + sent_mbps, 1),
+                    'bandwidth_mbps': round(received_mbps + sent_mbps, 2),
                     'received_mbps': received_mbps,
                     'sent_mbps': sent_mbps,
                     'description': f'Cluster Network ({network_node_count} nodes)'
