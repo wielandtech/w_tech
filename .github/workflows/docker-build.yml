@@ -30,8 +30,14 @@ jobs:
         SHA=$(git rev-parse --short HEAD)
         echo "date=$DATE" >> $GITHUB_OUTPUT
         echo "sha=$SHA" >> $GITHUB_OUTPUT
+        echo "event_name=${{ github.event_name }}" >> $GITHUB_OUTPUT
+        echo "ref=${{ github.ref }}" >> $GITHUB_OUTPUT
         if [ "${{ github.event_name }}" == "push" ] && [ "${{ github.ref }}" == "refs/heads/main" ]; then
-          echo "versioned_tag=ghcr.io/wielandtech/w_tech:${DATE}-${SHA}" >> $GITHUB_OUTPUT
+          VERSIONED_TAG="ghcr.io/wielandtech/w_tech:${DATE}-${SHA}"
+          echo "versioned_tag=${VERSIONED_TAG}" >> $GITHUB_OUTPUT
+          echo "Created versioned tag: ${VERSIONED_TAG}"
+        else
+          echo "Skipping versioned tag (not a push to main)"
         fi
     
     - name: Extract metadata
@@ -47,6 +53,7 @@ jobs:
     
     - name: Build and push Docker image
       uses: docker/build-push-action@v5
+      id: build
       with:
         context: .
         push: ${{ github.event_name != 'pull_request' }}
