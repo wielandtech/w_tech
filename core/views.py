@@ -346,7 +346,8 @@ def get_netdata_metrics(request):
                 params={
                     'contexts': 'net.net',
                     'nodes': ','.join(netdata_hosts),
-                    'points': 1
+                    'points': 1,
+                    'after': -10  # Get data from last 10 seconds for real-time values
                 },
                 timeout=timeout
             )
