@@ -11,18 +11,189 @@
 <div class="homelab-container">
     <div class="homelab-header">
         <h1>Homelab Dashboard</h1>
-        <p>Real-time monitoring of my Kubernetes cluster running on Proxmox. These metrics are pulled directly from Netdata agents running across the cluster nodes.</p>
+        <p>My Kubernetes homelab: more expensive and less reliable than the cloud, but way more fun!</p>
     </div>
 
-    <div class="cluster-info">
-        <h2>Cluster Overview</h2>
-        <p>This dashboard displays live statistics from a 3-node Kubernetes cluster. The metrics are aggregated across all nodes and updated every 5 seconds.</p>
-    </div>
-
-    <div class="metrics-container" id="metrics-container">
-        <div id="metrics-content">
-            <div class="metrics-loading">Loading metrics...</div>
+    <div class="homelab-section">
+        <h2>Live Cluster Metrics</h2>
+        <p>Real-time monitoring of my 3-node K3s cluster running on Proxmox. Metrics are pulled directly from Netdata agents.</p>
+        <div class="metrics-container" id="metrics-container">
+            <div id="metrics-content">
+                <div class="metrics-loading">Loading metrics...</div>
+            </div>
         </div>
+    </div>
+
+    <div class="homelab-section">
+        <h2>Software Stack</h2>
+        <p>This homelab runs a complete Kubernetes infrastructure with GitOps automation.</p>
+        <div class="stack-grid">
+            <div class="stack-card">
+                <div class="stack-title">Kubernetes</div>
+                <div class="stack-tech">K3s</div>
+                <div class="stack-desc">Lightweight Kubernetes distribution</div>
+            </div>
+            <div class="stack-card">
+                <div class="stack-title">GitOps</div>
+                <div class="stack-tech">Flux v2</div>
+                <div class="stack-desc">Automated deployment and configuration</div>
+            </div>
+            <div class="stack-card">
+                <div class="stack-title">Ingress</div>
+                <div class="stack-tech">Traefik</div>
+                <div class="stack-desc">HTTP/HTTPS routing and load balancing</div>
+            </div>
+            <div class="stack-card">
+                <div class="stack-title">LoadBalancer</div>
+                <div class="stack-tech">MetalLB</div>
+                <div class="stack-desc">LoadBalancer for bare metal</div>
+            </div>
+            <div class="stack-card">
+                <div class="stack-title">Storage</div>
+                <div class="stack-tech">Synology CSI</div>
+                <div class="stack-desc">NAS integration for persistent storage</div>
+            </div>
+            <div class="stack-card">
+                <div class="stack-title">Certificates</div>
+                <div class="stack-tech">cert-manager</div>
+                <div class="stack-desc">Automated TLS certificate management</div>
+            </div>
+            <div class="stack-card">
+                <div class="stack-title">Secrets</div>
+                <div class="stack-tech">Sealed Secrets</div>
+                <div class="stack-desc">Encrypted secrets for GitOps</div>
+            </div>
+            <div class="stack-card">
+                <div class="stack-title">Database</div>
+                <div class="stack-tech">CloudNativePG + Redis</div>
+                <div class="stack-desc">PostgreSQL operator + caching</div>
+            </div>
+            <div class="stack-card">
+                <div class="stack-title">Monitoring</div>
+                <div class="stack-tech">Prometheus + Grafana + Netdata</div>
+                <div class="stack-desc">Metrics, visualization, AI troubleshooting</div>
+            </div>
+            <div class="stack-card">
+                <div class="stack-title">Automation</div>
+                <div class="stack-tech">Renovate + n8n</div>
+                <div class="stack-desc">Dependency updates and workflows</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="homelab-section">
+        <h2>Applications &amp; Services</h2>
+        
+        <div class="app-category">
+            <h3>Media &amp; Entertainment</h3>
+            <div class="app-list">
+                <span class="app-tag">Plex Media Server</span>
+                <span class="app-tag">Radarr</span>
+                <span class="app-tag">Sonarr</span>
+                <span class="app-tag">Lidarr</span>
+                <span class="app-tag">Bazarr</span>
+                <span class="app-tag">Ombi</span>
+                <span class="app-tag">CommaFeed</span>
+            </div>
+        </div>
+
+        <div class="app-category">
+            <h3>Home Automation</h3>
+            <div class="app-list">
+                <span class="app-tag">Home Assistant</span>
+            </div>
+        </div>
+
+        <div class="app-category">
+            <h3>Monitoring &amp; Observability</h3>
+            <div class="app-list">
+                <span class="app-tag">Prometheus</span>
+                <span class="app-tag">Grafana</span>
+                <span class="app-tag">AlertManager</span>
+                <span class="app-tag">Blackbox Exporter</span>
+                <span class="app-tag">Netdata</span>
+            </div>
+        </div>
+
+        <div class="app-category">
+            <h3>Infrastructure &amp; DevOps</h3>
+            <div class="app-list">
+                <span class="app-tag">PostgreSQL</span>
+                <span class="app-tag">Redis</span>
+                <span class="app-tag">Renovate</span>
+                <span class="app-tag">Homepage</span>
+                <span class="app-tag">n8n</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="homelab-section">
+        <h2>Hardware</h2>
+        <div class="hardware-grid">
+            <div class="hardware-card">
+                <div class="hardware-label">Compute</div>
+                <div class="hardware-value">3x Dell OptiPlex 7060</div>
+                <div class="hardware-detail">i5-8500T CPU, 16GB RAM, 2.5GbE NIC</div>
+            </div>
+            <div class="hardware-card">
+                <div class="hardware-label">NAS</div>
+                <div class="hardware-value">Synology DS923+</div>
+                <div class="hardware-detail">16TB RAID1, 1TB NVMe Cache, 10GbE</div>
+            </div>
+            <div class="hardware-card">
+                <div class="hardware-label">Router</div>
+                <div class="hardware-value">UniFi UCG-Fiber</div>
+                <div class="hardware-detail">Primary gateway with cellular failover</div>
+            </div>
+            <div class="hardware-card">
+                <div class="hardware-label">Switches</div>
+                <div class="hardware-value">UniFi USW-Pro-XG-8-PoE + USW-Ultra</div>
+                <div class="hardware-detail">10GbE uplinks, PoE for devices</div>
+            </div>
+            <div class="hardware-card">
+                <div class="hardware-label">Rack</div>
+                <div class="hardware-value">DeskPi RackMate T2</div>
+                <div class="hardware-detail">10" 12U mini-rack</div>
+            </div>
+            <div class="hardware-card">
+                <div class="hardware-label">UPS</div>
+                <div class="hardware-value">Tripp Lite 600VA</div>
+                <div class="hardware-detail">Battery backup for clean shutdown</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="homelab-section">
+        <h2>Gallery</h2>
+        <div class="gallery-grid">
+            <a href="https://raw.githubusercontent.com/wielandtech/w_lab/main/w_homelab_front.jpg" target="_blank" class="gallery-item">
+                <img src="https://raw.githubusercontent.com/wielandtech/w_lab/main/w_homelab_front.jpg" alt="Homelab Front View">
+                <span>Front View</span>
+            </a>
+            <a href="https://raw.githubusercontent.com/wielandtech/w_lab/main/w_homelab_back.jpg" target="_blank" class="gallery-item">
+                <img src="https://raw.githubusercontent.com/wielandtech/w_lab/main/w_homelab_back.jpg" alt="Homelab Back View">
+                <span>Back View</span>
+            </a>
+            <a href="https://raw.githubusercontent.com/wielandtech/w_lab/main/w_homelab_left.jpg" target="_blank" class="gallery-item">
+                <img src="https://raw.githubusercontent.com/wielandtech/w_lab/main/w_homelab_left.jpg" alt="Homelab Left Side">
+                <span>Left Side</span>
+            </a>
+            <a href="https://raw.githubusercontent.com/wielandtech/w_lab/main/w_homelab_right.jpg" target="_blank" class="gallery-item">
+                <img src="https://raw.githubusercontent.com/wielandtech/w_lab/main/w_homelab_right.jpg" alt="Homelab Right Side">
+                <span>Right Side</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="homelab-section">
+        <h2>Repository</h2>
+        <p>View the full documentation and source code on GitHub.</p>
+        <a href="https://github.com/wielandtech/w_lab" target="_blank" class="repo-link">
+            <svg height="24" width="24" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+            </svg>
+            wielandtech/w_lab
+        </a>
     </div>
 </div>
 
