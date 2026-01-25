@@ -427,11 +427,6 @@ ul {
   font-size: 1.2em;
 }
 
-.weather-location {
-  font-size: 0.85em;
-  opacity: 0.8;
-}
-
 .weather-temp-display {
   display: flex;
   align-items: center;

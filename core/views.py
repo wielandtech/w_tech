@@ -739,7 +739,6 @@ def get_weather_data(request):
                 'wind_speed_mph': wind_speed,
                 'wind_direction': wind_direction,
                 'wind_direction_cardinal': wind_cardinal,
-                'location': 'Norton Shores, MI',
                 'status': 'ok',
                 'cache_hit': False
             }
