@@ -57,7 +57,6 @@ INSTALLED_APPS = [
     'images.apps.ImagesConfig',
     'easy_thumbnails',
     'django_recaptcha',
-    'django_prometheus',  # Prometheus monitoring (must also be last for DB instrumentation)
 ]
 
 MIDDLEWARE = [
