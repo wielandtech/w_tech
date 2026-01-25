@@ -83,6 +83,52 @@ function fetchMetrics() {
                 `;
             }
 
+            // Disk I/O Card
+            if (data.disk_io !== null) {
+                html += `
+                    <div class="metric-card">
+                        <div class="metric-label">${data.disk_io.description}</div>
+                        <div class="metric-value">${data.disk_io.total_mbps} MB/s</div>
+                        <div class="metric-detail">↑${data.disk_io.write_mbps} ↓${data.disk_io.read_mbps} MB/s</div>
+                    </div>
+                `;
+            }
+
+            // Uptime Card
+            if (data.uptime !== null) {
+                html += `
+                    <div class="metric-card">
+                        <div class="metric-label">${data.uptime.description}</div>
+                        <div class="metric-value">${data.uptime.formatted}</div>
+                        <div class="metric-detail">${data.uptime.days} days continuous</div>
+                    </div>
+                `;
+            }
+
+            // Temperature Card
+            if (data.temperature !== null) {
+                const tempClass = data.temperature.max_celsius > 80 ? 'critical' : (data.temperature.max_celsius > 65 ? 'warning' : '');
+                html += `
+                    <div class="metric-card">
+                        <div class="metric-label">${data.temperature.description}</div>
+                        <div class="metric-value ${tempClass}">${data.temperature.avg_celsius}°C</div>
+                        <div class="metric-detail">max ${data.temperature.max_celsius}°C across ${data.temperature.node_count} nodes</div>
+                    </div>
+                `;
+            }
+
+            // Deployments Card
+            if (data.deployments !== null) {
+                const deployClass = data.deployments.healthy < data.deployments.total ? 'warning' : '';
+                html += `
+                    <div class="metric-card">
+                        <div class="metric-label">${data.deployments.description}</div>
+                        <div class="metric-value ${deployClass}">${data.deployments.healthy}/${data.deployments.total}</div>
+                        <div class="metric-detail">healthy deployments</div>
+                    </div>
+                `;
+            }
+
             html += '</div>';
             
             // Add status indicator

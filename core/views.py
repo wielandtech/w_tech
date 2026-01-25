@@ -163,6 +163,10 @@ def get_netdata_metrics(request):
             'memory': None,
             'pods': None,
             'network': None,
+            'disk_io': None,
+            'uptime': None,
+            'temperature': None,
+            'deployments': None,
             'status': 'ok',
             'cache_hit': False,
             'errors': [],
@@ -393,6 +397,174 @@ def get_netdata_metrics(request):
             logger.warning(f"Failed to fetch network metrics: {e}")
             metrics['network'] = None
 
+        # Get disk I/O metrics aggregated across nodes
+        try:
+            total_read_kbps = 0
+            total_write_kbps = 0
+            disk_node_count = 0
+
+            for node in netdata_hosts:
+                try:
+                    disk_response = requests.get(
+                        f"{netdata_url}/api/v1/data",
+                        params={'chart': 'system.io', 'node': node, 'points': 1, 'after': -10},
+                        timeout=timeout
+                    )
+
+                    if disk_response.status_code == 200:
+                        disk_data = disk_response.json()
+                        if 'data' in disk_data and len(disk_data['data']) > 0:
+                            latest = disk_data['data'][0]
+                            # Disk I/O format: [time, in (read), out (write)] in KiB/s
+                            if len(latest) >= 3:
+                                read_kbps = abs(latest[1]) if isinstance(latest[1], (int, float)) else 0
+                                write_kbps = abs(latest[2]) if isinstance(latest[2], (int, float)) else 0
+                                total_read_kbps += read_kbps
+                                total_write_kbps += write_kbps
+                                disk_node_count += 1
+                except Exception as e:
+                    logger.warning(f"Failed to fetch disk I/O from node {node}: {e}")
+                    continue
+
+            if disk_node_count > 0:
+                # Convert KiB/s to MB/s
+                read_mbps = round(total_read_kbps / 1024, 2)
+                write_mbps = round(total_write_kbps / 1024, 2)
+                metrics['disk_io'] = {
+                    'read_mbps': read_mbps,
+                    'write_mbps': write_mbps,
+                    'total_mbps': round(read_mbps + write_mbps, 2),
+                    'description': 'Disk I/O'
+                }
+        except Exception as e:
+            logger.warning(f"Failed to fetch disk I/O metrics: {e}")
+            metrics['disk_io'] = None
+
+        # Get uptime from the first reachable node (representative of cluster)
+        try:
+            max_uptime_seconds = 0
+            min_uptime_seconds = float('inf')
+
+            for node in netdata_hosts:
+                try:
+                    uptime_response = requests.get(
+                        f"{netdata_url}/api/v1/data",
+                        params={'chart': 'system.uptime', 'node': node, 'points': 1, 'after': -10},
+                        timeout=timeout
+                    )
+
+                    if uptime_response.status_code == 200:
+                        uptime_data = uptime_response.json()
+                        if 'data' in uptime_data and len(uptime_data['data']) > 0:
+                            latest = uptime_data['data'][0]
+                            if len(latest) >= 2:
+                                node_uptime = latest[1] if isinstance(latest[1], (int, float)) else 0
+                                max_uptime_seconds = max(max_uptime_seconds, node_uptime)
+                                min_uptime_seconds = min(min_uptime_seconds, node_uptime)
+                except Exception as e:
+                    logger.warning(f"Failed to fetch uptime from node {node}: {e}")
+                    continue
+
+            if max_uptime_seconds > 0:
+                # Use minimum uptime (most recent reboot) for cluster uptime
+                uptime_seconds = min_uptime_seconds if min_uptime_seconds != float('inf') else max_uptime_seconds
+                # Convert to days, hours, minutes
+                days = int(uptime_seconds // 86400)
+                hours = int((uptime_seconds % 86400) // 3600)
+                minutes = int((uptime_seconds % 3600) // 60)
+
+                if days > 0:
+                    uptime_str = f"{days}d {hours}h"
+                elif hours > 0:
+                    uptime_str = f"{hours}h {minutes}m"
+                else:
+                    uptime_str = f"{minutes}m"
+
+                metrics['uptime'] = {
+                    'seconds': int(uptime_seconds),
+                    'formatted': uptime_str,
+                    'days': days,
+                    'description': 'Cluster Uptime'
+                }
+        except Exception as e:
+            logger.warning(f"Failed to fetch uptime metrics: {e}")
+            metrics['uptime'] = None
+
+        # Get CPU temperature aggregated across nodes
+        try:
+            temps = []
+            for node in netdata_hosts:
+                try:
+                    # Try different sensor chart names common on Intel systems
+                    for chart_name in ['sensors.coretemp_isa_0000_temperature', 'sensors.coretemp-isa-0000_temperature']:
+                        temp_response = requests.get(
+                            f"{netdata_url}/api/v1/data",
+                            params={'chart': chart_name, 'node': node, 'points': 1, 'after': -10},
+                            timeout=timeout
+                        )
+
+                        if temp_response.status_code == 200:
+                            temp_data = temp_response.json()
+                            if 'data' in temp_data and len(temp_data['data']) > 0:
+                                latest = temp_data['data'][0]
+                                # Temperature data: [time, temp1, temp2, ...] - get max core temp
+                                core_temps = [v for v in latest[1:] if isinstance(v, (int, float))]
+                                if core_temps:
+                                    temps.append(max(core_temps))
+                                    break
+                except Exception as e:
+                    logger.warning(f"Failed to fetch temperature from node {node}: {e}")
+                    continue
+
+            if temps:
+                avg_temp = round(sum(temps) / len(temps), 1)
+                max_temp = round(max(temps), 1)
+                metrics['temperature'] = {
+                    'avg_celsius': avg_temp,
+                    'max_celsius': max_temp,
+                    'node_count': len(temps),
+                    'description': 'CPU Temperature'
+                }
+        except Exception as e:
+            logger.warning(f"Failed to fetch temperature metrics: {e}")
+            metrics['temperature'] = None
+
+        # Get deployment status from k8s_state collector
+        try:
+            deployments_response = requests.get(
+                f"{netdata_url}/api/v2/data",
+                params={
+                    'contexts': 'k8s_state.deployment_replicas_ready',
+                    'points': 1
+                },
+                timeout=timeout
+            )
+
+            if deployments_response.status_code == 200:
+                deploy_data = deployments_response.json()
+                # Count deployments and check their status
+                total_deployments = 0
+                healthy_deployments = 0
+
+                if 'summary' in deploy_data and 'instances' in deploy_data['summary']:
+                    for instance in deploy_data['summary']['instances']:
+                        total_deployments += 1
+                        # If ready replicas > 0, consider it healthy
+                        if 'sts' in instance and 'avg' in instance['sts']:
+                            if instance['sts']['avg'] > 0:
+                                healthy_deployments += 1
+
+                metrics['deployments'] = {
+                    'total': total_deployments,
+                    'healthy': healthy_deployments,
+                    'description': 'Deployments'
+                }
+            else:
+                logger.warning(f"Deployments API returned status {deployments_response.status_code}")
+        except Exception as e:
+            logger.warning(f"Failed to fetch deployment metrics: {e}")
+            metrics['deployments'] = None
+
         cache.set('netdata_metrics', metrics, 1)
 
         return JsonResponse(metrics)
@@ -410,6 +582,10 @@ def get_netdata_metrics(request):
             'memory': None,
             'pods': None,
             'network': None,
+            'disk_io': None,
+            'uptime': None,
+            'temperature': None,
+            'deployments': None,
             'status': 'unavailable',
             'error': 'Unable to connect to monitoring service'
         })
@@ -420,6 +596,10 @@ def get_netdata_metrics(request):
             'memory': None,
             'pods': None,
             'network': None,
+            'disk_io': None,
+            'uptime': None,
+            'temperature': None,
+            'deployments': None,
             'status': 'error',
             'error': 'Internal error'
         })
