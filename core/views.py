@@ -434,7 +434,7 @@ def get_netdata_metrics(request):
                     'read_mbps': read_mbps,
                     'write_mbps': write_mbps,
                     'total_mbps': round(read_mbps + write_mbps, 2),
-                    'description': 'Disk I/O'
+                    'description': 'Disk Utilization'
                 }
         except Exception as e:
             logger.warning(f"Failed to fetch disk I/O metrics: {e}")
@@ -484,7 +484,7 @@ def get_netdata_metrics(request):
                     'seconds': int(uptime_seconds),
                     'formatted': uptime_str,
                     'days': days,
-                    'description': 'Cluster Uptime'
+                    'description': 'Uptime'
                 }
         except Exception as e:
             logger.warning(f"Failed to fetch uptime metrics: {e}")
