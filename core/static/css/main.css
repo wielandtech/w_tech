@@ -391,6 +391,49 @@ ul {
   text-align: center;
 }
 
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  max-width: 1200px;
+  margin: 0 auto;
+  gap: 10px;
+}
+
+.footer-content h3 {
+  margin: 0;
+}
+
+.footer-weather {
+  font-size: 0.9em;
+  opacity: 0.9;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.weather-icon {
+  font-size: 1.2em;
+}
+
+.weather-location {
+  font-size: 0.85em;
+  opacity: 0.8;
+  margin-left: 5px;
+}
+
+@media screen and (max-width: 600px) {
+  .footer-content {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .footer-weather {
+    margin-top: 10px;
+  }
+}
+
 /* Update theme switch styles for better visibility */
 .theme-switch-wrapper {
   display: flex;

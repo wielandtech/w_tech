@@ -656,3 +656,60 @@ def get_netdata_metrics(request):
             'status': 'error',
             'error': 'Internal error'
         })
+
+
+def get_weather_data(request):
+    """
+    Fetch weather temperature from Prometheus (Home Assistant metrics).
+    Queries the Norton Shores weather station temperature sensor.
+    Implements caching to reduce API calls (1 minute TTL).
+    """
+    cached_weather = cache.get('weather_data')
+    if cached_weather:
+        cached_weather['cache_hit'] = True
+        return JsonResponse(cached_weather)
+
+    try:
+        prometheus_url = "http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090"
+        query = 'homeassistant_sensor_temperature_celsius{entity="sensor.norton_shores_weather_station_temperature"}'
+        timeout = 5
+
+        response = requests.get(
+            f"{prometheus_url}/api/v1/query",
+            params={'query': query},
+            timeout=timeout
+        )
+
+        if response.status_code == 200:
+            data = response.json()
+            if data.get('status') == 'success' and data.get('data', {}).get('result'):
+                temp_celsius = float(data['data']['result'][0]['value'][1])
+                temp_fahrenheit = round((temp_celsius * 9/5) + 32, 1)
+
+                weather = {
+                    'temperature_c': round(temp_celsius, 1),
+                    'temperature_f': temp_fahrenheit,
+                    'location': 'Norton Shores, MI',
+                    'status': 'ok',
+                    'cache_hit': False
+                }
+                cache.set('weather_data', weather, 60)  # 1 minute cache
+                return JsonResponse(weather)
+            else:
+                logger.warning("No weather data found in Prometheus response")
+                return JsonResponse({'status': 'error', 'error': 'No data available'})
+        else:
+            logger.warning(f"Prometheus weather query returned status {response.status_code}")
+            return JsonResponse({'status': 'error', 'error': f'Prometheus returned {response.status_code}'})
+
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Failed to connect to Prometheus for weather data: {e}")
+        # Try to return cached data even if expired
+        cached_weather = cache.get('weather_data_backup')
+        if cached_weather:
+            cached_weather['status'] = 'cached'
+            return JsonResponse(cached_weather)
+        return JsonResponse({'status': 'error', 'error': 'Unable to connect to monitoring service'})
+    except Exception as e:
+        logger.error(f"Unexpected error fetching weather data: {e}")
+        return JsonResponse({'status': 'error', 'error': 'Internal error'})
