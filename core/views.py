@@ -283,7 +283,7 @@ def get_netdata_metrics(request):
                     'total_gb': memory_total_gb,
                     'used_gb': memory_used_gb,
                     'percentage': memory_percentage,
-                    'description': 'Cluster Memory'
+                    'description': 'Memory Utilization'
                 }
             else:
                 metrics['memory'] = {
@@ -382,7 +382,7 @@ def get_netdata_metrics(request):
                         'bandwidth_mbps': round(received_mbps + sent_mbps, 2),
                         'received_mbps': received_mbps,
                         'sent_mbps': sent_mbps,
-                        'description': 'Cluster Network'
+                        'description': 'Network Utilization'
                     }
                 else:
                     metrics['network'] = None
