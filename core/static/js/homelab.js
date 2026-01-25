@@ -100,7 +100,7 @@ function fetchMetrics() {
                     <div class="metric-card">
                         <div class="metric-label">${data.uptime.description}</div>
                         <div class="metric-value">${data.uptime.formatted}</div>
-                        <div class="metric-detail">${data.uptime.days} days continuous</div>
+                        <div class="metric-detail">since last reboot</div>
                     </div>
                 `;
             }
@@ -112,7 +112,7 @@ function fetchMetrics() {
                     <div class="metric-card">
                         <div class="metric-label">${data.temperature.description}</div>
                         <div class="metric-value ${tempClass}">${data.temperature.avg_celsius}°C</div>
-                        <div class="metric-detail">max ${data.temperature.max_celsius}°C across ${data.temperature.node_count} nodes</div>
+                        <div class="metric-detail">peak ${data.temperature.max_celsius}°C</div>
                     </div>
                 `;
             }
@@ -120,11 +120,12 @@ function fetchMetrics() {
             // Deployments Card
             if (data.deployments !== null) {
                 const deployClass = data.deployments.healthy < data.deployments.total ? 'warning' : '';
+                const deployDetail = data.deployments.healthy === data.deployments.total ? 'all healthy' : `${data.deployments.total - data.deployments.healthy} unhealthy`;
                 html += `
                     <div class="metric-card">
                         <div class="metric-label">${data.deployments.description}</div>
                         <div class="metric-value ${deployClass}">${data.deployments.healthy}/${data.deployments.total}</div>
-                        <div class="metric-detail">healthy deployments</div>
+                        <div class="metric-detail">${deployDetail}</div>
                     </div>
                 `;
             }
