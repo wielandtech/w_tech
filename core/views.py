@@ -848,19 +848,24 @@ def get_weather_history(request):
     """
     period = request.GET.get('period', '24h')
     
-    # Calculate time range
+    # Calculate time range and step (Prometheus accepts step as integer seconds)
+    # Use last_over_time to fill gaps when metric is sparse (e.g. station offline)
     if period == '7d':
         duration = 7 * 24 * 60 * 60  # 7 days in seconds
-        step = '1h'  # 1 hour resolution for 7 days
+        step = 3600  # 1 hour resolution for 7 days
+        step_duration = '1h'
     elif period == '30d':
         duration = 30 * 24 * 60 * 60  # 30 days in seconds
-        step = '4h'  # 4 hour resolution for 30 days
+        step = 14400  # 4 hour resolution for 30 days
+        step_duration = '4h'
     elif period == '365d':
         duration = 365 * 24 * 60 * 60  # 365 days in seconds
-        step = '24h'  # 1 day resolution for 1 year
+        step = 86400  # 24 hour resolution for 1 year
+        step_duration = '24h'
     else:
         duration = 24 * 60 * 60  # 24 hours in seconds
-        step = '5m'  # 5 minute resolution for 24 hours
+        step = 300  # 5 minute resolution for 24 hours
+        step_duration = '5m'
     
     import time
     end_time = int(time.time())
@@ -881,8 +886,9 @@ def get_weather_history(request):
             'status': 'ok'
         }
         
-        # Query temperature history
-        temp_query = 'homeassistant_sensor_temperature_celsius{entity="sensor.norton_shores_weather_station_temperature"}'
+        # Query temperature history (last_over_time fills gaps when metric is sparse)
+        temp_base = 'homeassistant_sensor_temperature_celsius{entity="sensor.norton_shores_weather_station_temperature"}'
+        temp_query = f'last_over_time({temp_base}[{step_duration}])'
         temp_response = requests.get(
             f"{prometheus_url}/api/v1/query_range",
             params={
@@ -903,8 +909,9 @@ def get_weather_history(request):
                     for v in values
                 ]
         
-        # Query wind speed history
-        wind_query = 'homeassistant_sensor_wind_speed_mph{entity="sensor.norton_shores_weather_station_wind_speed"}'
+        # Query wind speed history (last_over_time fills gaps when metric is sparse)
+        wind_base = 'homeassistant_sensor_wind_speed_mph{entity="sensor.norton_shores_weather_station_wind_speed"}'
+        wind_query = f'last_over_time({wind_base}[{step_duration}])'
         wind_response = requests.get(
             f"{prometheus_url}/api/v1/query_range",
             params={
@@ -925,8 +932,9 @@ def get_weather_history(request):
                     for v in values
                 ]
         
-        # Query humidity history if available
-        humidity_query = 'homeassistant_sensor_humidity_percent{entity=~"sensor.norton_shores.*humidity.*"}'
+        # Query humidity history if available (last_over_time fills gaps)
+        humidity_base = 'homeassistant_sensor_humidity_percent{entity=~"sensor.norton_shores.*humidity.*"}'
+        humidity_query = f'last_over_time({humidity_base}[{step_duration}])'
         humidity_response = requests.get(
             f"{prometheus_url}/api/v1/query_range",
             params={
@@ -947,8 +955,9 @@ def get_weather_history(request):
                     for v in values
                 ]
         
-        # Query pressure history if available
-        pressure_query = 'homeassistant_sensor_pressure_hpa{entity=~"sensor.norton_shores.*pressure.*"}'
+        # Query pressure history if available (last_over_time fills gaps)
+        pressure_base = 'homeassistant_sensor_pressure_hpa{entity=~"sensor.norton_shores.*pressure.*"}'
+        pressure_query = f'last_over_time({pressure_base}[{step_duration}])'
         pressure_response = requests.get(
             f"{prometheus_url}/api/v1/query_range",
             params={
