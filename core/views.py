@@ -843,7 +843,7 @@ def weather(request):
 def get_weather_history(request):
     """
     Fetch historical weather data from Prometheus for charting.
-    Accepts 'period' parameter: '24h' (default) or '7d'.
+    Accepts 'period' parameter: '24h' (default), '7d', '30d', or '365d'.
     Returns time-series data for temperature and wind speed.
     """
     period = request.GET.get('period', '24h')
@@ -852,6 +852,12 @@ def get_weather_history(request):
     if period == '7d':
         duration = 7 * 24 * 60 * 60  # 7 days in seconds
         step = '1h'  # 1 hour resolution for 7 days
+    elif period == '30d':
+        duration = 30 * 24 * 60 * 60  # 30 days in seconds
+        step = '4h'  # 4 hour resolution for 30 days
+    elif period == '365d':
+        duration = 365 * 24 * 60 * 60  # 365 days in seconds
+        step = '24h'  # 1 day resolution for 1 year
     else:
         duration = 24 * 60 * 60  # 24 hours in seconds
         step = '5m'  # 5 minute resolution for 24 hours

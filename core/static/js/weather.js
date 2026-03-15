@@ -257,10 +257,12 @@ function renderTemperatureChart(data, period) {
                 x: {
                     ...getChartOptions('Temperature (°F)').scales.x,
                     time: {
-                        unit: period === '7d' ? 'day' : 'hour',
+                        unit: period === '365d' ? 'month' : (period === '7d' || period === '30d') ? 'day' : 'hour',
                         displayFormats: {
                             hour: 'ha',
-                            day: 'MMM d'
+                            day: 'MMM d',
+                            week: 'MMM d',
+                            month: 'MMM yyyy'
                         }
                     }
                 }
@@ -308,10 +310,12 @@ function renderWindChart(data, period) {
                 x: {
                     ...getChartOptions('Wind Speed (mph)').scales.x,
                     time: {
-                        unit: period === '7d' ? 'day' : 'hour',
+                        unit: period === '365d' ? 'month' : (period === '7d' || period === '30d') ? 'day' : 'hour',
                         displayFormats: {
                             hour: 'ha',
-                            day: 'MMM d'
+                            day: 'MMM d',
+                            week: 'MMM d',
+                            month: 'MMM yyyy'
                         }
                     }
                 },
