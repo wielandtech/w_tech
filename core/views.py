@@ -872,6 +872,8 @@ def get_weather_history(request):
         
         history = {
             'period': period,
+            'start_time': start_time,
+            'end_time': end_time,
             'temperature': [],
             'wind_speed': [],
             'humidity': [],

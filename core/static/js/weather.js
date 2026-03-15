@@ -210,8 +210,8 @@ function fetchHistoricalData(period) {
                 return;
             }
             
-            renderTemperatureChart(data.temperature, period);
-            renderWindChart(data.wind_speed, period);
+            renderTemperatureChart(data.temperature, period, data.start_time, data.end_time);
+            renderWindChart(data.wind_speed, period, data.start_time, data.end_time);
         })
         .catch(error => {
             console.error('Error fetching historical data:', error);
@@ -219,7 +219,7 @@ function fetchHistoricalData(period) {
 }
 
 // Render temperature chart
-function renderTemperatureChart(data, period) {
+function renderTemperatureChart(data, period, startTime, endTime) {
     const ctx = document.getElementById('temperature-chart');
     if (!ctx) return;
     
@@ -256,6 +256,8 @@ function renderTemperatureChart(data, period) {
                 ...getChartOptions('Temperature (°F)').scales,
                 x: {
                     ...getChartOptions('Temperature (°F)').scales.x,
+                    min: startTime && endTime ? startTime * 1000 : undefined,
+                    max: startTime && endTime ? endTime * 1000 : undefined,
                     time: {
                         unit: period === '365d' ? 'month' : (period === '7d' || period === '30d') ? 'day' : 'hour',
                         displayFormats: {
@@ -272,7 +274,7 @@ function renderTemperatureChart(data, period) {
 }
 
 // Render wind speed chart
-function renderWindChart(data, period) {
+function renderWindChart(data, period, startTime, endTime) {
     const ctx = document.getElementById('wind-chart');
     if (!ctx) return;
     
@@ -309,6 +311,8 @@ function renderWindChart(data, period) {
                 ...getChartOptions('Wind Speed (mph)').scales,
                 x: {
                     ...getChartOptions('Wind Speed (mph)').scales.x,
+                    min: startTime && endTime ? startTime * 1000 : undefined,
+                    max: startTime && endTime ? endTime * 1000 : undefined,
                     time: {
                         unit: period === '365d' ? 'month' : (period === '7d' || period === '30d') ? 'day' : 'hour',
                         displayFormats: {
