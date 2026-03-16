@@ -879,7 +879,7 @@ def get_weather_history(request):
     end_time = int(time.time())
     
     prometheus_url = "http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090"
-    timeout = 30 if period in ('30d', '365d') else 10
+    timeout = 60 if period == '365d' else (30 if period == '30d' else 10)
     
     history = {
         'period': period,
@@ -952,15 +952,15 @@ def get_weather_history(request):
             history['pressure'] = _merge_dedupe_points(pressure_chunks)
             
         elif period == '365d':
-            # Chunk into 12 x ~30-day queries (Prometheus truncates single long-range query)
+            # Chunk into 26 x 14-day queries (small enough to avoid Prometheus truncation)
             duration = 365 * 24 * 60 * 60
             start_time = end_time - duration
             history['start_time'] = start_time
-            chunk_days = 31
+            chunk_days = 14
             chunk_sec = chunk_days * 24 * 60 * 60
-            step = '6h'  # ~124 points per chunk
+            step = '6h'  # ~56 points per chunk
             temp_chunks, wind_chunks, humidity_chunks, pressure_chunks = [], [], [], []
-            for i in range(12):
+            for i in range(26):
                 c_start = start_time + i * chunk_sec
                 c_end = min(c_start + chunk_sec, end_time)
                 temp_chunks.append(_query_prometheus_range(
