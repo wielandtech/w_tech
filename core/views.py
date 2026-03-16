@@ -840,136 +840,155 @@ def weather(request):
     return render(request, 'core/weather.html')
 
 
+def _query_prometheus_range(prometheus_url, query, start_time, end_time, step, timeout):
+    """Query Prometheus query_range and return list of {time, value} dicts."""
+    response = requests.get(
+        f"{prometheus_url}/api/v1/query_range",
+        params={'query': query, 'start': start_time, 'end': end_time, 'step': step},
+        timeout=timeout
+    )
+    if response.status_code != 200:
+        return []
+    data = response.json()
+    if data.get('status') != 'success' or not data.get('data', {}).get('result'):
+        return []
+    values = data['data']['result'][0].get('values', [])
+    return [{'time': int(v[0]), 'value': round(float(v[1]), 1)} for v in values]
+
+
+def _merge_dedupe_points(points_list):
+    """Merge multiple point lists and deduplicate by timestamp."""
+    seen = set()
+    merged = []
+    for points in points_list:
+        for p in points:
+            if p['time'] not in seen:
+                seen.add(p['time'])
+                merged.append(p)
+    return sorted(merged, key=lambda x: x['time'])
+
+
 def get_weather_history(request):
     """
     Fetch historical weather data from Prometheus for charting.
     Accepts 'period' parameter: '24h' (default), '7d', '30d', or '365d'.
-    Returns time-series data for temperature and wind speed.
+    For 30d and 365d, uses chunked queries (Prometheus truncates long ranges).
     """
     period = request.GET.get('period', '24h')
-    
-    # Calculate time range and step
-    # Use coarser steps for 30d/365d to stay under potential Prometheus/grafana limits
-    # and ensure full range is returned (not truncated to first ~7 days)
-    if period == '7d':
-        duration = 7 * 24 * 60 * 60  # 7 days in seconds
-        step = '1h'  # 1 hour resolution for 7 days
-    elif period == '30d':
-        duration = 30 * 24 * 60 * 60  # 30 days in seconds
-        step = '12h'  # 12 hour resolution for 30 days (~60 points)
-    elif period == '365d':
-        duration = 365 * 24 * 60 * 60  # 365 days in seconds
-        step = '7d'  # 1 week resolution for 1 year (~52 points)
-    else:
-        duration = 24 * 60 * 60  # 24 hours in seconds
-        step = '5m'  # 5 minute resolution for 24 hours
-    
     import time
     end_time = int(time.time())
-    start_time = end_time - duration
+    
+    prometheus_url = "http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090"
+    timeout = 30 if period in ('30d', '365d') else 10
+    
+    history = {
+        'period': period,
+        'start_time': None,
+        'end_time': end_time,
+        'temperature': [],
+        'wind_speed': [],
+        'humidity': [],
+        'pressure': [],
+        'status': 'ok'
+    }
+    
+    temp_query = 'homeassistant_sensor_temperature_celsius{entity="sensor.norton_shores_weather_station_temperature"}'
+    wind_query = 'homeassistant_sensor_wind_speed_mph{entity="sensor.norton_shores_weather_station_wind_speed"}'
+    humidity_query = 'homeassistant_sensor_humidity_percent{entity=~"sensor.norton_shores.*humidity.*"}'
+    pressure_query = 'homeassistant_sensor_pressure_hpa{entity=~"sensor.norton_shores.*pressure.*"}'
     
     try:
-        prometheus_url = "http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090"
-        timeout = 30 if period in ('30d', '365d') else 10
-        
-        history = {
-            'period': period,
-            'start_time': start_time,
-            'end_time': end_time,
-            'temperature': [],
-            'wind_speed': [],
-            'humidity': [],
-            'pressure': [],
-            'status': 'ok'
-        }
-        
-        # Query temperature history
-        temp_query = 'homeassistant_sensor_temperature_celsius{entity="sensor.norton_shores_weather_station_temperature"}'
-        temp_response = requests.get(
-            f"{prometheus_url}/api/v1/query_range",
-            params={
-                'query': temp_query,
-                'start': start_time,
-                'end': end_time,
-                'step': step
-            },
-            timeout=timeout
-        )
-        
-        if temp_response.status_code == 200:
-            data = temp_response.json()
-            if data.get('status') == 'success' and data.get('data', {}).get('result'):
-                values = data['data']['result'][0].get('values', [])
-                history['temperature'] = [
-                    {'time': int(v[0]), 'value': round(float(v[1]), 1)}
-                    for v in values
-                ]
-        
-        # Query wind speed history
-        wind_query = 'homeassistant_sensor_wind_speed_mph{entity="sensor.norton_shores_weather_station_wind_speed"}'
-        wind_response = requests.get(
-            f"{prometheus_url}/api/v1/query_range",
-            params={
-                'query': wind_query,
-                'start': start_time,
-                'end': end_time,
-                'step': step
-            },
-            timeout=timeout
-        )
-        
-        if wind_response.status_code == 200:
-            data = wind_response.json()
-            if data.get('status') == 'success' and data.get('data', {}).get('result'):
-                values = data['data']['result'][0].get('values', [])
-                history['wind_speed'] = [
-                    {'time': int(v[0]), 'value': round(float(v[1]), 1)}
-                    for v in values
-                ]
-        
-        # Query humidity history if available
-        humidity_query = 'homeassistant_sensor_humidity_percent{entity=~"sensor.norton_shores.*humidity.*"}'
-        humidity_response = requests.get(
-            f"{prometheus_url}/api/v1/query_range",
-            params={
-                'query': humidity_query,
-                'start': start_time,
-                'end': end_time,
-                'step': step
-            },
-            timeout=timeout
-        )
-        
-        if humidity_response.status_code == 200:
-            data = humidity_response.json()
-            if data.get('status') == 'success' and data.get('data', {}).get('result'):
-                values = data['data']['result'][0].get('values', [])
-                history['humidity'] = [
-                    {'time': int(v[0]), 'value': round(float(v[1]), 1)}
-                    for v in values
-                ]
-        
-        # Query pressure history if available
-        pressure_query = 'homeassistant_sensor_pressure_hpa{entity=~"sensor.norton_shores.*pressure.*"}'
-        pressure_response = requests.get(
-            f"{prometheus_url}/api/v1/query_range",
-            params={
-                'query': pressure_query,
-                'start': start_time,
-                'end': end_time,
-                'step': step
-            },
-            timeout=timeout
-        )
-        
-        if pressure_response.status_code == 200:
-            data = pressure_response.json()
-            if data.get('status') == 'success' and data.get('data', {}).get('result'):
-                values = data['data']['result'][0].get('values', [])
-                history['pressure'] = [
-                    {'time': int(v[0]), 'value': round(float(v[1]), 1)}
-                    for v in values
-                ]
+        if period == '24h':
+            duration = 24 * 60 * 60
+            start_time = end_time - duration
+            step = '5m'
+            history['start_time'] = start_time
+            history['temperature'] = _query_prometheus_range(
+                prometheus_url, temp_query, start_time, end_time, step, timeout)
+            history['wind_speed'] = _query_prometheus_range(
+                prometheus_url, wind_query, start_time, end_time, step, timeout)
+            history['humidity'] = _query_prometheus_range(
+                prometheus_url, humidity_query, start_time, end_time, step, timeout)
+            history['pressure'] = _query_prometheus_range(
+                prometheus_url, pressure_query, start_time, end_time, step, timeout)
+            
+        elif period == '7d':
+            duration = 7 * 24 * 60 * 60
+            start_time = end_time - duration
+            step = '1h'
+            history['start_time'] = start_time
+            history['temperature'] = _query_prometheus_range(
+                prometheus_url, temp_query, start_time, end_time, step, timeout)
+            history['wind_speed'] = _query_prometheus_range(
+                prometheus_url, wind_query, start_time, end_time, step, timeout)
+            history['humidity'] = _query_prometheus_range(
+                prometheus_url, humidity_query, start_time, end_time, step, timeout)
+            history['pressure'] = _query_prometheus_range(
+                prometheus_url, pressure_query, start_time, end_time, step, timeout)
+            
+        elif period == '30d':
+            # Chunk into 5 x 6-day queries (Prometheus truncates single long-range query)
+            duration = 30 * 24 * 60 * 60
+            start_time = end_time - duration
+            history['start_time'] = start_time
+            chunk_days = 6
+            chunk_sec = chunk_days * 24 * 60 * 60
+            step = '1h'
+            temp_chunks, wind_chunks, humidity_chunks, pressure_chunks = [], [], [], []
+            for i in range(5):
+                c_start = start_time + i * chunk_sec
+                c_end = min(c_start + chunk_sec, end_time)
+                temp_chunks.append(_query_prometheus_range(
+                    prometheus_url, temp_query, c_start, c_end, step, timeout))
+                wind_chunks.append(_query_prometheus_range(
+                    prometheus_url, wind_query, c_start, c_end, step, timeout))
+                humidity_chunks.append(_query_prometheus_range(
+                    prometheus_url, humidity_query, c_start, c_end, step, timeout))
+                pressure_chunks.append(_query_prometheus_range(
+                    prometheus_url, pressure_query, c_start, c_end, step, timeout))
+            history['temperature'] = _merge_dedupe_points(temp_chunks)
+            history['wind_speed'] = _merge_dedupe_points(wind_chunks)
+            history['humidity'] = _merge_dedupe_points(humidity_chunks)
+            history['pressure'] = _merge_dedupe_points(pressure_chunks)
+            
+        elif period == '365d':
+            # Chunk into 12 x ~30-day queries (Prometheus truncates single long-range query)
+            duration = 365 * 24 * 60 * 60
+            start_time = end_time - duration
+            history['start_time'] = start_time
+            chunk_days = 31
+            chunk_sec = chunk_days * 24 * 60 * 60
+            step = '6h'  # ~124 points per chunk
+            temp_chunks, wind_chunks, humidity_chunks, pressure_chunks = [], [], [], []
+            for i in range(12):
+                c_start = start_time + i * chunk_sec
+                c_end = min(c_start + chunk_sec, end_time)
+                temp_chunks.append(_query_prometheus_range(
+                    prometheus_url, temp_query, c_start, c_end, step, timeout))
+                wind_chunks.append(_query_prometheus_range(
+                    prometheus_url, wind_query, c_start, c_end, step, timeout))
+                humidity_chunks.append(_query_prometheus_range(
+                    prometheus_url, humidity_query, c_start, c_end, step, timeout))
+                pressure_chunks.append(_query_prometheus_range(
+                    prometheus_url, pressure_query, c_start, c_end, step, timeout))
+            history['temperature'] = _merge_dedupe_points(temp_chunks)
+            history['wind_speed'] = _merge_dedupe_points(wind_chunks)
+            history['humidity'] = _merge_dedupe_points(humidity_chunks)
+            history['pressure'] = _merge_dedupe_points(pressure_chunks)
+            
+        else:
+            duration = 24 * 60 * 60
+            start_time = end_time - duration
+            history['start_time'] = start_time
+            step = '5m'
+            history['temperature'] = _query_prometheus_range(
+                prometheus_url, temp_query, start_time, end_time, step, timeout)
+            history['wind_speed'] = _query_prometheus_range(
+                prometheus_url, wind_query, start_time, end_time, step, timeout)
+            history['humidity'] = _query_prometheus_range(
+                prometheus_url, humidity_query, start_time, end_time, step, timeout)
+            history['pressure'] = _query_prometheus_range(
+                prometheus_url, pressure_query, start_time, end_time, step, timeout)
         
         return JsonResponse(history)
         
