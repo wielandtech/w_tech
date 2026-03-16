@@ -111,6 +111,7 @@
 
 .condition-card.primary {
     grid-column: span 2;
+    margin: 0;  /* Override global .primary margin-top from main.css */
 }
 
 .condition-icon {
