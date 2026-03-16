@@ -849,15 +849,17 @@ def get_weather_history(request):
     period = request.GET.get('period', '24h')
     
     # Calculate time range and step
+    # Use coarser steps for 30d/365d to stay under potential Prometheus/grafana limits
+    # and ensure full range is returned (not truncated to first ~7 days)
     if period == '7d':
         duration = 7 * 24 * 60 * 60  # 7 days in seconds
         step = '1h'  # 1 hour resolution for 7 days
     elif period == '30d':
         duration = 30 * 24 * 60 * 60  # 30 days in seconds
-        step = '4h'  # 4 hour resolution for 30 days
+        step = '12h'  # 12 hour resolution for 30 days (~60 points)
     elif period == '365d':
         duration = 365 * 24 * 60 * 60  # 365 days in seconds
-        step = '24h'  # 1 day resolution for 1 year
+        step = '7d'  # 1 week resolution for 1 year (~52 points)
     else:
         duration = 24 * 60 * 60  # 24 hours in seconds
         step = '5m'  # 5 minute resolution for 24 hours
@@ -868,7 +870,7 @@ def get_weather_history(request):
     
     try:
         prometheus_url = "http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090"
-        timeout = 10
+        timeout = 30 if period in ('30d', '365d') else 10
         
         history = {
             'period': period,
