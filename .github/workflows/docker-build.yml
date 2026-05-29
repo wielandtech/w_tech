@@ -2,9 +2,14 @@ name: Build and Push Docker Image
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - "**"
   pull_request:
     branches: [ main ]
+
+permissions:
+  contents: read
+  packages: write
 
 jobs:
   build:
@@ -36,10 +41,15 @@ jobs:
         echo "ref=${{ github.ref }}" >> $GITHUB_OUTPUT
         if [ "${{ github.event_name }}" == "push" ] && [ "${{ github.ref }}" == "refs/heads/main" ]; then
           VERSIONED_TAG="ghcr.io/wielandtech/w_tech:${DATE}-${TIME}-${SHA}"
+          echo "release_tag=${DATE}-${TIME}-${SHA}" >> $GITHUB_OUTPUT
           echo "versioned_tag=${VERSIONED_TAG}" >> $GITHUB_OUTPUT
           echo "Created versioned tag: ${VERSIONED_TAG}"
+        elif [ "${{ github.event_name }}" == "push" ]; then
+          DEV_TAG="ghcr.io/wielandtech/w_tech:dev-${DATE}-${TIME}-${SHA}"
+          echo "dev_tag=dev-${DATE}-${TIME}-${SHA}" >> $GITHUB_OUTPUT
+          echo "Created dev tag: ${DEV_TAG}"
         else
-          echo "Skipping versioned tag (not a push to main)"
+          echo "Skipping registry promotion tag (not a push event)"
         fi
     
     - name: Extract metadata
@@ -52,7 +62,8 @@ jobs:
           type=ref,event=pr
           type=sha,prefix={{branch}}-
           type=raw,value=latest,enable={{is_default_branch}}
-          type=raw,value=${{ steps.vars.outputs.date }}-${{ steps.vars.outputs.time }}-${{ steps.vars.outputs.sha }},enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          type=raw,value=${{ steps.vars.outputs.release_tag }},enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          type=raw,value=${{ steps.vars.outputs.dev_tag }},enable=${{ github.event_name == 'push' && github.ref != 'refs/heads/main' }}
     
     - name: Build and push Docker image
       uses: docker/build-push-action@v5

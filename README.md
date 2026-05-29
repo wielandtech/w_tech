@@ -86,6 +86,16 @@ w_tech/
 
 ## 🚀 Getting Started
 
+## 🐳 Container Images
+
+GitHub Actions builds the Docker image with repo-scoped homelab runners.
+
+- Pushes to `main` publish production tags like `20260529-143000-abc1234`.
+- Pushes to non-main branches publish shared dev tags like `dev-20260529-143000-abc1234`.
+- Pull requests build the image for validation but do not push to GHCR.
+
+The homelab Flux Image Automation watches the `dev-*` tags for the shared `website-dev` environment.
+
 1. Clone repository:
 ```bash
 git clone https://github.com/wielandtech/w_tech.git
