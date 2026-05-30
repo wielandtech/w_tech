@@ -21,6 +21,7 @@ ALLOWED_HOSTS = [
     "www.wielandtech.com",
     "dev.wielandtech.com",
     "qa.wielandtech.com",
+    ".review.wielandtech.com",
     "wielandtech.k8s.local",
     "dev.wielandtech.k8s.local",
     "qa.wielandtech.k8s.local",
@@ -39,6 +40,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://dev.wielandtech.com",
     "http://qa.wielandtech.com",
     "https://qa.wielandtech.com",
+    "https://*.review.wielandtech.com",
     "http://dev.wielandtech.k8s.local",
     "https://dev.wielandtech.k8s.local",
     "http://qa.wielandtech.k8s.local",
@@ -111,16 +113,24 @@ TEMPLATES = [
 WSGI_APPLICATION = 'wielandtech.wsgi.application'
 
 # Database
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv("DATABASE_NAME", "app_db"),
-        'USER': os.getenv("DATABASE_USER", "app_user"),
-        'PASSWORD': os.getenv("DATABASE_PASSWORD"),
-        'HOST': os.getenv("DATABASE_HOST", "db"),
-        'PORT': os.getenv("DATABASE_PORT", "5432"),
+if os.getenv("DATABASE_ENGINE") == "sqlite":
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.getenv("DATABASE_NAME", str(BASE_DIR / "db.sqlite3")),
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv("DATABASE_NAME", "app_db"),
+            'USER': os.getenv("DATABASE_USER", "app_user"),
+            'PASSWORD': os.getenv("DATABASE_PASSWORD"),
+            'HOST': os.getenv("DATABASE_HOST", "db"),
+            'PORT': os.getenv("DATABASE_PORT", "5432"),
+        }
+    }
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
